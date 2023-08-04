@@ -1,0 +1,138 @@
+#%RAML 1.0 ResourceType
+#
+# see:
+#  https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/#resource-types-and-traits
+
+usage: This resource type should be used for any collection of items.
+displayName: <<resourcePathName>>
+description: >
+  The endpoint responsible for interacting with and managing
+  **<<resourcePathName>>** resources.
+
+get:
+  description: >
+    Retrieve all **<<resourcePathName>>** resources in an unspecified
+    order in the <<collectionResource>> type.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<collectionResource>>
+
+    500:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+post?:
+  displayName: <<resourcePathName>>
+  description: |
+    Create a new <<existingResource>> from a <<newResource>> in
+    a manner which alters the collection state each time it is
+    invoked.
+    
+    Collections which enable `post` declare at least one of
+    the questions below is answered with "no":
+    
+    - Are collection items unique?
+    - Does uniqueness exist independent of service state?
+    - Does the client provide the uniqueness?
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  body:
+    application/json:
+      type: <<newResource>>
+
+  responses:
+    201:
+      headers:
+        Location:
+          description: >
+            When a <<newResource>> is successfully created, **only**
+            the location is returned.
+
+          type: URL
+
+    400:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    409:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    500:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+put?:
+  displayName: <<resourcePathName>>
+  description: |
+    Create a new <<existingResource>> from a <<newResource>> in
+    an idempotent manner.
+
+    Collections which enable `put` declare at all of the
+    questions below are answered with "yes":
+
+    - Are collection items unique?
+    - Does uniqueness exist independent of service state?
+    - Does the client provide the uniqueness?
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  body:
+    application/json:
+      type: <<newResource>>
+
+  responses:
+    201:
+      headers:
+        Location:
+          description: >
+            When a <<newResource>> is successfully created, **only**
+            the location is returned.
+
+          type: URL
+
+    400:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    409:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    500:
+      body:
+        application/problem+json:
+          type: ProblemDetails

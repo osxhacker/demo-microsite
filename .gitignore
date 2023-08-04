@@ -1,0 +1,41 @@
+# Local working files
+todo
+
+# Known temporary files
+.DS_Store
+.sass-cache/
+*~
+*.log
+*.out
+
+# IntelliJ generated artifacts
+/.bsp/
+/.idea/
+
+# Eclispe/Scala-IDE generated artifacts
+.scala_dependencies
+.cache
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+.target
+.worksheet
+bin/
+gen
+
+# SBT generated artifacts
+.sass-cache
+dist/
+lib_managed/
+project/boot/
+src_managed/
+target/
+
+# Akka persistent actor artifacts
+**/snapshots/
+
+# Specifically allow the Karaf bin directory
+!/karaf/bin/
+

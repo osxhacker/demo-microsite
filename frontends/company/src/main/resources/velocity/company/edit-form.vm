@@ -1,0 +1,129 @@
+#*
+    @(#) Company edit form Velocity template
+
+    Body: Company (RAML API)
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+#set( $status = $body.get("status").asText() )
+
+<form
+    class='edit pure-form pure-form-aligned'
+    enctype="application/x-www-form-urlencoded"
+    hx-post="/company/save"
+    hx-target="#work-area"
+    hx-swap="innerHTML"
+    >
+    <fieldset>
+        <div class='pure-control-group'>
+            <label for='id'>Id</label>
+            <span>$body.get("id").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='version'>Version</label>
+            <span>$body.get("version").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='created-on'>Created</label>
+            <span>$body.get("createdOn").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='last-changed'>Last Changed</label>
+            <span>$body.get("lastChanged").asText()</span>
+        </div>
+
+        <hr/>
+
+        <div class='pure-control-group'>
+            <label for='status'>Status</label>
+            <select id='companyStatus' name='companyStatus'>
+                <option #if( $status == "Active") selected #end>Active</option>
+                <option #if( $status == "Inactive") selected #end>Inactive</option>
+                <option #if( $status == "Suspended") selected #end>Suspended</option>
+            </select>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companySlug'>Slug</label>
+            <input
+                type='text'
+                id='companySlug'
+                name='companySlug'
+                value='$body.get("slug").asText()'
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companyName'>Name</label>
+            <input
+                type='text'
+                id='companyName'
+                name='companyName'
+                value='$body.get("name").asText()'
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companyDescription'>Description</label>
+            <textarea
+                rows=10
+                cols=40
+                maxlength=2048
+                id='companyDescription'
+                name='companyDescription'
+                >$body.get("description").asText()</textarea>
+        </div>
+
+        <input
+            type='hidden'
+            name='edit'
+            value='$body.at("/_links/edit/href").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='companyId'
+            value='$body.at("/id").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='companyVersion'
+            value='$body.at("/version").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='companyCreatedOn'
+            value='$body.at("/createdOn").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='companyLastChanged'
+            value='$body.at("/lastChanged").asText()'
+            />
+    </fieldset>
+
+    <section class="pure-button-group" role="group">
+        <button class='pure-button'
+                type='submit'
+                >
+            Save
+        </button>
+
+        <button class='pure-button'
+                hx-get='/company/view?self=$body.at("/_links/self/href").asText()'
+                hx-trigger='click'
+                hx-target='#work-area'
+                hx-swap='innerHTML'
+                >
+            Cancel
+        </button>
+    </section>
+</form>
+

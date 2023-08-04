@@ -1,0 +1,19 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: BadRequestDetails
+discriminatorValue: "/problem/bad-request"
+
+description: |
+  The **BadRequestDetails** type is a **ProblemDetails** which
+  is produced when an invalid request is submitted and cannot be accepted
+  due to either:
+  
+  - A payload which is incompatible with what is expected.
+  - A supported payload which has one or more incompatible properties.
+  - A supported payload which fails workflow validation.
+
+properties:
+  status:
+    type: integer
+    default: 400

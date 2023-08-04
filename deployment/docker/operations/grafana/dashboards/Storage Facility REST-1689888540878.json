@@ -1,0 +1,109 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "c64d9077-25d3-44db-ab79-92dd3b500660"
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "c64d9077-25d3-44db-ab79-92dd3b500660"
+          },
+          "editorMode": "code",
+          "expr": "{microservice=\"storage-facility\", subsystem=\"$subsystem\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log Entries",
+      "type": "logs"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "rest",
+          "value": "rest"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "c64d9077-25d3-44db-ab79-92dd3b500660"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Subsystem",
+        "multi": false,
+        "name": "subsystem",
+        "options": [],
+        "query": {
+          "label": "subsystem",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "",
+          "type": 1
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Storage Facility Logs",
+  "uid": "f59e0df1-a11b-4acb-ac30-bf790e32d52f",
+  "version": 9,
+  "weekStart": ""
+}

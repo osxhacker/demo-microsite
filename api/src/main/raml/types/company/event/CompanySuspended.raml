@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+(package): CompanyEvent
+type: CompanyStatusChanged
+displayName: CompanySuspended
+discriminatorValue: "/event/domain/company/status/suspended"
+
+description: >
+  The **CompanySuspended** event is emitted when a
+  **Company** has its **CompanyStatus** altered to be
+  "Suspended".
+

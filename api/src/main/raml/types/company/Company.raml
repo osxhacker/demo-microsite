@@ -1,0 +1,38 @@
+#%RAML 1.0 DataType
+(package): Company
+displayName: Company
+
+description: >
+  **Company** captures the properties of a distinct corporate
+  entity known to the system.
+
+type: ResourceObject
+properties:
+  id: URN
+  version: Version
+  createdOn:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  lastChanged:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  slug: CompanySlug
+  name:
+    description: >
+      Official name of the organization.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  status:
+    type: CompanyStatus
+  description:
+    description: >
+      Free-form textual description of the organization.
+
+    type: string
+    default: ""
+    maxLength: 2048
+    pattern: "^(?:[^ \t](?:.*[^ \t])?)?$"
+

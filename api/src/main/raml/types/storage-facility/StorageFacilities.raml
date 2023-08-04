@@ -1,0 +1,13 @@
+#%RAML 1.0 DataType
+(package): StorageFacility
+displayName: StorageFacilities
+
+description: >
+  The **StorageFacilities** type contains zero or more
+  **StorageFacility** instances produced by a service.
+
+type: ResourceObject
+properties:
+  facilities:
+    type: array
+    items: StorageFacility

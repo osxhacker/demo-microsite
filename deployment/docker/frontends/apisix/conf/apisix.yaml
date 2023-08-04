@@ -1,0 +1,110 @@
+# @(#) APISIX Stand Alone Route, Service, and Upstream
+#
+# see: https://apisix.apache.org/docs/apisix/deployment-modes/#standalone
+
+########################################################################
+# ROUTES
+########################################################################
+
+routes:
+  - uri: /api/companies
+    service_id: company_service
+  - uri: /api/companies/*
+    service_id: company_service
+  - uri: /api/:slug/storage-facilities
+    service_id: storage_facility_service
+  - uri: /api/:slug/storage-facilities/*
+    service_id: storage_facility_service
+  - uri: /company
+    upstream_id: frontend_company_site
+  - uri: /company/*
+    upstream_id: frontend_company_site
+  - uri: /*
+    upstream_id: frontend_site
+  - uri: /
+    upstream_id: frontend_site
+
+
+########################################################################
+# SERVICES
+########################################################################
+
+services:
+  - id: company_service
+    plugins:
+      api-breaker:
+        max_breaker_sec: 30
+        break_response_code: 502
+        unhealthy:
+          http_statuses:
+            - 500
+            - 503
+          failures: 2
+        healthy:
+          http_statuses:
+            - 200
+            - 201
+          successes: 1
+      limit-req:
+        rate: 100
+        burst: 100
+        key_type: "var"
+        key: "server_addr"
+        rejected_code: 429
+        rejected_msg: "request rejected due to rate limit being exceeded, try again later"
+    upstream:
+      type: roundrobin
+      nodes:
+        - host: company
+          port: 6891
+          weight: 1
+  - id: storage_facility_service
+    plugins:
+      api-breaker:
+        max_breaker_sec: 30
+        break_response_code: 502
+        unhealthy:
+          http_statuses:
+            - 500
+            - 503
+          failures: 2
+        healthy:
+          http_statuses:
+            - 200
+            - 201
+          successes: 1
+      limit-req:
+        rate: 100
+        burst: 50
+        key_type: "var"
+        key: "server_addr"
+        rejected_code: 429
+        rejected_msg: "request rejected due to rate limit being exceeded, try again later"
+    upstream:
+      type: roundrobin
+      nodes:
+        - host: storage_facility
+          port: 6890
+          weight: 1
+
+
+########################################################################
+# UPSTREAMS
+########################################################################
+
+upstreams:
+  - id: frontend_site
+    type: roundrobin
+    nodes:
+      - host: site
+        port: 12000
+        weight: 1
+  - id: frontend_company_site
+    type: roundrobin
+    nodes:
+      - host: company_site
+        port: 12000
+        weight: 1
+
+
+#END

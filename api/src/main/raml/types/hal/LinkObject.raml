@@ -1,0 +1,82 @@
+#%RAML 1.0 DataType
+(package): HAL
+type: object
+displayName: LinkObject
+
+description: >
+  A LinkObject enriches a hyperlink with the properties defined in
+  [Link Objects](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-5).
+  The definition here varies from the specification by renaming the
+  `type` property to `mediaType` and by adding a `method` property.
+
+  See also [RFC-8288](https://www.rfc-editor.org/rfc/rfc8288).
+
+properties:
+  method:
+    description: >
+      Every **LinkObject** specifies what
+      [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+      must be used when interacting with the resource.
+
+    type: SupportedHttpMethods
+  href:
+    description: |
+      The location of the resource.
+
+      - Can be fully qualified [URL](https://datatracker.ietf.org/doc/html/rfc1738)
+      - Can be an absolute path (`/some/resource/path`)
+      - Can be a relative path (`../sibling`)
+      - Fragments are not supported
+
+    type: URL
+  mediaType:
+    description: >
+      This is a *hint* as to what the media type of the result is when
+      dereferencing the `href`.  Note that it is not named "type" as
+      indicated by the
+      [specification](https://www.rfc-editor.org/rfc/rfc8288#section-3.4.1)
+      due to conflicting with YAML and supported programming languages.
+
+    type: string
+    minLength: 8
+    maxLength: 32
+    pattern: "^(?:application|image|text)/[A-Za-z0-9_.+-]+$"
+  templated:
+    description: >
+      Indicates whether or not the `href` is a
+      [URI template](https://datatracker.ietf.org/doc/html/rfc6570).
+
+    type: boolean
+    default: false
+  name?:
+    description: >
+      An option secondary key to identify the **LinkObject**.
+
+    type: string
+    minLength: 2
+    maxLength: 32
+  title?:
+    description: >
+      Contains the short, displayable text if given.
+
+    type: string
+    minLength: 1
+    maxLength: 64
+  deprecation?:
+    description: |
+      As described in the
+      [specification](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-5.4)
+
+      > Its presence indicates that the link is to be deprecated (i.e.
+      > removed) at a future date.  Its value is a URL that SHOULD provide
+      > further information about the deprecation.
+
+    type: URL
+  length?:
+    description: >
+      The optional size (in bytes) of the resource.
+
+    type: integer
+    format: long
+    minimum: 0
+

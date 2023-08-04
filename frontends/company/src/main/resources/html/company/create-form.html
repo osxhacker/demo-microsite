@@ -1,0 +1,73 @@
+<form
+    class='edit pure-form pure-form-aligned'
+    enctype="application/x-www-form-urlencoded"
+    hx-post="/company/create"
+    hx-target="#work-area"
+    hx-swap="innerHTML"
+    >
+    <fieldset>
+        <legend>All fields with '*' are reqiured</legend>
+
+        <div class='pure-control-group'>
+            <label for='companyStatus'>Status</label>
+            <select id='companyStatus' name='companyStatus'>
+                <option>Active</option>
+                <option>Suspended</option>
+            </select>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companySlug'>Slug</label>
+            <input
+                    type='text'
+                    id='companySlug'
+                    name='companySlug'
+                    required
+                    />
+
+            <span class="pure-form-message-inline">*</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companyName'>Name</label>
+            <input
+                    type='text'
+                    id='companyName'
+                    name='companyName'
+                    required
+                    />
+
+            <span class="pure-form-message-inline">*</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='companyDescription'>Description</label>
+            <textarea
+                    rows=10
+                    cols=40
+                    maxlength=2048
+                    id='companyDescription'
+                    name='companyDescription'
+                    ></textarea>
+        </div>
+
+        <input type="hidden" name="create" value="/api/companies"/>
+    </fieldset>
+
+    <section class="pure-button-group" role="group">
+        <button class="pure-button"
+                type="submit"
+                >
+            Save
+        </button>
+
+        <button class="pure-button"
+                hx-get="/company/summary"
+                hx-trigger="click"
+                hx-target="#work-area"
+                hx-swap="innerHTML"
+                >
+            Cancel
+        </button>
+    </section>
+</form>

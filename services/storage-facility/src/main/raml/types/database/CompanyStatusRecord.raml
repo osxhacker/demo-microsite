@@ -1,0 +1,49 @@
+#%RAML 1.0 DataType
+(package): PostgreSQL
+displayName: CompanyStatusRecord
+
+description: >
+  **CompanyStatusRecord** defines the PostgreSQL table layout for
+  the **CompanyStatus** Domain Object Model type.  The `(schema)`
+  custom annotation defines the table DDL and includes any "seed data"
+  required.
+
+(schema): |
+  CREATE TABLE IF NOT EXISTS company_status (
+  	status varchar (32) PRIMARY KEY,
+  	description varchar (128) NOT NULL,
+  	created_on TIMESTAMP NOT NULL
+  	  DEFAULT CURRENT_TIMESTAMP
+    );
+
+  INSERT INTO company_status
+  (status, description)
+  VALUES
+  ('Active', 'Company is available for use')
+  ON CONFLICT (status) DO
+    UPDATE SET
+      description = EXCLUDED.description;
+
+  INSERT INTO company_status
+  (status, description)
+  VALUES
+  ('Inactive', 'Company is not available for use due to inactivity')
+  ON CONFLICT (status) DO
+    UPDATE SET
+      description = EXCLUDED.description;
+
+  INSERT INTO company_status
+  (status, description)
+  VALUES
+  ('Suspended', 'Company is suspended and cannot be used')
+  ON CONFLICT (status) DO
+    UPDATE SET
+      description = EXCLUDED.description;
+
+type: object
+properties:
+  status:
+    type: string
+  description:
+    type: string
+

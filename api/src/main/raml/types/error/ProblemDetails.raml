@@ -1,0 +1,30 @@
+#%RAML 1.0 DataType
+(package): Error
+type: object
+displayName: ProblemDetails
+discriminator: type
+
+description: >
+  **ProblemDetails** defines a
+  [RFC-7807](https://datatracker.ietf.org/doc/html/rfc7807) compatible
+  type capable of giving context specific error information in a
+  consistent manner.
+
+properties:
+  type?:
+    type: URL
+  status:
+    type: integer
+    minimum: 400
+    maximum: 599
+    # By enabling a default value for status in this type, scraml is
+    # then allowed to provide different ones in subtypes as desired.
+    default: 400
+  title:
+    type: string
+    minLength: 2
+    maxLength: 80
+  detail?:
+    type: string
+    minLength: 4
+    maxLength: 2048

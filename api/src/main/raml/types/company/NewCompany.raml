@@ -1,0 +1,30 @@
+#%RAML 1.0 DataType
+(package): Company
+displayName: NewCompany
+
+description: >
+  The NewCompany type defines the contract for establishing a
+  new **Company** item in the system.
+
+type: object
+properties:
+  slug: CompanySlug
+  name:
+    description: >
+      Official name of the organization.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  status:
+    type: CompanyStatus
+  description:
+    description: >
+      Free-form textual description of the organization.
+
+    type: string
+    default: ""
+    maxLength: 2048
+    pattern: "^(?:[^ \t](?:.*[^ \t])?)?$"
+

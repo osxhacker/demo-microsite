@@ -1,0 +1,38 @@
+#%RAML 1.0 DataType
+(package): Event
+displayName: EventOrigin
+
+description: >
+  The **EventOrigin** type captures meta-data describing
+  where a **DistributedEvent** was emitted.  Consumers can,
+  and are expected to, use the included `region` to
+  selectively filter **DistributedEvent**s.
+
+  Each *must* contain a stable unique event `id` so that
+  detecting duplicates is possible.  Note that this `id`
+  identifies **this** event and has no relation to any
+  entity.  This is why it is a **UUID** and not a **URN**.
+
+properties:
+  region: Region
+  id: UUID
+  correlationId: UUID
+  createdOn:
+    description: >
+      The createdOn property is provided for informational
+      purposes only and *must not* be used to establish total
+      ordering.
+
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  fingerprint?:
+    description: >
+      The optional fingerprint property allows event producers
+      to identify which specific deployed service emitted the
+      **DistributedEvent**.  This may be needed for
+      additional event consumer filtering.
+
+    type: string
+    minLength: 1
+    maxLength: 64
+

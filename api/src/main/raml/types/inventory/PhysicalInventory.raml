@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+(package): Inventory
+displayName: PhysicalInventory
+
+description: >
+  The PhysicalInventory type is a **ProductInventory** which
+  represents a specific type of physical inventory.  As such,
+  it has a `size` and `quantity` are stored in a `facility`.
+
+type: ProductInventory
+discriminatorValue: physical
+properties:
+  quantity:
+    description: >
+      How many instances of the **PhysicalInventory** are thought
+      to be in the `facility`.
+
+    type: integer
+    format: int16
+    minimum: 0
+  size: Dimension
+  facility: URN
+

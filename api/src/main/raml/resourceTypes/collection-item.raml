@@ -1,0 +1,112 @@
+#%RAML 1.0 ResourceType
+#
+# see:
+#  https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/#resource-types-and-traits
+
+usage: This resource type should be used for items within a collection.
+uriParameters:
+  <<itemIdParameter>>: <<itemIdType>>
+
+delete:
+  displayName: Delete a <<resourcePathName>>
+  description: >
+    Removes a single **<<resourcePathName>>** by its unique *<<itemId>>*.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  responses:
+    204:
+    404:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    410:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+get:
+  displayName: Get a <<resourcePathName>>
+  description: >
+    Retrieve a single **<<resourcePathName>>** by its unique *<<itemId>>*.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<resource>>
+
+    400:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    404:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    500:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+post:
+  displayName: Modify an existing <<resourcePathName>>.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  body:
+    application/json:
+      type: <<resource>>
+
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<resource>>
+
+    400:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    404:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    409:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+
+    500:
+      body:
+        application/problem+json:
+          type: ProblemDetails
+

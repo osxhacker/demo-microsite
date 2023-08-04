@@ -1,0 +1,38 @@
+#%RAML 1.0 DataType
+(package): CompanyEvent
+type: CompanyEvent
+displayName: CompanyProfileChanged
+discriminatorValue: "/event/domain/company/profile-changed"
+
+description: >
+  The **CompanyProfileChanged** **CompanyEvent** is emitted
+  whenever a **Company** has properties altered which are
+  ancillary to workflow related events.
+
+  For example, when the `name` or `description` of a
+  **Company** changes, interested parties need to have the
+  opportunity to know about them changing, but those changes
+  likely have no affect on their logic.
+
+  However, when a **Company** `slug` changes, there is a high
+  probability that interested parties will need to react to
+  that event.
+
+properties:
+  name:
+    description: >
+      Official name of the organization.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  description:
+    description: >
+      Free-form textual description of the organization.
+
+    type: string
+    maxLength: 2048
+    pattern: "^(?:[^ \t](?:.*[^ \t])?)?$"
+    default: ""
+

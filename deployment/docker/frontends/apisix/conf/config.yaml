@@ -1,0 +1,19 @@
+# @(#) APISIX main configuration
+#
+
+apisix:
+  node_listen: 9080
+  enable_ipv6: false
+
+  router:
+    http: 'radixtree_uri_with_parameter'
+
+
+# Run in "stand alone" mode.
+# see: https://apisix.apache.org/docs/apisix/deployment-modes/#standalone
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+
+#END

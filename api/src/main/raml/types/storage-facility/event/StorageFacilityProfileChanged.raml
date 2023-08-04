@@ -1,0 +1,53 @@
+#%RAML 1.0 DataType
+(package): StorageFacilityEvent
+type: StorageFacilityEvent
+displayName: StorageFacilityProfileChanged
+discriminatorValue: "/event/domain/storage-facility/profile-changed"
+
+description: >
+  The **StorageFacilityProfileChanged**
+  **StorageFacilityEvent** is emitted whenever a
+  **StorageFacility** has properties altered which are
+  ancillary to workflow related events.
+
+  For example, when the `name` or `state` properties of a
+  **StorageFacility** changes, interested parties need to
+  have the opportunity to know about them changing, but those
+  changes likely have no affect on their logic.
+
+properties:
+  name:
+    description: >
+      Symbolic short description of the facility used as a mnemonic
+      reminder.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  city:
+    description: >
+      Name of the municipality nearest to or in which the facility
+      resides.
+
+    type: string
+    minLength: 2
+    maxLength: 32
+    pattern: "^[A-Za-z][A-Za-z'. -]*[a-z]$"
+  state:
+    description: >
+      State, province, or territory where the facility is located.
+
+    type: string
+    minLength: 2
+    maxLength: 3
+    pattern: "^[A-Z]+$"
+  zip:
+    description: >
+      Postal code for the facility's location.
+
+    type: string
+    minLength: 5
+    maxLength: 10
+    pattern: "^[0-9]{5}(?:-[0-9]{4})?$"
+

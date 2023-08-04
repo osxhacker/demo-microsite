@@ -1,0 +1,29 @@
+#%RAML 1.0 DataType
+(package): HAL
+type: object
+displayName: Links
+
+description: >
+  The Links type is the RAML representation of the object
+  [described](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-4.1.1)
+  in the HAL specification.  There is an optional `curies` property
+  and all **LinkObject**s are made available as
+  [additional properties](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/#additional-properties).
+
+  [Registered relation types](https://datatracker.ietf.org/doc/html/rfc5988#section-4.1)
+  are fully supported and preferred if their semantics allow their
+  use.
+
+  For the purposes of this system,
+  [extension relation types](https://datatracker.ietf.org/doc/html/rfc5988#section-4.2)
+  are limited to the subset of
+  [URI's](https://datatracker.ietf.org/doc/html/rfc3986) which
+  are URN's.
+
+properties:
+  curies?:
+    type: array
+    items: LinkObject
+  /^(?:urn:(?:[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*):)?(?:(?:[A-Za-z0-9]+[_.-])*[A-Za-z0-9])+$/:
+    type: LinkObject
+

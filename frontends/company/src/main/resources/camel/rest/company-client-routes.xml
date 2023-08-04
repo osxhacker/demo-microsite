@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templatedRoutes id="camel-xml-io-dsl"
+                 xmlns="http://camel.apache.org/schema/spring"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="
+                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                 ">
+    <!--
+    Note the use of the header property 'delete'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-delete">
+        <parameter name="name" value="delete-company"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{delete}"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-company-summary"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="/api/companies"/>
+        <parameter name="transform"
+                   value="jslt/company/collection-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'self'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-company-edit-form"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{self}"/>
+        <parameter name="transform"
+                   value="jslt/company/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'self'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-company-view"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{self}"/>
+        <parameter name="transform"
+                   value="jslt/company/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'companyAction'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-post">
+        <parameter name="name" value="post-company-change-status"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{companyAction}"/>
+        <parameter name="transform"
+                   value="jslt/company/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'create'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-post">
+        <parameter name="name" value="post-company-new"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{create}"/>
+        <parameter name="transform"
+                   value="jslt/company/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'edit'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-post">
+        <parameter name="name" value="post-company-save"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="{edit}"/>
+        <parameter name="transform"
+                   value="jslt/company/resource-response.jslt"
+                   />
+    </templatedRoute>
+</templatedRoutes>
+

@@ -1,0 +1,25 @@
+# @(#) Terminal command for HTTP delete requests
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+########################################################################
+# MAIN
+########################################################################
+
+[[ ! -z "${TIME_REQUEST:-}" ]] && REPORT="--trace-time"
+
+$CURL -s \
+	${VERBOSE:+-v} \
+	--connect-timeout 1 \
+	--request DELETE \
+	--header "X-Correlation-ID: $(uuid -v4)" \
+	${REPORT:-} \
+	"$ENDPOINT" || err $? "delete failed: $ENDPOINT"
+

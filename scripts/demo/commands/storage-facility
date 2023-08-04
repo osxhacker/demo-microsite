@@ -1,0 +1,39 @@
+# @(#) Entry command for the storage-facility microservice
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+export ENDPOINT="$(microserviceBaseUri 'storage-facility')"
+
+[[ $# -ge 2 ]] || err 2 "missing DSL command(s)\n\nSee demo.sh --help"
+
+case "$1" in
+	heartbeat)
+		ENDPOINT="$ENDPOINT/internal/heartbeat"
+		;;
+
+	shutdown)
+		ENDPOINT="$ENDPOINT/internal/shutdown"
+		;;
+
+	*)
+		ENDPOINT="$ENDPOINT/$1/storage-facilities"
+		;;
+esac
+
+NEXT="$COMMANDS/$2"
+shift 2
+
+exec $SH $NEXT $@
+

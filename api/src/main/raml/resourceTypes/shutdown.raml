@@ -1,0 +1,73 @@
+#%RAML 1.0 ResourceType
+#
+# see:
+#  https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/#resource-types-and-traits
+
+usage: This resource type should be used for "shutdown" endpoints.
+put:
+  description: >
+    The shutdown administrative endpoint initiates microservice
+    quiescence.  Once begun, the microservice is expected to stop
+    accepting requests and complete "in-flight" work before
+    exiting.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+    X-Forwarded-For?:
+      description: >
+        Proxy information from upstream servers, such as load
+        balancers and HTTP proxies.
+
+      type: string
+      minLength: 1
+      maxLength: 128
+
+    User-Agent:
+      description: >
+        A short self-description of what client is invoking the
+        endpoint.  Do not rely on its correctness.
+
+      type: string
+      minLength: 1
+      maxLength: 128
+
+  body:
+    application/json:
+      type: ShutdownMessage
+
+    text/plain:
+      type: string
+      maxLength: 1024
+
+  responses:
+    200:
+      description: >
+        Sent when the shutdown has been initiated.
+
+    202:
+      description: >
+        Sent when a shutdown is already in progress.
+
+    401:
+      description: >
+        Sent when the requester does not have rights to shut down
+        the service.
+
+      body:
+        application/json:
+          type: ProblemDetails
+
+    410:
+      description: >
+        Sent when a shutdown has already been completed.
+
+      body:
+        application/json:
+          type: ProblemDetails

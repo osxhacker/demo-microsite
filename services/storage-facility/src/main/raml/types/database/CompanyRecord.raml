@@ -1,0 +1,72 @@
+#%RAML 1.0 DataType
+(package): PostgreSQL
+displayName: CompanyRecord
+
+description: >
+  **CompanyRecord** defines the PostgreSQL table layout for
+  the **Company** Domain Object Model type.  The `(schema)`
+  custom annotation defines the table and includes any "seed data"
+  required.
+
+(schema): |
+  -- To enable migrations, the recommended pattern to use is to
+  -- add DDL for initial releases and then, when all environments
+  -- are known to be updated, the "create table" statement can
+  -- be updated along with the alter table statement(s) removed.
+
+  CREATE TABLE IF NOT EXISTS company (
+    key serial PRIMARY KEY,
+    external_id uuid NOT NULL UNIQUE,
+    status varchar (32) NOT NULL
+      REFERENCES company_status (status),
+
+    slug varchar (64) NOT NULL UNIQUE,
+    name varchar (64) NOT NULL UNIQUE,
+    created_on TIMESTAMP NOT NULL
+      DEFAULT CURRENT_TIMESTAMP,
+    last_changed TIMESTAMP NOT NULL
+      DEFAULT CURRENT_TIMESTAMP,
+
+    CHECK (created_on <= last_changed)
+  );
+
+  -- This is the Company used for internal (DevOps) operations
+  -- and *must* exist.  See "application.conf" for more
+  -- information.
+  INSERT INTO company
+  (external_id, status, slug, name)
+  VALUES
+  (
+    '20230101-0000-4000-0000-9d71a6b4ad56',
+    'Active',
+    'internal-devops',
+    'Internal DevOps Company'
+  )
+  ON CONFLICT (external_id) DO
+    UPDATE SET
+      last_changed = CURRENT_TIMESTAMP;
+
+type: object
+properties:
+  key:
+    type: integer
+    default: 0
+  external_id:
+    (scala-type): "java.util.UUID"
+  slug:
+    type: string
+    minLength: 1
+    maxLength: 64
+  name:
+    type: string
+    minLength: 2
+    maxLength: 64
+  status:
+    type: string
+  created_on:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  last_changed:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+

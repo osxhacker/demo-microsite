@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: ObjectNotFoundDetails
+discriminatorValue: "/problem/object-not-found"
+
+description: >
+  The **ObjectNotFoundDetails** type is a **ProblemDetails** which
+  is produced when a domain object instance could not be resolved.
+
+properties:
+  status:
+    type: integer
+    default: 404
+  id: URN
+

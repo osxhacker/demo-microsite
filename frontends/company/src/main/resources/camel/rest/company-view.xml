@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:company-view' route defines the logic for providing
+    the ability to produce a detailed view of a company resource
+    identified by 'header.companyId' as an HTML snippet.
+    -->
+    <route>
+        <from uri="direct:company-view"/>
+
+        <to uri="direct:get-company-view"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} range '200..299'</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <ognl>request.body.at("/name").asText()</ognl>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/company/view.vm"/>
+                <to uri="velocity:classpath:velocity/home-document.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

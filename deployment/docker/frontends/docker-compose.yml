@@ -1,0 +1,69 @@
+# @(#) Docker Compose configuration for frontend services
+
+# This is the docker-compose version required and is dependent upon
+# what version of docker-compose installed.
+version: '3.8'
+
+# The entries in *each* Docker Compose file must be unique, even though
+# they exist separately.  The symptoms observed when not are collisions
+# in resolving host names (even if *all* of them have distinct hostname
+# properties).
+services:
+  site:
+    build: ../../../frontends/site/target/docker
+    container_name: "site"
+    hostname: "site"
+    restart: "no"
+    ports:
+      # Service API
+      - target: 12000
+        published: 11610
+        protocol: tcp
+        mode: host
+    networks:
+      - lan
+      - services
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -server"
+
+  company-site:
+    build: ../../../frontends/company/target/docker
+    container_name: "company-site"
+    hostname: "company_site"
+    restart: "no"
+    ports:
+      # Service API
+      - target: 12000
+        published: 11611
+        protocol: tcp
+        mode: host
+    networks:
+      - lan
+      - services
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -server"
+      COMPANY_SERVICE_HOST: "gateway"
+      COMPANY_SERVICE_PORT: 9080
+
+  gateway:
+    image: apache/apisix:3.4.0-debian
+    container_name: "gateway"
+    hostname: "gateway"
+    restart: "unless-stopped"
+    volumes:
+      - ./apisix/conf/apisix.yaml:/usr/local/apisix/conf/apisix.yaml
+      - ./apisix/conf/config.yaml:/usr/local/apisix/conf/config.yaml
+    ports:
+      - "9080:9080/tcp"         # This is the services gateway port
+      - "9180:9180/tcp"         # This is the admin port
+    networks:
+      - lan
+      - services
+
+networks:
+  lan:
+    driver: bridge
+  services:
+    name: services_lan
+    external: true
+

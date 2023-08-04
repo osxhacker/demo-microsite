@@ -1,0 +1,92 @@
+#%RAML 1.0
+title: Company Service API
+version: v1
+baseUri: http://localhost:6891/api
+
+annotationTypes: !include types/annotations.raml
+types: !include types/company/types.raml
+
+# The default media type is JSON.  Each resource can override that
+# as needed.
+mediaType: application/json
+
+# RAML resourceTypes are templates for resource definitions.
+resourceTypes:
+  change-status: !include resourceTypes/change-status.raml
+  collection: !include resourceTypes/collection.raml
+  collection-item: !include resourceTypes/collection-item.raml
+  heartbeat: !include resourceTypes/heartbeat.raml
+  shutdown: !include resourceTypes/shutdown.raml
+
+
+########################################################################
+# Internal Resources
+########################################################################
+
+/internal/heartbeat:
+  type: heartbeat
+
+/internal/shutdown:
+  type: shutdown
+
+
+########################################################################
+# Public Resources
+########################################################################
+
+/companies:
+  type:
+    collection:
+      collectionResource: Companies
+      existingResource: Company
+      newResource: NewCompany
+
+  # Creating new companies is done via 'POST' due to the service
+  # having exclusive responsibility for establishing uniqueness.
+  post:
+
+  # Individual company instances are made available under this endpoint.
+  # The "{company}" is the entity URN or UUID.
+  /{company}:
+    type:
+      collection-item:
+        resource: Company
+        itemIdParameter: company
+        itemIdType: string
+
+    # Attempt to activate the Company, succeeding when the
+    # current CompanyStatus allows transitioning to "Active."
+    # If it is semantically valid for this endpoint to be
+    # invoked for any given Company, it will be provided by
+    # the service within the `_links` array.
+    /activate:
+      type:
+        change-status:
+          resource: Company
+          itemIdParameter: company
+          itemIdType: string
+
+    # Attempt to deactivate the Company, succeeding when the
+    # current CompanyStatus allows transitioning to "Inactive."
+    # If it is semantically valid for this endpoint to be
+    # invoked for any given Company, it will be provided by
+    # the service within the `_links` array.
+    /deactivate:
+      type:
+        change-status:
+          resource: Company
+          itemIdParameter: company
+          itemIdType: string
+
+    # Attempt to suspend the Company, succeeding when the
+    # current CompanyStatus allows transitioning to "Suspended."
+    # If it is semantically valid for this endpoint to be
+    # invoked for any given Company, it will be provided by
+    # the service within the `_links` array.
+    /suspend:
+      type:
+        change-status:
+          resource: Company
+          itemIdParameter: company
+          itemIdType: string
+

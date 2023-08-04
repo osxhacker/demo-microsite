@@ -1,0 +1,31 @@
+# @(#) Command for providing an entity id for the ENDPOINT
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+[[ $# -gt 1 ]] || err 2 "missing item URI/UUID\n\nSee demo.sh --help"
+
+# Strip quotes possibly left over from jq and the URN prefix (if any).
+ID=$(echo $1 | sed -e 's/"//g' -e 's/^urn:[A-Za-z0-9_-]*://')
+
+if echo "$ID" | egrep -q '^[a-f0-9]{8}-[a-f0-9]{4}'
+then
+	ENDPOINT="$ENDPOINT/$ID"
+	NEXT="$COMMANDS/$2"
+	shift 2
+	exec $SH $NEXT $@
+else
+	err 3 "'$1' does not look like a UUID or a URI"
+fi
+

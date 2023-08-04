@@ -1,0 +1,41 @@
+#%RAML 1.0 DataType
+(package): Inventory
+displayName: NewPhysicalInventory
+
+description: >
+  The NewPhysicalInventory type defines the contract for
+  establishing a new **PhysicalInventory** item in the system.
+
+type: object
+properties:
+  sku: SKU
+  quantity:
+    description: >
+      How many instances of the **PhysicalInventory** are thought
+      to be in the `facility`.
+
+    type: integer
+    format: int16
+    minimum: 1
+  size: Dimension
+  facility:
+    description: >
+      Which **StorageFacility** houses the
+      **NewPhysicalInventory**.
+
+    type: URN
+  shortDescription:
+    description: >
+      Brief description of the product.
+
+    type: string
+    minLength: 4
+    maxLength: 64
+    pattern: "^[^ \t].+[^ \t]$"
+  longDescription?:
+    description: >
+      An optional detailed description of the product.  This can
+      include additional resources, such as HTTP links, as needed.
+
+    type: string
+

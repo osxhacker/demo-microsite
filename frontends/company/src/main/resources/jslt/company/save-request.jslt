@@ -1,0 +1,11 @@
+{
+  "id" : $headers.companyId,
+  "version" : number($headers.companyVersion),
+  "slug" : trim ($headers.companySlug),
+  "status" : $headers.companyStatus,
+  "name" : trim ($headers.companyName),
+  "description": trim ($headers.companyDescription),
+  "createdOn" : $headers.companyCreatedOn,
+  "lastChanged" : $headers.companyLastChanged
+}
+

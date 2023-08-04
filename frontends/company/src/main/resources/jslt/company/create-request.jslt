@@ -1,0 +1,7 @@
+{
+  "slug" : trim ($headers.companySlug),
+  "status" : $headers.companyStatus,
+  "name" : trim ($headers.companyName),
+  "description": trim ($headers.companyDescription)
+}
+

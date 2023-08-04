@@ -1,0 +1,26 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: StaleObjectDetails
+discriminatorValue: "/problem/stale-object"
+
+description: >
+  The **StaleObjectDetails** type is a **ProblemDetails** which
+  is produced when a valid request is submitted, but cannot be accepted
+  due to prior manipulations making the resource given no longer the
+  latest known version.
+
+  Where possible, `additionalProperties` will have an object difference
+  property named `differences` indicating what has changed between the
+  `submittedVersion` and the `currentVersion`.
+
+properties:
+  status:
+    type: integer
+    default: 409
+  id: URN
+  submittedVersion: Version
+  currentVersion?: Version
+  lastChanged?:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z

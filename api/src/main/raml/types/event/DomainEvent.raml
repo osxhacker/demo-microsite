@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+(package): Event
+type: DistributedEvent
+displayName: DomainEvent
+discriminatorValue: "/event/domain"
+
+description: >
+  A **DomainEvent** is a category of a **DistributedEvent**
+  whose concrete instances represent significant changes to
+  entities within a microservice's bounded context.
+  
+  Every **DomainEvent** is associated with an entity, implying
+  the availability of its `id`.  Note that the entity
+  **Version** is intentionally *not* included as there is no
+  correlation between the number of events produced for an
+  atomic entity modification.
+
+  All **DomainEvent**s **must** have a `discriminatorValue`
+  "under" the one defined here.
+
+properties:
+  id: URN
+

@@ -1,0 +1,37 @@
+#%RAML 1.0 DataType
+(package): Inventory
+displayName: ProductInventory
+
+description: >
+  The ProductInventory type is the "aggregate root" representing a
+  specific type of inventory, physical or virtual.
+
+type: ResourceObject
+discriminator: type
+properties:
+  type:
+    type: string
+  id: URN
+  version: Version
+  createdOn:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  lastChanged:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  sku: SKU
+  shortDescription:
+    description: >
+      Brief non-empty description of the product.
+
+    type: string
+    minLength: 4
+    maxLength: 64
+    pattern: "^[^ \t].+[^ \t]$"
+  longDescription?:
+    description: >
+      An optional detailed description of the product.  This can
+      include additional resources, such as HTTP links, as needed.
+
+    type: string
+

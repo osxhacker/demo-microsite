@@ -1,0 +1,57 @@
+#*
+    @(#) Company summary Velocity template
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<div>
+    #if( $body.get("numberOfCompanies").asInt() == 0 )
+        No Companies found.
+    #elseif( $body.get("numberOfCompanies").asInt() == 1 )
+        Loaded 1 Company.
+    #else
+        Loaded $body.get("numberOfCompanies").asInt() Companies.
+    #end
+</div>
+
+<hr/>
+
+<section class="pure-g">
+    #foreach( $company in $body.get("companies").elements() )
+        <details class="pure-u-1">
+            <summary>$company.get("name").asText()</summary>
+
+            <h5>
+                <a href='/company/view?self=$company.at("/_links/self/href").asText()'>
+                    $company.get("slug").asText()
+                </a>
+            </h5>
+
+            <h6>$company.get("status").asText()</h6>
+
+            <p>
+                $company.get("description").asText()
+            </p>
+        </details>
+    #end
+</section>
+
+<section class="pure-button-group" role="group">
+    <a class="pure-button"
+        hx-get="/company/summary"
+        hx-trigger="click"
+        hx-target="#work-area"
+        hx-swap="innerHTML"
+        >
+        Refresh
+    </a>
+
+    <a class="pure-button"
+        hx-get="/company/create-form"
+        hx-trigger="click"
+        hx-target="#work-area"
+        hx-swap="innerHTML"
+        >
+        Add Company
+    </a>
+</section>

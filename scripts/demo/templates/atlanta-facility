@@ -1,0 +1,9 @@
+{
+  "name": "Southeast warehouse",
+  "status": "Active",
+  "city": "Atlanta",
+  "state": "GA",
+  "zip": "30342",
+  "capacity": 100000,
+  "available": 50000
+}

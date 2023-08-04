@@ -1,0 +1,14 @@
+#%RAML 1.0 DataTypes
+(package): Shared
+displayName: VersionOnly
+
+description: >
+  The VersionOnly type defines a request `object` having only
+  a `version` property.  The expectation is that its
+  corresponding identifier is provided through other means
+  (such as a segment within a **URL**).
+
+type: object
+properties:
+  version: Version
+

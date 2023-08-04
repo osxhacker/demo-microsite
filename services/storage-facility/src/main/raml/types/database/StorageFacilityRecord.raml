@@ -1,0 +1,107 @@
+#%RAML 1.0 DataType
+(package): PostgreSQL
+displayName: StorageFacilityRecord
+
+description: >
+  **StorageFacilityRecord** defines the PostgreSQL table layout for
+  the **StorageFacility** Domain Object Model type.  The `(schema)`
+  custom annotation defines the table and includes any "seed data"
+  required.
+
+(schema): |
+  -- To enable migrations, the recommended pattern to use is to
+  -- add DDL for initial releases and then, when all environments
+  -- are known to be updated, the "create table" statement can
+  -- be updated along with the alter table statement(s) removed.
+
+  CREATE TABLE IF NOT EXISTS storage_facility (
+    key serial PRIMARY KEY,
+    external_id uuid NOT NULL UNIQUE,
+    version smallint NOT NULL
+      CHECK (version > 0),
+    status varchar (32) NOT NULL
+      REFERENCES storage_facility_status (status),
+    company_key integer NOT NULL
+      REFERENCES company (key),
+    name varchar (64) NOT NULL,
+    city varchar (32) NOT NULL,
+    state varchar (3) NOT NULL,
+    zip varchar (10) NOT NULL,
+    capacity NUMERIC (7, 1) NOT NULL
+      CHECK (capacity >= 0),
+    available NUMERIC (7, 1) NOT NULL
+      CHECK (available >= 0),
+    created_on TIMESTAMP NOT NULL
+      DEFAULT CURRENT_TIMESTAMP,
+    last_changed TIMESTAMP NOT NULL
+      DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE (name, company_key),
+    CHECK (available <= capacity),
+    CHECK (created_on <= last_changed)
+  );
+  
+  -- This is an example of a domain model representation
+  -- being augmented after the original definition has been
+  -- deployed into production.  In a real system, this ALTER
+  -- statement would remain until *all* environments have
+  -- been successfully migrated.  Only then would this
+  -- migration be moved into the above CREATE TABLE statement.
+  ALTER TABLE storage_facility
+    ADD COLUMN IF NOT EXISTS region varchar (32);
+
+type: object
+properties:
+  external_id:
+    (scala-type): "java.util.UUID"
+  version:
+    type: integer
+    minimum: 1
+  status:
+    type: string
+  company_key:
+    type: integer
+    minimum: 1
+  name:
+    type: string
+    minLength: 1
+    maxLength: 64
+  city:
+    type: string
+    minLength: 2
+    maxLength: 32
+  state:
+    type: string
+    minLength: 2
+    maxLength: 3
+  zip:
+    type: string
+    minLength: 5
+    maxLength: 10
+  capacity:
+    type: number
+    format: double
+    minimum: 0
+    maximum: 300000
+  available:
+    type: number
+    format: double
+    minimum: 0
+    maximum: 300000
+  created_on:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  last_changed:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  region?:
+    description: >
+      The region property captures what **Region** is
+      considered the "single point of truth" for the a
+      **StorageFacility** definition.  All other **Region**s
+      operate in a "secondary" mode.
+
+    type: string
+    minLength: 2
+    maxLength: 32
+

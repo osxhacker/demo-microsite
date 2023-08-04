@@ -1,0 +1,20 @@
+# @(#) Grafana Prometheus datasource configuration
+#
+# See: https://github.com/docker/awesome-compose
+#
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    isDefault: true
+    access: proxy
+    editable: true
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki.docker:3100
+    jsonData:
+      maxLines: 1000
+

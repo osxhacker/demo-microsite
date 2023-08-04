@@ -1,0 +1,29 @@
+#%RAML 1.0 ResourceType
+#
+# see:
+#  https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md/#resource-types-and-traits
+
+usage: This resource type should be used for "heartbeat" endpoints.
+get:
+  description: >
+    The heartbeat administrative endpoint exists to allow health
+    observability.
+    
+    If the service is running but unable to satisfy requests, a
+    `5xx` status will be returned and include a **ProblemDetails**.
+
+  headers:
+    X-Correlation-ID:
+      description: >
+        Each request **must** be accompanied by an identifier chosen
+        by the invoker and must be a valid string representation of
+        a UUID.  Furthermore, the UUID **must** be version 3 or above.
+
+      type: UUID
+
+  responses:
+    200:
+    500:
+      body:
+        application/json:
+          type: ProblemDetails

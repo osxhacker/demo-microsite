@@ -1,0 +1,65 @@
+# @(#) Terminal command for HTTP post requests
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+########################################################################
+# MAIN
+########################################################################
+
+# By default, expect all JSON properties to be provided as additional
+# arguments
+JO_INPUT_FLAGS="-e"
+JO_SOURCE="cat /dev/null"
+
+# Restore the arguments the driver saved.
+set -- $LAST_COMMAND_ARGS
+
+# Process command line arguments, stopping if an unknown flag is
+# detected.
+while getopts 'f:' arg
+do
+	case "$arg" in
+		f)
+			if [[ "$OPTARG" != "-" ]]
+			then
+				JO_INPUT_FLAGS="-f $TEMPLATES/$OPTARG"
+			else
+				JO_INPUT_FLAGS="-f -"
+				JO_SOURCE="cat -"
+			fi
+			;;
+
+		--)
+			break
+			;;
+
+		?)
+			err 127 'post only supports the "-f <template>" flag'
+			;;
+	esac
+done
+
+# Discard process flags (if any)
+shift $((OPTIND - 1))
+
+[[ ! -z "${TIME_REQUEST:-}" ]] && REPORT="--trace-time"
+
+PAYLOAD=$(eval "$JO_SOURCE | $JO -n -D -d . $JO_INPUT_FLAGS -- $@")
+echo $PAYLOAD |
+$CURL -s \
+	${VERBOSE:+-v} \
+	--connect-timeout 1 \
+	--fail-early \
+	--request POST \
+	--header "X-Correlation-ID: $(uuid -v4)" \
+	${REPORT:-} \
+	--data @- \
+	"$ENDPOINT" || err $? "post failed: $ENDPOINT\npayload: $PAYLOAD"
+

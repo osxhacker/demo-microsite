@@ -1,0 +1,23 @@
+let numberOfCompanies = size (.companies)
+
+{
+  "_links" : { for (._links)
+    .key : .value | { for (.)
+      .key : if (.key == "href") url-encode (.value) else .value
+      }
+    },
+
+  "companies": [ for (.companies) . | {
+      "_links" : { for (._links)
+        .key : .value | { for (.)
+          .key : if (.key == "href") url-encode (.value) else .value
+            }
+          },
+
+      * : .
+      }
+    ] | sort-by ("/name"),
+
+  "numberOfCompanies" : $numberOfCompanies,
+  * : .
+}

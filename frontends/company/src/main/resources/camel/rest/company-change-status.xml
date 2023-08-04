@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:company-change-status' route defines the logic for
+    attempting to alter the status of an existing company.
+    -->
+    <route>
+        <from uri="direct:company-change-status"/>
+
+        <!--
+        JSLT expects valid JSON as input (Camel body).  Since this
+        route adapts URL-encoded forms into JSON, the body must be
+        set to something which is valid (even though it is never
+        used).
+        -->
+        <setBody>
+            <constant>{}</constant>
+        </setBody>
+
+        <to uri="jslt:jslt/company/change-status-request.jslt"/>
+        <to uri="direct:post-company-change-status"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} range '200..299'</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <ognl>request.body.at("/name").asText()</ognl>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/company/view.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

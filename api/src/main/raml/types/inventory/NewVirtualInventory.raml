@@ -1,0 +1,32 @@
+#%RAML 1.0 DataType
+(package): Inventory
+displayName: NewVirtualInventory
+
+description: >
+  The NewVirtualInventory type defines the contract for
+  establishing a new **VirtualInventory** item in the system.
+
+type: object
+properties:
+  sku: SKU
+  shortDescription:
+    description: >
+      Brief description of the product.
+
+    type: string
+    minLength: 4
+    maxLength: 64
+    pattern: "^[^ \t].+[^ \t]$"
+  longDescription?:
+    description: >
+      An optional detailed description of the product.  This can
+      include additional resources, such as HTTP links, as needed.
+
+    type: string
+  location?:
+    description: >
+      If the **NewVirtualInventory** is an artifact capable of
+      being retrieved (such as an audio or video recording),
+      the `location` specifies where it resides.
+
+    type: URL

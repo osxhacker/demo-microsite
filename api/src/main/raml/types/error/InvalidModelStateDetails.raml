@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: InvalidModelStateDetails
+discriminatorValue: "/problem/invalid-model-state"
+
+description: >
+  The **InvalidModelStateDetails** type is a **ProblemDetails** which
+  is produced when a valid request is submitted, but cannot be accepted
+  due to prior (valid) resource manipulations that make the current
+  request semantically invalid.
+
+properties:
+  status:
+    type: integer
+    default: 422

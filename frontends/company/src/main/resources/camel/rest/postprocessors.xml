@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+                 xmlns="http://camel.apache.org/schema/spring"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="
+                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                 ">
+    <route>
+        <from uri="direct:finish-binary-octet"/>
+
+        <to uri="direct:remove-internal-headers"/>
+
+        <setHeader name="Content-Type">
+            <constant>application/octet-stream</constant>
+        </setHeader>
+    </route>
+
+    <route>
+        <from uri="direct:finish-html-file"/>
+
+        <to uri="direct:remove-internal-headers"/>
+
+        <setHeader name="CamelHttpChunked">
+            <constant>false</constant>
+        </setHeader>
+
+        <setHeader name="Content-Type">
+            <constant>text/html; charset=UTF-8</constant>
+        </setHeader>
+    </route>
+
+    <route>
+        <from uri="direct:finish-javascript-file"/>
+
+        <to uri="direct:remove-internal-headers"/>
+
+        <setHeader name="Content-Type">
+            <constant>application/javascript</constant>
+        </setHeader>
+    </route>
+
+    <route>
+        <from uri="direct:finish-stylesheet-file"/>
+
+        <to uri="direct:remove-internal-headers"/>
+
+        <setHeader name="Content-Type">
+            <constant>text/css</constant>
+        </setHeader>
+    </route>
+
+    <route>
+        <from uri="direct:remove-internal-headers"/>
+        <removeHeader name="Accept"/>
+        <removeHeader name="HomeDocumentTitle"/>
+        <removeHeader name="User-Agent"/>
+        <removeHeader name="demo.resource.path"/>
+        <removeHeader name="demo.resource.url"/>
+        <removeHeader name="filename"/>
+    </route>
+</routes>

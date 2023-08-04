@@ -1,0 +1,14 @@
+#%RAML 1.0 DataType
+(package): Company
+displayName: Companies
+
+description: >
+  The **Companies** type contains zero or more **Company**
+  instances produced by a service.
+
+type: ResourceObject
+properties:
+  companies:
+    type: array
+    items: Company
+

@@ -1,0 +1,28 @@
+# @(#) Terminal command for internal shutdown requests
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+PAYLOAD=$(echo $LAST_COMMAND_ARGS | $JO -d.)
+
+$CURL -s \
+	${VERBOSE:+-v} \
+	--connect-timeout 1 \
+	--fail-early \
+	--request PUT \
+	--header "Content-Type: application/json" \
+	--header "X-Correlation-ID: $(uuid -v4)" \
+	--data-ascii "$PAYLOAD" \
+	"$ENDPOINT" || err $? "shutdown failed: $ENDPOINT"
+

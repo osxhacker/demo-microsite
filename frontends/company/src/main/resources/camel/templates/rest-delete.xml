@@ -1,0 +1,80 @@
+<routeTemplates id="camel-xml-io-dsl"
+                xmlns="http://camel.apache.org/schema/spring"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                ">
+    <!--
+    REST Producer (client) DELETE Definition
+
+    Each HTTP DELETE endpoint follows the form of:
+
+    - Take parameters in URL query, present in Camel headers.
+    - Issue the DELETE.
+    - Handle errors resulting in endpoint interaction.
+
+    Error detection in calling routes can be done by inspecting the
+    CamelHttpResponseCode header.
+    -->
+    <routeTemplate id="rest-delete">
+        <templateParameter name="service"/>
+        <templateParameter name="endpoint"/>
+        <templateParameter name="name"/>
+
+        <route>
+            <from uri="direct:{{name}}"/>
+
+            <log logName="com.github.osxhacker.demo"
+                 loggingLevel="info"
+                 message="REST DELETE '{{endpoint}}?host={{service}}'"
+                 />
+
+            <!--
+            Remove the original HTTP path, method, and uri headers so
+            the request can be processed as a client invocation.
+            -->
+            <removeHeader name="CamelHttpMethod"/>
+            <removeHeader name="CamelHttpPath"/>
+            <removeHeader name="CamelHttpUri"/>
+
+            <doTry>
+                <to uri="direct:generate-correlation-id"/>
+                <to uri="rest:delete:{{endpoint}}?host={{service}}"/>
+
+                <doCatch>
+                    <exception>org.apache.camel.http.base.HttpOperationFailedException</exception>
+
+                    <log logName="com.github.osxhacker.demo"
+                         loggingLevel="error"
+                         message="REST DELETE '{{endpoint}}?host={{service}}' : (${exception.statusCode}) ${exception.message}"
+                         />
+                </doCatch>
+
+                <!--
+                Any other exception when interacting with the endpoint is a 500.
+                -->
+                <doCatch>
+                    <exception>java.lang.Throwable</exception>
+
+                    <log logName="com.github.osxhacker.demo"
+                         loggingLevel="error"
+                         message="REST DELETE '{{endpoint}}?host={{service}}' : ${exception.message}"
+                         />
+
+                    <setHeader name="CamelHttpResponseCode">
+                        <constant resultType="int">500</constant>
+                    </setHeader>
+                    <setHeader name="CamelHttpResponseText">
+                        <constant>Internal Server Error.</constant>
+                    </setHeader>
+                </doCatch>
+            </doTry>
+
+            <log logName="com.github.osxhacker.demo"
+                 loggingLevel="info"
+                 message="REST DELETE '{{endpoint}}?host={{service}}' : (${header.CamelHttpResponseCode}) ${body}"
+                 />
+        </route>
+    </routeTemplate>
+</routeTemplates>
+

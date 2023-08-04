@@ -1,0 +1,65 @@
+# @(#) Docker Compose configuration for operations services
+#
+# Some of this configuration is derived from this article:
+#
+#    https://navendu.me/posts/introduction-to-monitoring-microservices/
+#
+
+# This is the docker-compose version required and is dependent upon
+# what version of docker-compose installed.
+version: '3.8'
+
+services:
+  prometheus:
+    image: "prom/prometheus:v2.43.1"
+    container_name: "prometheus"
+    hostname: "prometheus"
+    restart: "unless-stopped"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    # Expose prometheus to its default host port.
+    ports:
+      - "9090:9090"
+    networks:
+      - lan
+      - services
+      - repositories
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-storage:/prometheus
+
+  grafana:
+    image: "grafana/grafana:9.5.2"
+    container_name: "grafana"
+    hostname: "grafana"
+    restart: "unless-stopped"
+    # Expose Grafana to its default host port.
+    ports:
+      - "3000:3000"
+    networks:
+      - lan
+      - repositories
+    extra_hosts:
+      - "loki.docker:172.28.100.110"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: cilantroPARSLEY
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources/
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
+  prometheus-storage:
+
+networks:
+  lan:
+    driver: bridge
+  repositories:
+    name: repositories_lan
+    external: true
+  services:
+    name: services_lan
+    external: true
+

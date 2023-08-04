@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+(package): HAL
+
+type: object
+displayName: Embedded
+description: >
+  The Embedded type is the RAML representation of the object
+  [described](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-4.1.2)
+  in the HAL specification.  It is optionally provided in a
+  **ResourceObject**.
+
+(asMap):
+  key: LinkRelation
+  value: ResourceObject
+

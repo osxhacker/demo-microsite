@@ -1,0 +1,123 @@
+# @(#) Docker Compose configuration for persistent stores
+
+# This is the docker-compose version required and is dependent upon
+# what version of docker-compose installed.
+version: '3.8'
+
+services:
+  # For more information regarding these options, see:
+  # https://github.com/docker-library/docs/blob/master/postgres/README.md
+  postgres:
+    image: "postgres:14.5"
+    container_name: "postgres"
+    hostname: "postgres"
+    restart: "unless-stopped"
+    # Expose postgresql to an unassigned host port.
+    ports:
+      - "6430:5432"
+    networks:
+      - lan
+    # These environment settings could also be specified using the
+    # docker-compose 'env_file' entry.  See:
+    # https://docs.docker.com/compose/compose-file/#env_file
+    environment:
+      INVENTORY_DB: inventory
+      INVENTORY_USER: inventory
+      INVENTORY_PASSWORD: orangePLUM
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: lettuceTOMATOonion
+      STORAGE_FACILITY_DB: storage_facility
+      STORAGE_FACILITY_USER: storage_facility
+      STORAGE_FACILITY_PASSWORD: avocadoTOMATO
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/create_databases.sh
+
+  mongodb:
+    image: "mongo:5.0"
+    container_name: "mongo"
+    hostname: "mongo"
+    restart: "unless-stopped"
+    # Expose mongodb to an unassigned host port.
+    ports:
+      - "6440:27017"
+    networks:
+      - lan
+    environment:
+      MONGO_INITDB_DATABASE: admin
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: tomatoPOTATO
+    volumes:
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    hostname: "zookeeper"
+    container_name: "zookeeper"
+    ports:
+      - "2181:2181"
+    networks:
+      - lan
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    hostname: "kafka"
+    container_name: "kafka"
+    ports:
+      - "9092:9092"
+      - "9999:9999"
+    networks:
+      lan:
+        ipv4_address: 172.28.100.100
+    environment:
+      # see: https://www.confluent.io/blog/kafka-listeners-explained/
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://172.28.100.100:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+    depends_on:
+      - zookeeper
+
+  loki:
+    image: grafana/loki:2.8.2
+    hostname: "loki"
+    container_name: "loki"
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      lan:
+        ipv4_address: 172.28.100.110
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+
+volumes:
+  pgdata:
+  mongodb:
+  mongoconfig:
+
+networks:
+  lan:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.100.0/24
+          gateway: 172.28.100.1
+

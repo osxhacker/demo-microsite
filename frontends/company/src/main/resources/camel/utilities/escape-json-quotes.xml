@@ -1,0 +1,23 @@
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:escape-json-quotes' route defines the logic for ensuring
+    a message $body having a valid JSON value is escaped such that it
+    can be embedded within another JSON object as a string property.
+    -->
+    <route>
+        <from uri="direct:escape-json-quotes"/>
+
+        <transform>
+            <simple>${bodyAs(String)}</simple>
+        </transform>
+
+        <transform>
+            <ognl>request.body.replace("\"", "\\\"")</ognl>
+        </transform>
+    </route>
+</routes>

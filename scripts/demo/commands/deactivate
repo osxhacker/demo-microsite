@@ -1,0 +1,22 @@
+# @(#) Command for specifying the 'deactivate' semantic action
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+[[ $# -gt 1 ]] || err 2 "missing HTTP verb\n\nSee demo.sh --help"
+
+ENDPOINT="$ENDPOINT/deactivate"
+shift 1
+exec $SH "$COMMANDS/$1" $@
+

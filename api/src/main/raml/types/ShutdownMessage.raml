@@ -1,0 +1,17 @@
+#%RAML 1.0 DataTypes
+(package): Shared
+displayName: ShutdownMessage
+
+description: >
+  The ShutdownMessage type provides a service with context when a
+  `shutdown` is being initiated.
+
+type: object
+properties:
+  message:
+    description: >
+      Message which is logged when a shutdown request has been accepted.
+
+    type: string
+    minLength: 1
+    maxLength: 1024

@@ -1,0 +1,136 @@
+package com.github.osxhacker.demo.api.storageFacility
+
+import org.scalatest.diagrams.Diagrams
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
+import com.github.osxhacker.demo.api.ProjectSpec
+
+
+/**
+ * The '''StorageFacilitySpec''' type certifies the
+ * [[com.github.osxhacker.demo.api.storageFacility.StorageFacility]] API type
+ * for fitness of purpose and serves as an exemplar of its use.
+ */
+final class StorageFacilitySpec ()
+	extends ProjectSpec
+		with Diagrams
+		with ScalaCheckPropertyChecks
+		with StorageFacilitySupport
+{
+	"The StorageFacility API type" must {
+		"be a model of ResourceObject" in {
+			val parentType = classOf[ResourceObject]
+
+			assert (parentType.isAssignableFrom (classOf[StorageFacility]))
+			}
+
+		"be able to contain values which satisfy its contract" in {
+			forAll {
+				facility : StorageFacility =>
+
+					assert (facility._links.isEmpty)
+					assert (facility._embedded.isEmpty)
+					assert (facility.city.value.nonEmpty)
+					assert (facility.state.value.nonEmpty)
+					assert (facility.zip.value.nonEmpty)
+				}
+			}
+
+		"be able to detect and reject invalid names" in {
+			/// Valid pattern: "^[^ \t].*[^ \t]$"
+			val invalidNames = Table (
+				/// Leading and trailing spaces are not allowed
+				" test", "\ttest", " \ttest", "\t test",
+				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
+
+				/// Must be at least 2 characters long
+				"", "x",
+
+				/// Cannot exceed 64 characters
+				"." * 65
+				)
+
+			forAll (invalidNames) {
+				candidate =>
+					val result = StorageFacility.NameType.from (candidate)
+
+					assert (
+						result.isLeft,
+						s"failed to detect invalid name: '$candidate'"
+						)
+				}
+			}
+
+		"be able to detect and reject invalid city names" in {
+			/// Valid pattern: "^[A-Za-z'][A-Za-z'-. ]*[a-z]$"
+			val invalidCities = Table (
+				/// Leading and trailing spaces are not allowed
+				" test", "\ttest", " \ttest", "\t test",
+				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
+
+				/// Must be at least 2 characters long
+				"A",
+
+				/// Cannot exceed 64 characters
+				"X" * 65,
+
+				/// Cannot contain shell/HTML/programming-like characters
+				"Bad & City", "Bad $ City", "Bad [ City",
+				"Bad ] City", "Bad / City", "Bad % City",
+				"Bad ` City", "Bad ( City", "Bad ) City"
+				)
+
+			forAll (invalidCities) {
+				candidate =>
+					val result = StorageFacility.CityType.from (candidate)
+
+					assert (
+						result.isLeft,
+						s"failed to detect invalid city: '$candidate'"
+						)
+				}
+			}
+
+		"be able to detect and reject invalid state names" in {
+			/// Valid pattern: "^[A-Z]+$"
+			val invalidStates = Table (
+				/// Cannot be empty or spaces
+				"", "  ", "   ", "\t ", " \t ", "  \t",
+
+				/// Cannot be lower case
+				"ny", "Ca", "pA"
+				)
+
+			forAll (invalidStates) {
+				candidate =>
+					val result = StorageFacility.StateType.from (candidate)
+
+					assert (
+						result.isLeft,
+						s"failed to detect invalid state: '$candidate'"
+						)
+				}
+			}
+
+		"be able to detect and reject invalid zip codes" in {
+			/// Valid pattern: "^[0-9]{5}(?:-[0-9]{4})?$"
+			val invalidZips = Table (
+				/// Cannot be empty or spaces
+				"", "     ", "\t    ", "  \t  ", "    \t",
+
+				/// Cannot contain non-numeric characters
+				"123a5", "ABCDE", "12345-AbCdE"
+				)
+
+			forAll (invalidZips) {
+				candidate =>
+					val result = StorageFacility.ZipType.from (candidate)
+
+					assert (
+						result.isLeft,
+						s"failed to detect invalid state: '$candidate'"
+						)
+				}
+			}
+		}
+}

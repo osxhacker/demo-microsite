@@ -1,0 +1,29 @@
+# @(#) Command for requesting resource expansion for the ENDPOINT
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+[[ $# -gt 1 ]] || err 2 "missing expand enum\n\nSee demo.sh --help"
+
+if [[ -z "${QUERY_PARAMETERS:-}" ]]
+then
+	QUERY_PARAMETERS="?expand=$1"
+else
+	QUERY_PARAMETERS="${QUERY_PARAMETERS}&expand=$1"
+fi
+
+NEXT="$COMMANDS/$2"
+shift 2
+exec $SH $NEXT $@
+

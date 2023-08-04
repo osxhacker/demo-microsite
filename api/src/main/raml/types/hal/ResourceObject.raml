@@ -1,0 +1,40 @@
+#%RAML 1.0 DataType
+(package): HAL
+type: object
+displayName: ResourceObject
+
+description: |
+  Hypertext Application Language common resource definition.
+
+  Notes
+
+  - The `_links` content is ignored when received by the system.
+  - The `_embedded` content is ignored when received by the system.
+
+  See [here](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal).
+
+properties:
+  _links?:
+    description: |
+      An optional **Links** object which represents the semantic
+      actions available for **this** resource.  From
+      [the specification](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-4.1.1)
+
+      > It is an object whose property names are link relation types (as
+      > defined by [RFC5988]) and values are either a Link Object or an array
+      > of Link Objects.  The subject resource of these links is the Resource
+      > Object of which the containing "_links" object is a property.
+
+    type: Links
+  _embedded?:
+    description: |
+      An optional **Embedded** object which contains expanded resources
+      in addition to **this** resource.  From
+      [the specification](https://datatracker.ietf.org/doc/html/draft-kelly-json-hal#section-4.1.2)
+
+      > It is an object whose property names are link relation types (as
+      > defined by [RFC5988]) and values are either a Resource Object or an
+      > array of Resource Objects.
+
+    type: Embedded
+

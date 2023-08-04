@@ -1,0 +1,69 @@
+#%RAML 1.0 DataType
+(package): Shared
+type: object
+displayName: WebLink
+
+description: |
+  The WebLink type defines what objects can be provided in the
+  `_links` property of a **HalResource**.
+
+  See [RFC-8288](https://www.rfc-editor.org/rfc/rfc8288).
+
+properties:
+  method:
+    description: |
+      Every **WebLink** specifies what
+      [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+      must be used when interacting with the resource.
+
+    type: SupportedHttpMethods
+  rel:
+    description: |
+      Defines the link relation type.  This can be one of the standard
+      relations or an application specific one.
+
+      For an up-to-date listing of the IANA registered relations,
+      including their descriptions and defining authorities, see
+      [here](https://www.iana.org/assignments/link-relations/link-relations.xml).
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ ]+$"
+  href:
+    description: |
+      The location of the resource.
+
+      - Can be fully qualified [URL](https://datatracker.ietf.org/doc/html/rfc1738)
+      - Can be an absolute path (`/some/resource/path`)
+      - Can be a relative path (`../sibling`)
+      - Fragments are not supported
+
+    type: URL
+  mediaType:
+    description: |
+      This is a *hint* as to what the media type of the result is when
+      dereferencing the `href`.  Note that it is not named "type" as
+      indicated by the
+      [specification](https://www.rfc-editor.org/rfc/rfc8288#section-3.4.1)
+      due to conflicting with YAML and supported programming languages.
+
+    type: string
+    minLength: 8
+    maxLength: 32
+    pattern: "^(?:application|image|text)/[A-Za-z0-9_.+-]+$"
+  title?:
+    description: |
+      Contains the short, displayable text if given.
+
+    type: string
+    minLength: 1
+    maxLength: 64
+  length?:
+    description: |
+      The optional size (in bytes) of the resource.
+
+    type: integer
+    format: long
+    minimum: 0
+

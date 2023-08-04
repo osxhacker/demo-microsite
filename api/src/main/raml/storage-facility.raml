@@ -1,0 +1,103 @@
+#%RAML 1.0
+title: Storage Facility Service API
+version: v1
+baseUri: http://localhost:6890/api
+
+annotationTypes: !include types/annotations.raml
+types: !include types/storage-facility/types.raml
+
+# The default media type is JSON.  Each resource can override that
+# as needed.
+mediaType: application/json
+
+# RAML resourceTypes are templates for resource definitions.
+resourceTypes:
+  change-status: !include resourceTypes/change-status.raml
+  collection: !include resourceTypes/collection.raml
+  collection-item: !include resourceTypes/collection-item.raml
+  heartbeat: !include resourceTypes/heartbeat.raml
+  shutdown: !include resourceTypes/shutdown.raml
+
+
+########################################################################
+# Internal Resources
+########################################################################
+
+/internal/heartbeat:
+  type: heartbeat
+
+/internal/shutdown:
+  type: shutdown
+
+
+########################################################################
+# Public Resources
+########################################################################
+
+# The storage-facilities top-level endpoint defines the contract
+# for managing StorageFacility instances as being:
+#
+# The collection holds unique instances.
+# Logical uniqueness is defined by the "name" property.
+# Clients are expected to provide unique names.
+#
+/{company}/storage-facilities:
+  type:
+    collection:
+      collectionResource: StorageFacilities
+      existingResource: StorageFacility
+      newResource: NewStorageFacility
+
+  uriParameters:
+    company:
+      type: CompanySlug
+
+  # The client can optionally provide what known embedded
+  # resources should be resolved and returned within the
+  # StorageFacility resources.
+  get:
+    queryParameters:
+      expand?: StorageFacilitiesExpansion
+
+  put:
+
+  # Individual storage facility instances are made available under
+  # this endpoint.  The "{facility}" is the entity URN or UUID.
+  /{facility}:
+    type:
+      collection-item:
+        resource: StorageFacility
+        itemIdParameter: facility
+        itemIdType: string
+
+    # The client can optionally provide what known embedded
+    # resources should be resolved and returned within the
+    # StorageFacility resource.
+    get:
+      queryParameters:
+        expand?: StorageFacilityExpansion
+
+    # Attempt to activate the StorageFacility, succeeding when the
+    # current StorageFacilityStatus allows transitioning to
+    # "Active."  If it is semantically valid for this endpoint to
+    # be invoked for any given StorageFacility, it will be
+    # provided by the service within the `_links` array.
+    /activate:
+      type:
+        change-status:
+          resource: StorageFacility
+          itemIdParameter: facility
+          itemIdType: string
+
+    # Attempt to close the StorageFacility, succeeding when the
+    # current StorageFacilityStatus allows transitioning to
+    # "Closed."  If it is semantically valid for this endpoint to
+    # be invoked for any given StorageFacility, it will be
+    # provided by the service within the `_links` array.
+    /close:
+      type:
+        change-status:
+          resource: StorageFacility
+          itemIdParameter: facility
+          itemIdType: string
+

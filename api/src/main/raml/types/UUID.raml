@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+(package): Shared
+
+description: >
+  The UUID type defines a RAML representation of a v4
+  [standard UUID](https://datatracker.ietf.org/doc/html/rfc4122).
+
+  Language specific UUID mappings, such as `java.util.UUID`,
+  can be used instead of this definition.  In those cases,
+  this RAML definition may not be included.
+
+type: string
+minLength: 36
+maxLength: 36
+pattern: "^[A-Za-z0-9]{8}-[A-Za-z0-9]{4}-[3-9][A-Za-z0-9]{3}-[A-Za-z0-9]{4}-[A-Za-z0-9]{12}$"
+

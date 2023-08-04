@@ -1,0 +1,19 @@
+#%RAML 1.0 DataType
+(package): Event
+displayName: DistributedEvent
+discriminator: type
+
+description: >
+  **DistributedEvent** is the common ancestor to *all* events
+  which can be produced by *any* microservice.
+
+properties:
+  type:
+    description: >
+      The type property defines how each **DistributedEvent**
+      can be identified in JSON form.  It is a **URL** to
+      encourage hierarchial organization.
+
+    type: URL
+  origin: EventOrigin
+

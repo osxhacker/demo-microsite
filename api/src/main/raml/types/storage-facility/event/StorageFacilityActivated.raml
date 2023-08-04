@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+(package): StorageFacilityEvent
+type: StorageFacilityStatusChanged
+displayName: StorageFacilityActivated
+discriminatorValue: "/event/domain/storage-facility/status/activated"
+
+description: >
+  The **StorageFacilityActivated** event is emitted when a
+  **StorageFacility** has its **StorageFacilityStatus**
+  altered to be "Active".
+

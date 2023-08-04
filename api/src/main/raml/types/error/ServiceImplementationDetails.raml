@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: ServiceImplementationDetails
+discriminatorValue: "/problem/service-implementation"
+
+description: >
+  The **ServiceImplementationDetails** type is a **ProblemDetails** which
+  is produced when an internal implementation logic error is detected.
+
+properties:
+  status:
+    type: integer
+    default: 500
+

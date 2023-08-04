@@ -1,0 +1,160 @@
+#*
+    @(#) Company detail view Velocity template
+
+    Body: Company (RAML API)
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<section class='view pure-form pure-form-aligned'>
+    <fieldset>
+        <div class='pure-control-group'>
+            <label for='id'>Id</label>
+            <span>$body.get("id").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='version'>Version</label>
+            <span>$body.get("version").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='created-on'>Created</label>
+            <span>$body.get("createdOn").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='last-changed'>Last Changed</label>
+            <span>$body.get("lastChanged").asText()</span>
+        </div>
+
+        <hr/>
+
+        <div class='pure-control-group'>
+            <label for='status'>Status</label>
+            <input
+                type='text'
+                id='status'
+                placeholder='$body.get("status").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='slug'>Slug</label>
+            <input
+                type='text'
+                id='slug'
+                placeholder='$body.get("slug").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='name'>Name</label>
+            <input
+                type='text'
+                id='name'
+                placeholder='$body.get("name").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='description'>Description</label>
+            <textarea
+                rows=10
+                cols=40
+                maxlength=2048
+                id='description'
+                readonly
+                >$body.get("description").asText()</textarea>
+        </div>
+    </fieldset>
+</section>
+
+<section class="pure-button-group" role="group">
+    <a class="pure-button"
+        href='/company/view?self=$body.at("/_links/self/href").asText()'
+        >
+        Refresh
+    </a>
+
+    #if( $body.at("/_links/edit").isMissingNode() == false )
+        <button class="pure-button"
+            hx-get='/company/edit-form?self=$body.at("/_links/self/href").asText()'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            Edit
+        </button>
+    #end
+
+    #*
+        Determine what semantic actions are available and render them.
+        Which are available is determined by the services and, as such,
+        must be inspected individually.
+    *#
+
+    #if( $body.at("/_links/urn:company:activate").isMissingNode() == false )
+        #set( $action = $body.at("/_links/urn:company:activate/href").asText() )
+        #set( $title = $body.at("/_links/urn:company:activate/title").asText("Activate") )
+        #set( $version = $body.get("version").asInt() )
+
+        <button class="pure-button"
+            hx-post='/company/change-status?companyAction=$action&companyVersion=$version'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    #if( $body.at("/_links/urn:company:deactivate").isMissingNode() == false )
+        #set( $action = $body.at("/_links/urn:company:deactivate/href").asText() )
+        #set( $title = $body.at("/_links/urn:company:deactivate/title").asText("Deactivate") )
+        #set( $version = $body.get("version").asInt() )
+
+        <button class="pure-button"
+            hx-post='/company/change-status?companyAction=$action&companyVersion=$version'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    #if( $body.at("/_links/urn:company:suspend").isMissingNode() == false )
+        #set( $action = $body.at("/_links/urn:company:suspend/href").asText() )
+        #set( $title = $body.at("/_links/urn:company:suspend/title").asText("Suspend") )
+        #set( $version = $body.get("version").asInt() )
+
+        <button class="pure-button"
+            hx-post='/company/change-status?companyAction=$action&companyVersion=$version'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    #if( $body.at("/_links/delete").isMissingNode() == false )
+        #set( $action = $body.at("/_links/delete/href").asText() )
+        #set( $title = $body.at("/_links/delete/title").asText("Delete") )
+
+        <button class="pure-button"
+            hx-delete='/company/delete?delete=$action'
+            hx-confirm='This action cannot be undone.  Continue?'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    <a class="pure-button"
+        href='/company'
+        >
+        Summary
+    </a>
+</section>

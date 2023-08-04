@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+
+<!-- see: https://logback.qos.ch/manual/configuration.html -->
+<configuration>
+    <import class="ch.qos.logback.classic.AsyncAppender" />
+    <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" />
+    <import class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter" />
+    <import class="ch.qos.logback.core.ConsoleAppender" />
+    <import class="net.logstash.logback.appender.LogstashUdpSocketAppender" />
+
+    <if condition='isDefined("LOGSTASH")'>
+        <then>
+            <appender name="JSON" class="net.logstash.logback.appender.LogstashUdpSocketAppender">
+				<host>${LOGSTASH}</host>
+                <port>5514</port>
+
+				<layout class="net.logstash.logback.layout.LogstashLayout">
+					<customFields>{"microservice":"storage-facility"}</customFields>
+				</layout>
+            </appender>
+        </then>
+        <else>
+            <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+				<layout class="net.logstash.logback.layout.LogstashLayout">
+					<customFields>{"microservice":"storage-facility"}</customFields>
+				</layout>
+            </appender>
+        </else>
+    </if>
+
+    <appender name="PLAIN" class="ConsoleAppender">
+        <encoder class="PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- see: https://logback.qos.ch/manual/appenders.html#AsyncAppender -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>4096</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+
+        <!--
+        see: https://logback.qos.ch/manual/configuration.html#defaultValuesForVariables
+        -->
+        <appender-ref ref="${LOG_LAYOUT:-JSON}" />
+    </appender>
+
+    <!-- Custom Log Levels -->
+
+	<!--
+	LogstashEncoder apparently does not pick up changes in log levels.
+	Therefore, if LOGSTASH is defined, unconditionally use the DEBUG
+	log level.
+	-->
+    <if condition='isDefined("LOGSTASH")'>
+        <then>
+			<logger
+				name="com.github.osxhacker"
+				level="DEBUG"
+				/>
+		</then>
+	</if>
+
+    <logger
+        name="org.http4s"
+        level="INFO"
+        />
+
+    <logger
+        name="org.http4s.blaze.channel"
+        level="WARN"
+        />
+
+	<logger
+		name="org.apache.kafka.clients"
+		level="INFO"
+		/>
+
+	<logger
+		name="oshi.util.FileUtil"
+		level="WARN"
+		/>
+
+    <!--
+    see: https://logback.qos.ch/manual/configuration.html#defaultValuesForVariables
+    -->
+    <if condition='isDefined("LOGSTASH")'>
+        <then>
+			<root level="debug">
+				<appender-ref ref="ASYNC" />
+			</root>
+		</then>
+		<else>
+			<root level="${LOG_LEVEL:-info}">
+				<appender-ref ref="ASYNC" />
+			</root>
+		</else>
+	</if>
+</configuration>

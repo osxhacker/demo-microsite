@@ -1,0 +1,36 @@
+#%RAML 1.0 DataType
+(package): CompanyEvent
+type: CompanyEvent
+displayName: CompanyCreated
+discriminatorValue: "/event/domain/company/created"
+
+description: >
+  The **CompanyCreated** **CompanyEvent** is emitted whenever
+  a **Company** has been defined.
+
+properties:
+  createdOn:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  lastChanged:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  slug: CompanySlug
+  name:
+    description: >
+      Official name of the organization.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].+[^ \t]$"
+  status:
+    type: CompanyStatus
+  description:
+    description: >
+      Optional free-form textual description of the organization.
+
+    type: string
+    maxLength: 2048
+    default: ""
+

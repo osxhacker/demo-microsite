@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: LogicErrorDetails
+discriminatorValue: "/problem/logic-error"
+
+description: >
+  The **LogicErrorDetails** type is a **ProblemDetails** which
+  is produced when there is an implementation error within a
+  service.
+
+properties:
+  status:
+    type: integer
+    default: 500

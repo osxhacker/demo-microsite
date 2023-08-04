@@ -1,0 +1,18 @@
+#%RAML 1.0 DataType
+(package): CompanyEvent
+type: CompanyEvent
+displayName: CompanySlugChanged
+discriminatorValue: "/event/domain/company/slug-changed"
+
+description: >
+  The **CompanySlugChanged** **CompanyEvent** is emitted
+  whenever a **Company** has its `slug` property altered.
+
+  Since **CompanySlug** uniquely identifies each **Company**,
+  this event includes the `from` and `to` properties to help
+  consumers identify impact.
+
+properties:
+  from: CompanySlug
+  to: CompanySlug
+

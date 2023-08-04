@@ -1,0 +1,20 @@
+#%RAML 1.0 DataTypes
+(package): Shared
+
+description: |
+  RAML specification of a
+  [URL](https://datatracker.ietf.org/doc/html/rfc1738).
+
+  Notes
+
+  - Can be fully qualified (`http://example.com/some/resource/path`)
+  - Can be an absolute path (`/some/resource/path`)
+  - Can be a relative path (`../sibling`)
+  - Fragments are not supported
+
+type: string
+displayName: URL
+minLength: 1
+maxLength: 1024
+pattern: "^(?:(?:http|https)://[A-Za-z0-9.]+)?(?:/[A-Za-z0-9.%+-]*)+(?:[?][^/#]+)?$"
+

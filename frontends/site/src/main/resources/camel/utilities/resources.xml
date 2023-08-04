@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <route>
+        <from uri="direct:resource-as-url"/>
+        <setHeader name="demo.resource.url">
+			<ognl>context.classResolver.loadResourceAsURL (headers["demo.resource.path"])</ognl>
+        </setHeader>
+    </route>
+
+    <route>
+        <from uri="direct:load-resource"/>
+        <setBody>
+			<ognl>context.classResolver.loadResourceAsStream (headers["demo.resource.path"])</ognl>
+        </setBody>
+        <transform>
+			<ognl>#stream = request.body, #bytes = #stream.readAllBytes (), #stream.close (), #bytes</ognl>
+        </transform>
+    </route>
+</routes>

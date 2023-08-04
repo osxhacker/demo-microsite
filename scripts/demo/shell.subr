@@ -1,0 +1,82 @@
+# @(#) Common POSIX shell variables and subroutines
+#
+# vim: syntax=sh
+#
+
+
+########################################################################
+# Manifest Constants
+########################################################################
+
+# Locations
+readonly COMMANDS="$SCRIPT_HOME/commands"
+readonly RAML="$SCRIPT_HOME/../../api/src/main/raml"
+readonly TEMPLATES="$SCRIPT_HOME/templates"
+
+
+########################################################################
+# Shared subroutines
+########################################################################
+
+# findInPath [program]
+#
+#	Locate a program in PATH, exiting if cannot be found.
+#
+findInPath () {
+	program="$1"
+	location=$(
+		echo "$PATH" |
+		sed -e 's/:/\n/g' |
+		while read -r dir
+		do
+			if [[ -x "$dir/$program" ]]
+			then
+				echo "$dir/$program"
+				break
+			fi
+		done
+		)
+
+	[[ -z "$location" ]] && err 128 "unable to find $program"
+
+	echo "$location"
+}
+
+
+# err [exitval] [message]
+#
+#	Use this function to indicate an error and immidately terminate
+#	execution.
+#
+err () {
+	code="$1"
+
+	if [[ ! -z "${2:-}" ]]
+	then
+		echo "$2" >&2
+	fi
+
+	exit $code
+}
+
+# microserviceBaseUri
+#
+#	This function extracts the "baseUri" property from the RAML
+#	microservice top-level definition.
+#
+microserviceBaseUri () {
+	[[ -f "$RAML/$1.raml" ]] || err 129 "'$1.raml' not found"
+
+	grep '^baseUri:' $RAML/$1.raml | awk '{ print $2 }'
+}
+
+
+########################################################################
+# Program Locations
+########################################################################
+
+CURL="$(findInPath curl)" || err $?
+JO="$(findInPath jo)" || err $?
+JQ="$(findInPath jq)" || err $?
+SH="/bin/sh"
+

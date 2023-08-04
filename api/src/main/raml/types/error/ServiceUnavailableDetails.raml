@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+(package): Error
+type: ProblemDetails
+displayName: ServiceUnavailableDetails
+discriminatorValue: "/problem/service-unavailable"
+
+description: >
+  The **ServiceUnavailableDetails** type is a **ProblemDetails** which
+  is produced when the microservice is not available for normal use
+  at this time.
+
+properties:
+  status:
+    type: integer
+    default: 503
+

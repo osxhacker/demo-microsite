@@ -1,0 +1,10 @@
+#%RAML 1.0 DataType
+(package): CompanyEvent
+type: DomainEvent
+displayName: CompanyEvent
+discriminatorValue: "/event/domain/company"
+
+description: >
+  The **CompanyEvent** **DomainEvent** is the common ancestor
+  to *all* **Company**-related distributed events.
+

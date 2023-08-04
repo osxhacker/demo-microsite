@@ -1,0 +1,35 @@
+#%RAML 1.0
+title: Inventory Service API
+version: v1
+baseUri: http://localhost:6890/api
+
+annotationTypes: !include types/annotations.raml
+types: !include types/inventory/types.raml
+
+# The default media type is JSON.  Each resource can override that
+# as needed.
+mediaType: application/json
+
+# RAML resourceTypes are templates for resource definitions.
+resourceTypes:
+  collection: !include resourceTypes/collection.raml
+  collection-item: !include resourceTypes/collection-item.raml
+  heartbeat: !include resourceTypes/heartbeat.raml
+  shutdown: !include resourceTypes/shutdown.raml
+
+
+########################################################################
+# Internal Resources
+########################################################################
+
+/internal/heartbeat:
+  type: heartbeat
+
+/internal/shutdown:
+  type: shutdown
+
+
+########################################################################
+# Public Resources
+########################################################################
+

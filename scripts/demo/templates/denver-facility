@@ -1,0 +1,9 @@
+{
+  "name": "Main warehouse",
+  "status": "Active",
+  "city": "Denver",
+  "state": "CO",
+  "zip": "80022",
+  "capacity": 300000,
+  "available": 300000
+}

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rests xmlns="http://camel.apache.org/schema/spring"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       ">
+    <!--
+    REST Endpoint (consumer) Definitions
+
+    In Camel, a consumer is a definition which *receives* messages.  Here,
+    all REST DSL endpoint routes are made available under '/company' or
+    '/internal'.
+    -->
+    <rest path="/company">
+        <post path="/change-status">
+            <to uri="direct:company-change-status"/>
+        </post>
+
+        <get path="/create-form">
+            <to uri="direct:load-company-create-form"/>
+        </get>
+
+        <post path="/create">
+            <to uri="direct:company-create"/>
+        </post>
+
+        <delete path="/delete">
+            <to uri="direct:company-delete"/>
+        </delete>
+
+        <get path="/edit-form">
+            <to uri="direct:company-edit-form"/>
+        </get>
+
+        <post path="/save">
+            <to uri="direct:company-save"/>
+        </post>
+
+        <get path="/summary">
+            <to uri="direct:company-summary"/>
+        </get>
+
+        <get path="/view">
+            <param name="self" type="query"/>
+
+            <to uri="direct:company-view"/>
+        </get>
+
+        <get path="/javascript/htmx/{filename}">
+            <to uri="direct:load-htmx-javascript-file"/>
+        </get>
+
+        <get path="/stylesheet/pure/{filename}">
+            <to uri="direct:load-pure-stylesheet-file"/>
+        </get>
+
+        <get path="/stylesheet/{filename}">
+            <to uri="direct:load-stylesheet-file"/>
+        </get>
+
+        <get path="/index.html">
+            <to uri="direct:site-index"/>
+        </get>
+
+        <get path="/">
+            <to uri="direct:site-index"/>
+        </get>
+    </rest>
+
+    <rest path="/internal">
+        <get path="/heartbeat">
+            <to uri="direct:heartbeat"/>
+        </get>
+
+        <get path="/shutdown">
+            <to uri="direct:shutdown"/>
+        </get>
+    </rest>
+</rests>
+

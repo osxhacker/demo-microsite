@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routeTemplates id="camel-xml-io-dsl"
+                xmlns="http://camel.apache.org/schema/spring"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                ">
+    <!--
+    The 'classpath-resource' route template defines the workflow for resolving
+    an arbitrary resource from the classpath.
+
+    Parameters:
+
+    name - the Camel 'direct' endpoint name defined (must be unique)
+    resource - what resource to load (full path)
+    postprocessor - the Camel endpoint expected to produce content headers
+    -->
+    <routeTemplate id="classpath-resource">
+        <templateParameter name="name"/>
+        <templateParameter name="resource"/>
+        <templateParameter name="postprocessor"/>
+
+        <route>
+            <from uri="direct:{{name}}"/>
+
+            <log logName="com.github.osxhacker.demo"
+                loggingLevel="info"
+                message="loading '{{resource}}'"
+                />
+
+            <setHeader name="demo.resource.path">
+                <simple>{{resource}}</simple>
+            </setHeader>
+
+            <!--
+            Any failure to load the desired resource is reported as
+            being a 404.
+            -->
+            <doTry>
+                <to uri="direct:load-resource"/>
+				<to uri="direct:{{postprocessor}}"/>
+
+                <doCatch>
+                    <exception>java.lang.Throwable</exception>
+                    <log message="unable to load '{{resource}}'"
+                        loggingLevel="error"
+                        />
+
+                    <setHeader name="CamelHttpResponseCode">
+                        <constant>404</constant>
+                    </setHeader>
+                    <setHeader name="Content-Type">
+                        <constant>text/plain</constant>
+                    </setHeader>
+                    <setBody>
+                        <constant>File not found.</constant>
+                    </setBody>
+                </doCatch>
+            </doTry>
+        </route>
+    </routeTemplate>
+</routeTemplates>
+

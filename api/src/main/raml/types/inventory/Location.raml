@@ -1,0 +1,38 @@
+#%RAML 1.0 DataType
+(package): Inventory
+type: ResourceObject
+displayName: Location
+
+description: >
+  The Location type captures where **PhysicalInventory** resides.
+  It contains information derived from a **StorageFacility** to
+  provide context as to where the inventory can be found.
+
+properties:
+  id: URN
+  name:
+    description: >
+      Symbolic short description of the facility used as a mnemonic
+      reminder.
+
+    type: string
+    minLength: 1
+    maxLength: 64
+    pattern: "^[^ ].+[^ ]$"
+  city:
+    description: >
+      Name of the municipality nearest to or in which the facility
+      resides.
+
+    type: string
+    minLength: 2
+    maxLength: 32
+    pattern: "^[A-Za-z'][A-Za-z'. -]*[a-z]$"
+  state:
+    description: >
+      State, province, or territory where the facility is located.
+
+    type: string
+    minLength: 2
+    maxLength: 3
+    pattern: "^[A-Z]+$"

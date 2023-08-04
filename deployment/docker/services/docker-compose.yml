@@ -1,0 +1,105 @@
+# @(#) Docker Compose configuration for microservices
+
+# This is the docker-compose version required and is dependent upon
+# what version of docker-compose installed.
+version: '3.8'
+
+services:
+  company:
+    build: ../../../services/company/target/docker
+    container_name: "company"
+    hostname: "company"
+    restart: "no"
+    ports:
+      # Kamon status page
+      - target: 5266
+        published: 5238
+        protocol: tcp
+        mode: host
+      # Service API
+      - target: 6891
+        published: 6891
+        protocol: tcp
+        mode: host
+      # Prometheus metrics
+      - target: 9095
+        published: 9557
+        protocol: tcp
+        mode: host
+    networks:
+      - lan
+      - repositories
+    extra_hosts:
+      - "loki.docker:172.28.100.110"
+      - "kafka.docker:172.28.100.100"
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -DLOGSTASH=logstash -server"
+    depends_on:
+      logstash:
+        condition: service_healthy
+
+  storage-facility:
+    build: ../../../services/storage-facility/target/docker
+    container_name: "storage-facility"
+    hostname: "storage_facility"
+    restart: "no"
+    ports:
+      # Kamon status page
+      - target: 5266
+        published: 5237
+        protocol: tcp
+        mode: host
+      # Service API
+      - target: 6890
+        published: 6890
+        protocol: tcp
+        mode: host
+      # Prometheus metrics
+      - target: 9095
+        published: 9556
+        protocol: tcp
+        mode: host
+    networks:
+      - lan
+      - repositories
+    extra_hosts:
+      - "loki.docker:172.28.100.110"
+      - "kafka.docker:172.28.100.100"
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -DLOGSTASH=logstash -server"
+    depends_on:
+      logstash:
+        condition: service_healthy
+
+  logstash:
+    build: ./logstash
+    container_name: "logstash"
+    hostname: "logstash"
+    command: logstash -f config/logback.conf
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9600/" ]
+      timeout: 2s
+      retries: 5
+      start_period: 10s
+    ports:
+      - target: 9600
+        published: 9600
+        protocol: tcp
+        mode: host
+      - target: 5514
+        published: 5514
+        protocol: udp
+        mode: host
+    networks:
+      - lan
+      - repositories
+    extra_hosts:
+      - "loki.docker:172.28.100.110"
+
+networks:
+  lan:
+    driver: bridge
+  repositories:
+    name: repositories_lan
+    external: true
+

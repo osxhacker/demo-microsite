@@ -1,0 +1,36 @@
+#%RAML 1.0 DataType
+(package): Inventory
+displayName: Price
+
+description: |
+  Price defines a monetary value assigned to a product.
+
+type: object
+properties:
+  cents:
+    description: >
+      Monetary amount expressed in the indivisible unit applicable
+      for the given currency code.
+
+    type: integer
+    format: int32
+    minimum: 0
+  fraction:
+    description: >
+      How many significant digits of `cents` are considered part of
+      a partial whole unit (such as dollar or euro).
+
+    type: integer
+    format: int8
+    minimum: 2
+    maximum: 4
+  currency:
+    description: >
+      The [currency code](https://currencysystem.com/codes/) for this
+      **Price**.
+
+    type: string
+    minLength: 3
+    maxLength: 3
+    pattern: "^[A-Z]{3}$"
+

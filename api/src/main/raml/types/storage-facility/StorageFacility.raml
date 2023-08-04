@@ -1,0 +1,72 @@
+#%RAML 1.0 DataType
+(package): StorageFacility
+displayName: StorageFacility
+
+description: >
+  StorageFacility captures the properties of a location which can
+  contain **ProductInventory**.
+
+type: ResourceObject
+properties:
+  id: URN
+  version: Version
+  createdOn:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  lastChanged:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  name:
+    description: >
+      Symbolic short description of the facility used as a mnemonic
+      reminder.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  status:
+    type: StorageFacilityStatus
+  city:
+    description: >
+      Name of the municipality nearest to or in which the facility
+      resides.
+
+    type: string
+    minLength: 2
+    maxLength: 32
+    pattern: "^[A-Za-z][A-Za-z'. -]*[a-z]$"
+  state:
+    description: >
+      State, province, or territory where the facility is located.
+
+    type: string
+    minLength: 2
+    maxLength: 3
+    pattern: "^[A-Z]+$"
+  zip:
+    description: >
+      Postal code for the facility's location.
+
+    type: string
+    minLength: 5
+    maxLength: 10
+    pattern: "^[0-9]{5}(?:-[0-9]{4})?$"
+  capacity:
+    description: >
+      Cubic volume of usable product storage (measured in cubic meters).
+
+    type: number
+    format: double
+    minimum: 0
+    maximum: 300000
+  available:
+    description: >
+      Cubic volume of available product storage (measured in cubic meters).
+      Must not exceed `capacity`.
+
+    type: number
+    format: double
+    minimum: 0
+    maximum: 300000
+

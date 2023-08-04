@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:shutdown' route defines an internal operations route
+    which *immediately* shuts down the microsite.
+    -->
+    <route>
+        <from uri="direct:shutdown"/>
+
+        <log logName="com.github.osxhacker.demo"
+             loggingLevel="info"
+             message="shutting down microsite"
+             />
+
+        <!--
+        A production quality approach would be to define a graceful
+        shutdown as documented here:
+
+        https://camel.apache.org/manual/graceful-shutdown.html
+        -->
+        <setBody>
+            <ognl>context.stop()</ognl>
+        </setBody>
+    </route>
+</routes>
+

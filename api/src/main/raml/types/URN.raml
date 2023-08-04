@@ -1,0 +1,13 @@
+#%RAML 1.0 DataType
+(package): Shared
+displayName: URN
+
+description: >
+  A [URN](https://www.rfc-editor.org/rfc/rfc8141) represents a
+  unique "scheme-specific" entity identity.
+
+type: string
+minLength: 8
+maxLength: 128
+pattern: "^urn:(?:[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*):(?:(?:[A-Za-z0-9]+[_.-])*[A-Za-z0-9])+$"
+

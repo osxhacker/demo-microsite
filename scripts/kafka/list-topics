@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# @(#) Driver script for listing all Kafka topics
+#
+
+KAFKA_SERVER="${KAFKA_SERVER:-localhost:9092}"
+
+kafka-topics.sh --bootstrap-server $KAFKA_SERVER \
+	--list

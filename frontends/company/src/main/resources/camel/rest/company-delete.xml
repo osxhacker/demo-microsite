@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:company-delete' route defines the logic for providing
+    the ability to produce a detailed view of a company resource
+    identified by 'header.companyId' as an HTML snippet.
+    -->
+    <route>
+        <from uri="direct:company-delete"/>
+
+        <to uri="direct:delete-company"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} == 200</simple>
+
+                <setHeader name="filename">
+                    <constant>company/delete-result.html</constant>
+                </setHeader>
+
+                <to uri="direct:load-html-file"/>
+
+                <setHeader name="HomeDocumentTitle">
+                    <constant>Company Deleted</constant>
+                </setHeader>
+
+                <transform>
+                    <simple>${mandatoryBodyAs(String)}</simple>
+                </transform>
+
+                <to uri="velocity:classpath:velocity/home-document.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

@@ -1,0 +1,28 @@
+#%RAML 1.0 DataType
+(package): StorageFacility
+displayName: StorageFacilityCompanyView
+
+description: >
+  **StorageFacilityCompanyView** captures the properties of a
+  Company relevant to the storage facility microservice.
+
+type: ResourceObject
+properties:
+  id: URN
+  createdOn:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  lastChanged:
+    type: datetime
+    example: 2022-09-01T10:12:34.567Z
+  slug: CompanySlug
+  name:
+    description: >
+      Official name of the organization.
+
+    type: string
+    minLength: 2
+    maxLength: 64
+    pattern: "^[^ \t].*[^ \t]$"
+  status:
+    type: CompanyStatus

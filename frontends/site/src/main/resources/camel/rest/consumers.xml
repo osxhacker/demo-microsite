@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rests xmlns="http://camel.apache.org/schema/spring"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="
+              http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+              ">
+    <!--
+    REST Consumer (receiver) Definitions
+
+    In Camel, a consumer is a definition which *receives* messages.
+    -->
+    <rest path="/internal">
+        <get path="/heartbeat">
+            <to uri="direct:heartbeat"/>
+        </get>
+
+        <get path="/shutdown">
+            <to uri="direct:shutdown"/>
+        </get>
+    </rest>
+
+    <rest>
+        <get path="/javascript/htmx/{filename}">
+            <to uri="direct:load-htmx-javascript-file"/>
+        </get>
+
+        <get path="/stylesheet/pure/{filename}">
+            <to uri="direct:load-pure-stylesheet-file"/>
+        </get>
+
+        <get path="/stylesheet/{filename}">
+            <to uri="direct:load-stylesheet-file"/>
+        </get>
+
+        <get path="/index.html">
+            <to uri="direct:load-index"/>
+        </get>
+
+        <get path="/{filename}">
+            <to uri="direct:load-html-file"/>
+        </get>
+
+        <get path="/">
+            <to uri="direct:load-index"/>
+        </get>
+    </rest>
+</rests>
+

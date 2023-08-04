@@ -1,0 +1,13 @@
+#%RAML 1.0 DataType
+(package): Inventory
+
+description: >
+  SKU is a
+  [stock keeping unit](https://www.investopedia.com/terms/s/stock-keeping-unit-sku.asp)
+  defined by a company and is unique within and for the company.
+
+type: string
+minLength: 2
+maxLength: 64
+pattern: "^(?:[A-Z0-9]+-)*[A-Z0-9]$"
+

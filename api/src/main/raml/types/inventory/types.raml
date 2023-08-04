@@ -1,0 +1,87 @@
+########################################
+# Type Aliases
+########################################
+
+UUID:
+  (scala-type): "java.util.UUID"
+
+
+########################################
+# System-wide Types
+########################################
+
+Dimension: !include ../Dimension.raml
+ShutdownMessage: !include ../ShutdownMessage.raml
+SupportedHttpMethods: !include ../SupportedHttpMethods.raml
+URL: !include ../URL.raml
+URN: !include ../URN.raml
+Version: !include ../Version.raml
+WebLink: !include ../WebLink.raml
+
+
+########################################
+# Hypertext Application Language Types
+########################################
+
+Embedded: !include ../hal/Embedded.raml
+ResourceObject: !include ../hal/ResourceObject.raml
+LinkObject: !include ../hal/LinkObject.raml
+Links: !include ../hal/Links.raml
+LinkRelation: !include ../hal/LinkRelation.raml
+
+
+########################################
+# Error Types
+########################################
+
+ProblemDetails: !include ../error/ProblemDetails.raml
+BadRequestDetails: !include ../error/BadRequestDetails.raml
+InvalidModelStateDetails: !include ../error/InvalidModelStateDetails.raml
+LogicErrorDetails: !include ../error/LogicErrorDetails.raml
+MinimalProblemDetails: !include ../error/MinimalProblemDetails.raml
+ObjectNotFoundDetails: !include ../error/ObjectNotFoundDetails.raml
+ServiceImplementationDetails: !include ../error/ServiceImplementationDetails.raml
+ServiceUnavailableDetails: !include ../error/ServiceUnavailableDetails.raml
+StaleObjectDetails: !include ../error/StaleObjectDetails.raml
+
+
+########################################
+# Event Types
+########################################
+
+CompanyActivated: !include ../company/event/CompanyActivated.raml
+CompanyCreated: !include ../company/event/CompanyCreated.raml
+CompanyDeleted: !include ../company/event/CompanyDeleted.raml
+CompanyEvent: !include ../company/event/CompanyEvent.raml
+CompanyInactivated: !include ../company/event/CompanyInactivated.raml
+CompanySlugChanged: !include ../company/event/CompanySlugChanged.raml
+CompanyStatusChanged: !include ../company/event/CompanyStatusChanged.raml
+CompanySuspended: !include ../company/event/CompanySuspended.raml
+DistributedEvent: !include ../event/DistributedEvent.raml
+DomainEvent: !include ../event/DomainEvent.raml
+EventOrigin: !include ../event/EventOrigin.raml
+Region: !include ../event/Region.raml
+ServiceEvent: !include ../event/ServiceEvent.raml
+
+
+########################################
+# Company Types
+########################################
+
+CompanySlug: !include ../company/CompanySlug.raml
+CompanyStatus: !include ../company/CompanyStatus.raml
+
+
+########################################
+# Inventory Types
+########################################
+
+Location: !include ./Location.raml
+NewPhysicalInventory: !include ./NewPhysicalInventory.raml
+NewVirtualInventory: !include ./NewVirtualInventory.raml
+PhysicalInventory: !include ./PhysicalInventory.raml
+Price: !include ./Price.raml
+ProductInventory: !include ./ProductInventory.raml
+SKU: !include ./SKU.raml
+VirtualInventory: !include ./VirtualInventory.raml
+

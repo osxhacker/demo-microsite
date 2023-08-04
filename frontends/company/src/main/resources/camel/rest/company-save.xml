@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:company-save' route defines the logic for providing
+    the ability to persist a company resource.
+    -->
+    <route>
+        <from uri="direct:company-save"/>
+
+        <!--
+        Because the 'edit' action is transmitted as a hidden
+        input field, it does not get decoded by the Camel REST
+        DSL.  Therefore, decoding is done here
+        -->
+        <setHeader name="edit">
+            <ognl>@java.net.URLDecoder@decode(headers["edit"])</ognl>
+        </setHeader>
+
+        <!--
+        JSLT expects valid JSON as input (Camel body).  Since this
+        route adapts URL-encoded forms into JSON, the body must be
+        set to something which is valid (even though it is never
+        used).
+        -->
+        <setBody>
+            <constant>{}</constant>
+        </setBody>
+
+        <to uri="jslt:jslt/company/save-request.jslt"/>
+        <to uri="direct:post-company-save"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} == 200</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <ognl>request.body.at("/name").asText()</ognl>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/company/view.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+
