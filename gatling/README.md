@@ -63,22 +63,24 @@ There are several knobs available to each load test, documented [here](./src/mai
 ### Burst Usage
 
 ```
-cd $(git rev-parse --show-toplevel) && sbt -DLOG_LEVEL=error \
-	-Dsimulation.delay=5 \
-	-Dsimulation.burstUsers=100 \
-	'gatling / GatlingIt / testOnly *StorageFacilityLoadTest'
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	simulation.delay=5 \
+	simulation.burstUsers=100
 ```
 
 
 ### Burst And Ramp Usage
 
 ```
-cd $(git rev-parse --show-toplevel) && sbt -DLOG_LEVEL=error \
-	-Dsimulation.delay=5 \
-	-Dsimulation.burstUsers=100 \
-	-Dsimulation.rampUsers=50 \
-	-Dsimulation.rampUsersWindow=10 \
-	'gatling / GatlingIt / testOnly *StorageFacilityLoadTest'
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	simulation.delay=5 \
+	simulation.burstUsers=100 \
+	simulation.rampUsers=50 \
+	simulation.rampUsersWindow=10
 ```
 
 
@@ -86,24 +88,26 @@ cd $(git rev-parse --show-toplevel) && sbt -DLOG_LEVEL=error \
 ### Constant Usage
 
 ```
-cd $(git rev-parse --show-toplevel) && sbt -DLOG_LEVEL=error \
-	-Dsimulation.constantUsers=50 \
-	-Dsimulation.constantUsersWindow=10 \
-	'gatling / GatlingIt / testOnly *StorageFacilityLoadTest'
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	simulation.constantUsers=50 \
+	simulation.constantUsersWindow=10
 ```
 
 
 ### Everything
 
 ```
-cd $(git rev-parse --show-toplevel) && sbt -DLOG_LEVEL=error \
-	-Dsimulation.delay=5 \
-	-Dsimulation.burstUsers=100 \
-	-Dsimulation.constantUsers=50 \
-	-Dsimulation.constantUsersWindow=10 \
-	-Dsimulation.rampUsers=50 \
-	-Dsimulation.rampUsersWindow=10 \
-	'gatling / GatlingIt / testOnly *StorageFacilityLoadTest'
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	simulation.delay=5 \
+	simulation.burstUsers=100 \
+	simulation.constantUsers=50 \
+	simulation.constantUsersWindow=10 \
+	simulation.rampUsers=50 \
+	simulation.rampUsersWindow=10
 ```
 
 
