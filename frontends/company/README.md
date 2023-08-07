@@ -14,6 +14,8 @@ The implementation here attempts to answer in the affirmative.
 
 [Apache Camel](https://camel.apache.org/docs/index.html) is used to provide pre-defined components which serve and respond to HTML5 and CSS3 artifacts.  They are configured using [XML DSL](https://camel.apache.org/components/3.20.x/others/java-xml-io-dsl.html) located in the [camel resources](./src/main/resources/camel) directory.
 
+The [REST endpoints](./src/main/resources/camel/rest/endpoints.xml) define the API which serves content and responds to browser commands.
+
 
 ## HTMX
 
