@@ -74,7 +74,7 @@ final class StorageFacilityFeatures ()
 		// allow domain events to propagate
 		.pause (200 milliseconds, 500 milliseconds)
 
-	private val generatedSlug = s"gatling-${System.currentTimeMillis}"
+	private val generatedSlug = s"gatling-${randomUUID ()}"
 
 
 	/// Constructor Body
