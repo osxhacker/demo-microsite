@@ -41,7 +41,7 @@ trait CompanySupport
 
 	implicit protected val domainSlug =
 		Generators.trimmedString[Slug.Value] (
-			1 to 32,
+			2 to 64,
 			Gen.alphaLowerChar
 			)
 			.map (Slug (_))

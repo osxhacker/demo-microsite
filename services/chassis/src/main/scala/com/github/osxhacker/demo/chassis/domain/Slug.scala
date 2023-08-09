@@ -47,7 +47,7 @@ object Slug
 	/// Class Types
 	type Value = Refined[
 		String,
-		Size[Interval.Closed[2, 32]] And
+		Size[Interval.Closed[2, 64]] And
 			Trimmed And
 			MatchesRegex[
 				"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"

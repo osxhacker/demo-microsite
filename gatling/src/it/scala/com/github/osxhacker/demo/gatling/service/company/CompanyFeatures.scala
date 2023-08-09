@@ -1,5 +1,7 @@
 package com.github.osxhacker.demo.gatling.service.company
 
+import java.util.UUID.randomUUID
+
 import com.github.osxhacker.demo.api
 import com.github.osxhacker.demo.gatling.FeatureSimulation
 
@@ -62,7 +64,7 @@ final class CompanyFeatures ()
 			}
 		.exec (tasks.delete (CompanySessionKeys.TargetCompanyEntry))
 
-	private val generatedSlug = s"gatling-${System.currentTimeMillis}"
+	private val generatedSlug = s"gatling-${randomUUID ()}"
 
 
 	/// Constructor Body
