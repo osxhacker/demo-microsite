@@ -27,6 +27,24 @@
     </templatedRoute>
 
     <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-jquery-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/jquery/{{demo.versions.jquery}}/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-parsley-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/parsleyjs/{{demo.versions.parsley}}/dist/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
         <parameter name="name" value="load-pure-stylesheet-file"/>
         <parameter name="resource"
                    value="META-INF/resources/webjars/purecss/{{demo.versions.purecess}}/build/${header.filename}"

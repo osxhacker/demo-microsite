@@ -28,6 +28,8 @@
 		<link rel="stylesheet" href="/company/stylesheet/microsite.css">
 
 		<script src="/company/javascript/htmx/htmx.min.js"></script>
+		<script src="/company/javascript/jquery/jquery.min.js"></script>
+		<script src="/company/javascript/parsley/parsley.min.js"></script>
     </head>
     <body>
         <main>

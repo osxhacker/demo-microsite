@@ -70,6 +70,14 @@
 }
 
 /*
+ * -- FORMS --
+ */
+
+form span.pure-form-message-inline {
+    position: absolute;
+}
+
+/*
  * -- ERROR --
  */
 section.error {
