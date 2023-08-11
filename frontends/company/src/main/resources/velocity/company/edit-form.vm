@@ -9,8 +9,12 @@
 #set( $status = $body.get("status").asText() )
 
 <form
+    id="edit-company-form"
     class='edit pure-form pure-form-aligned'
     enctype="application/x-www-form-urlencoded"
+    data-parsley-validate
+    data-parsley-ui-enabled="true"
+    data-parsley-focus="first"
     hx-post="/company/save"
     hx-target="#work-area"
     hx-swap="innerHTML"
@@ -54,7 +58,21 @@
                 id='companySlug'
                 name='companySlug'
                 value='$body.get("slug").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#edit-company-form-slug-errors"
+                data-parsley-pattern-message="Must be: [a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 64]"
+                data-parsley-pattern="^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"
                 />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="edit-company-form-slug-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
         </div>
 
         <div class='pure-control-group'>
@@ -64,7 +82,21 @@
                 id='companyName'
                 name='companyName'
                 value='$body.get("name").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#edit-company-form-name-errors"
+                data-parsley-pattern-message="Minimum two letters, no leading or trailing spaces"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 64]"
+                data-parsley-pattern="^[^ \t].*[^ \t]$"
                 />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="edit-company-form-name-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
         </div>
 
         <div class='pure-control-group'>
@@ -75,7 +107,17 @@
                 maxlength=2048
                 id='companyDescription'
                 name='companyDescription'
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#edit-company-form-description-errors"
+                data-parsley-pattern-message="Must be empty or not have leading/trailing spaces"
+                data-parsley-pattern="^(?:[^ \t](?:.*[^ \t])?)?$"
                 >$body.get("description").asText()</textarea>
+
+            <span
+                id="edit-company-form-description-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
         </div>
 
         <input
@@ -111,19 +153,43 @@
 
     <section class="pure-button-group" role="group">
         <button class='pure-button'
-                type='submit'
-                >
+            name="save"
+            type='submit'
+            >
             Save
         </button>
 
         <button class='pure-button'
-                hx-get='/company/view?self=$body.at("/_links/self/href").asText()'
-                hx-trigger='click'
-                hx-target='#work-area'
-                hx-swap='innerHTML'
-                >
+            name="cancel"
+            hx-get='/company/view?self=$body.at("/_links/self/href").asText()'
+            hx-trigger='click'
+            hx-target='body'
+            hx-swap='outerHTML'
+            >
             Cancel
         </button>
     </section>
+
+    <script>
+        $(function () {
+            var theForm = $('#edit-company-form').parsley ();
+
+            function validateForm (event) {
+                if (event.detail.elt.name == 'cancel' || theForm.isValid ())
+                    document.body.removeEventListener (
+                        'htmx:beforeRequest',
+                        validateForm
+                        );
+                else
+                    {
+                    theForm.validationResult = false;
+                    event.preventDefault ();
+                    event.stopPropagation ();
+                    }
+            }
+
+            document.body.addEventListener ('htmx:beforeRequest', validateForm);
+        });
+    </script>
 </form>
 

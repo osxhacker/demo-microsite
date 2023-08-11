@@ -194,14 +194,18 @@ lazy val `frontends-company` = (project in file ("frontends/company"))
 			CamelVelocity,
 			Htmx,
 			JacksonDatabind,
+			JQuery,
 			Logback,
 			LogbackJackson,
 			LogbackJson,
+			Parsley,
 			PureCSS
 			),
 
 		Compile / resourceGenerators += generateCamelMainProperties (
 			"htmx" -> Versions.Htmx ::
+			"jquery" -> Versions.JQuery ::
+			"parsley" -> Versions.Parsley ::
 			"purecess" -> Versions.PureCSS ::
 			Nil
 			).taskValue,

@@ -35,20 +35,22 @@ object Dependencies
 		val Htmx = "1.9.2"
 		val Http4sBlaze = "0.23.14"
 		val Janino = "3.1.10"
+		val JQuery = "3.7.0"
 		val Kamon = "2.6.3"
 		val Log4Cats = "2.6.0"
 		val Logback = "1.4.6"
 		val LogbackContrib = "0.1.5"
 		val LogstashLogbackEncoder ="7.4"
-		val Monocle = "3.1.0"
+		val Monocle = "3.2.0"
 		val Mouse = "1.2.1"
+		val Parsley = "2.9.2"
 		val Pureconfig = "0.17.4"
 		val PureCSS = "3.0.0"
 		val Refined = "0.10.3"
 		val Shapeless = "2.3.10"
 		val Squants = "1.8.3"
 		val Sttp ="3.8.8"
-		val Tapir = "1.2.10"
+		val Tapir = "1.4.0"
 
 		/// Testing Artifacts
 		val Scalacheck = "1.17.0"
@@ -119,6 +121,7 @@ object Dependencies
 		Runtime
 
 	val Janino = "org.codehaus.janino" % "janino" % Versions.Janino
+	val JQuery = "org.webjars" % "jquery" % Versions.JQuery
 	val KamonBundle = "io.kamon" %% "kamon-bundle" % Versions.Kamon
 	val KamonCatsIo = "io.kamon" %% "kamon-cats-io-3" % Versions.Kamon
 	val KamonJdbc = "io.kamon" %% "kamon-jdbc" % Versions.Kamon
@@ -145,6 +148,7 @@ object Dependencies
 	val MonocleGeneric = "dev.optics" %% "monocle-generic" % Versions.Monocle
 	val MonocleMacro = "dev.optics" %% "monocle-macro" % Versions.Monocle
 	val Mouse = "org.typelevel" %% "mouse" % Versions.Mouse
+	val Parsley = "org.webjars.npm" % "parsleyjs" % Versions.Parsley
 	val Pureconfig = "com.github.pureconfig" %% "pureconfig" % Versions.Pureconfig
 	val PureconfigCats = "com.github.pureconfig" %% "pureconfig-cats" % Versions.Pureconfig
 	val PureCSS = "org.webjars.npm" % "purecss" % Versions.PureCSS

@@ -50,6 +50,14 @@
             <to uri="direct:load-htmx-javascript-file"/>
         </get>
 
+        <get path="/javascript/jquery/{filename}">
+            <to uri="direct:load-jquery-javascript-file"/>
+        </get>
+
+        <get path="/javascript/parsley/{filename}">
+            <to uri="direct:load-parsley-javascript-file"/>
+        </get>
+
         <get path="/stylesheet/pure/{filename}">
             <to uri="direct:load-pure-stylesheet-file"/>
         </get>
