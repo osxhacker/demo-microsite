@@ -85,6 +85,7 @@ section.error {
     border: 2px solid;
     border-radius: 25px;
     padding: 0.5em;
+    word-break: break-word;
 }
 
 section.error div.pure-g {
