@@ -10,7 +10,7 @@ This directory contains the configuration assets required to deploy the demo mic
 
 More information can be found [here](./docker/README.md).
 
-The following table documents what `localhost` TCP/IP ports are exposed for each service when all are running.
+The following table documents what `localhost` IP ports are exposed for each service when all are running.
 
 | Service      |  API     |  Kamon  |  Prometheus  |  Admin  |
 |--------------|:--------:|:-------:|:------------:|:-------:|
@@ -19,7 +19,7 @@ The following table documents what `localhost` TCP/IP ports are exposed for each
 | Company Site |  11611   |         |              |         |
 | Company Svc  |  6891    |  5238   |  9557        |         |
 | Facility Svc |  6890    |  5237   |  9556        |         |
-| Logstash     |  5514    |         |              |  9600   |
+| Logstash     |  5514/udp|         |              |  9600   |
 | Postgres     |  6430    |         |              |         |
 | Mongo        |  6440    |         |              |         |
 | Kafka        |  9092    |         |              |  9999   |
