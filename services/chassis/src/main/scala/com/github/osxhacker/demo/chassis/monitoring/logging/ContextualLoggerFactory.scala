@@ -37,8 +37,8 @@ final class ContextualLoggerFactory[F[_]] (
 
 
 	/**
-	 * The addContext methdo augments the existing `minimumContext` with the
-	 * given '''properties'''.
+	 * The addContext method augments the existing `minimumContext` with the
+	 * key/value pairs in the given '''properties'''.
 	 */
 	def addContext (properties : Map[String, String])
 		: ContextualLoggerFactory[F] =

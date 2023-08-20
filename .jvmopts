@@ -1,6 +1,6 @@
--Xmx4096M
+-Xmx6144M
 -Xss2M
--XX:ReservedCodeCacheSize=128m
+-XX:ReservedCodeCacheSize=256m
 -XX:+DoEscapeAnalysis
 -XX:+UseCodeCacheFlushing
 -server

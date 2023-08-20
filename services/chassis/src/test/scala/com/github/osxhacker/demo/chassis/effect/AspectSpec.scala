@@ -52,7 +52,7 @@ final class AspectSpec ()
 			pointcut.around (fa) (
 				entering = () => history.append ('e'),
 				leaving = _ => history.append ('l'),
-				onError = () => history.append ('x')
+				onError = _ => history.append ('x')
 				)
 	}
 

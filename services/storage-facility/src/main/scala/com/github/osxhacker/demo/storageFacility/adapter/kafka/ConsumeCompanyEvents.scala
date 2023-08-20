@@ -8,6 +8,7 @@ import cats.effect.{
 import eu.timepit.refined
 import fs2.kafka._
 import io.circe
+import org.typelevel.log4cats.LoggerFactory
 
 import com.github.osxhacker.demo.chassis.adapter.kafka.{
 	AbstractConsumeEvents,
@@ -50,6 +51,7 @@ final case class ConsumeCompanyEvents[F[_]] (
 
 		override protected val async : Async[F],
 		override protected val pointcut : Pointcut[F],
+		private val underlyingLoggerFactory : LoggerFactory[F],
 		override protected val temporal : Temporal[F]
 	)
 	extends AbstractConsumeEvents[

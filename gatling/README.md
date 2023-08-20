@@ -60,7 +60,7 @@ There are several knobs available to each load test, documented [here](./src/mai
 [StorageFacilityLoadTest](src/it/scala/com/github/osxhacker/demo/gatling/service/storageFacility/StorageFacilityLoadTest.scala) is an example of a load test.  Below are sample invocations to illustrate its use:
 
 
-### Burst Usage
+### Burst Usage (Direct)
 
 ```
 cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
@@ -71,7 +71,7 @@ cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
 ```
 
 
-### Burst And Ramp Usage
+### Burst And Ramp Usage (Direct)
 
 ```
 cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
@@ -84,8 +84,7 @@ cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
 ```
 
 
-
-### Constant Usage
+### Constant Usage (Direct)
 
 ```
 cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
@@ -96,12 +95,66 @@ cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
 ```
 
 
-### Everything
+### Everything (Direct)
 
 ```
 cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
 	StorageFacilityLoadTest \
 	LOG_LEVEL=error \
+	simulation.delay=5 \
+	simulation.burstUsers=100 \
+	simulation.constantUsers=50 \
+	simulation.constantUsersWindow=10 \
+	simulation.rampUsers=50 \
+	simulation.rampUsersWindow=10
+```
+
+
+### Burst Usage (Gateway)
+
+```
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	service.endpoint=http://localhost:9080 \
+	simulation.delay=5 \
+	simulation.burstUsers=100
+```
+
+
+### Burst And Ramp Usage (Gateway)
+
+```
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	service.endpoint=http://localhost:9080 \
+	simulation.delay=5 \
+	simulation.burstUsers=100 \
+	simulation.rampUsers=50 \
+	simulation.rampUsersWindow=10
+```
+
+
+### Constant Usage (Gateway)
+
+```
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	service.endpoint=http://localhost:9080 \
+	simulation.constantUsers=50 \
+	simulation.constantUsersWindow=10
+```
+
+
+### Everything (Gateway)
+
+```
+cd $(git rev-parse --show-toplevel) && ./scripts/run-load-test.sh \
+	StorageFacilityLoadTest \
+	LOG_LEVEL=error \
+	service.endpoint=http://localhost:9080 \
 	simulation.delay=5 \
 	simulation.burstUsers=100 \
 	simulation.constantUsers=50 \

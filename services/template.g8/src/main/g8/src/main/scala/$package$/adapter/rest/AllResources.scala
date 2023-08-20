@@ -5,11 +5,13 @@ import org.http4s.HttpApp
 import org.http4s.server.Router
 import org.typelevel.log4cats.LoggerFactory
 import sttp.tapir.server.http4s.{
+	Http4sDefaultServerLog,
 	Http4sServerInterpreter,
 	Http4sServerOptions
 	}
 
 import com.github.osxhacker.demo.chassis.adapter.ServiceDeactivator
+import com.github.osxhacker.demo.chassis.adapter.rest.LogDecodeFailure
 import com.github.osxhacker.demo.chassis.effect.{
 	Pointcut,
 	ReadersWriterResource
@@ -42,6 +44,12 @@ final case class AllResources[F[_]] (
 	private val options = Http4sServerOptions.customiseInterceptors
 		.defaultHandlers (reporter.defaultFailureResponse)
 		.exceptionHandler (reporter)
+		.serverLog (
+			Http4sDefaultServerLog[F].doLogWhenHandled (
+				LogDecodeFailure[F] ()
+				)
+				.logWhenHandled (true)
+			)
 		.options
 
 	private val heartbeat = Heartbeat[F] (settings)

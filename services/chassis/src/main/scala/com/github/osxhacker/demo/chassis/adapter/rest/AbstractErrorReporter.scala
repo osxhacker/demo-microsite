@@ -100,43 +100,10 @@ abstract class AbstractErrorReporter[F[_], ProblemDetailsT <: AnyRef] ()
 			badRequest (iae).leftFlatMap (unknownError)
 		}
 
-	private val handlers = service orElse default
+	private lazy val handlers = service orElse default
 
 
-	final override def apply (ctx : ExceptionContext)
-		(implicit monad : MonadError[F])
-		: F[Option[ValuedEndpointOutput[_]]] =
-	{
-		val problemDetails = handlers.applyOrElse (ctx.e, unknownError)
-			.fproduct (statusCodeLens.get)
-			.getOrElse (fallback -> statusCodeLens.get (fallback))
-
-		monad.unit (
-			ValuedEndpointOutput (
-				jsonBody[ProblemDetailsT].and (statusCode),
-				problemDetails
-				)
-				.some
-			)
-	}
-
-
-	final def defaultFailureResponse (message : String)
-		: ValuedEndpointOutput[_] =
-	{
-		val problemDetails = badRequest (
-			ValidationError[DefaultDomainType] (message)
-			)
-			.fproduct (statusCodeLens.get)
-			.getOrElse (fallback -> statusCodeLens.get (fallback))
-
-		ValuedEndpointOutput (
-			jsonBody[ProblemDetailsT].and (statusCode),
-			problemDetails
-			)
-	}
-
-
+	/// Abstract Methods
 	protected def badRequest (error : DomainValueError)
 		: ErrorOr[ProblemDetailsT]
 
@@ -177,5 +144,39 @@ abstract class AbstractErrorReporter[F[_], ProblemDetailsT <: AnyRef] ()
 
 
 	protected def unknownError (error : Throwable) : ErrorOr[ProblemDetailsT]
+
+
+	final override def apply (ctx : ExceptionContext)
+		(implicit monad : MonadError[F])
+		: F[Option[ValuedEndpointOutput[_]]] =
+	{
+		val problemDetails = handlers.applyOrElse (ctx.e, unknownError)
+			.fproduct (statusCodeLens.get)
+			.getOrElse (fallback -> statusCodeLens.get (fallback))
+
+		monad.unit (
+			ValuedEndpointOutput (
+				jsonBody[ProblemDetailsT].and (statusCode),
+				problemDetails
+				)
+				.some
+			)
+	}
+
+
+	final def defaultFailureResponse (message : String)
+		: ValuedEndpointOutput[_] =
+	{
+		val problemDetails = badRequest (
+			ValidationError[DefaultDomainType] (message)
+			)
+			.fproduct (statusCodeLens.get)
+			.getOrElse (fallback -> statusCodeLens.get (fallback))
+
+		ValuedEndpointOutput (
+			jsonBody[ProblemDetailsT].and (statusCode),
+			problemDetails
+			)
+	}
 }
 
