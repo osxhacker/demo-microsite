@@ -76,7 +76,7 @@ final class IOPointcutSpec ()
 				) (
 				entering = () => sequence.append ("entering, "),
 				leaving = sequence.append ("leaving: ").append (_),
-				onError = () => sequence.append (" error!")
+				onError = _ => sequence.append (" error!")
 				)
 				.value
 
@@ -96,7 +96,7 @@ final class IOPointcutSpec ()
 					}
 				) (
 					leaving = _ => sequence.append ("leaving,"),
-					onError = () => sequence.append ("errored!")
+					onError = _ => sequence.append ("errored!")
 				)
 				.value
 

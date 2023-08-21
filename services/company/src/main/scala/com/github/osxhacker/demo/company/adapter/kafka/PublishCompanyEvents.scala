@@ -13,6 +13,7 @@ import fs2.kafka._
 import io.circe
 import io.scalaland.chimney
 import io.scalaland.chimney.TransformerF
+import org.typelevel.log4cats.LoggerFactory
 import shapeless.{
 	syntax => _,
 	_
@@ -50,7 +51,9 @@ final case class PublishCompanyEvents[F[_]] (
 		override protected val async : Async[F],
 
 		/// Needed for `measure`.
-		override protected val pointcut : Pointcut[F]
+		override protected val pointcut : Pointcut[F],
+
+		private val underlyingLoggerFactory : LoggerFactory[F]
 	)
 	extends AbstractPublishEvents[
 		F,

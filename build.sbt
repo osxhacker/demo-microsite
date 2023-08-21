@@ -53,7 +53,7 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.4.0-SNAPSHOT"
+ThisBuild / version := "0.5.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.13.11"
 ThisBuild / Compile / scalacOptions ++= Seq (
 	"-encoding", "UTF-8",

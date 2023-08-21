@@ -61,6 +61,6 @@ trait StartWorkflow[F[_], ResultT]
 
 
 	private def spanBuilder () : SpanBuilder =
-		Kamon.clientSpanBuilder (operation, component)
+		Kamon.serverSpanBuilder (operation, component)
 }
 

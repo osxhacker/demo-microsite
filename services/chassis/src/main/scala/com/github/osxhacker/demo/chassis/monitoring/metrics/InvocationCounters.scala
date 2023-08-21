@@ -43,7 +43,7 @@ trait InvocationCounters[F[_], ResultT]
 		pointcut.around (super.apply (fa)) (
 			entering = () => called.increment (),
 			leaving = _ => succeeded.increment (),
-			onError = () => failed.increment ()
+			onError = _ => failed.increment ()
 			)
 }
 

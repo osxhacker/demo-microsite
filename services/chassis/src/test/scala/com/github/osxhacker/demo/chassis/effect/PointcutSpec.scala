@@ -105,7 +105,7 @@ final class PointcutSpec ()
 			var hadError = false
 			val result = Pointcut[Try] ().always (
 				Later (Failure (new Exception ("boom!")))
-				) (_ => after = true, () => hadError = true)
+				) (_ => after = true, _ => hadError = true)
 				.value
 
 			assert (result.isFailure)
@@ -120,7 +120,7 @@ final class PointcutSpec ()
 				Later (
 					Future.failed[Int] (new Exception ("boom!"))
 					)
-				) (_ => after = true, () => hadError = true)
+				) (_ => after = true, _ => hadError = true)
 				.value
 
 			result.recover[Int] (_ => 0).map {

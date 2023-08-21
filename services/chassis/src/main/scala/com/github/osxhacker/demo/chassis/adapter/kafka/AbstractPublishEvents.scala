@@ -1,9 +1,11 @@
 package com.github.osxhacker.demo.chassis.adapter.kafka
 
+import cats.Monad
 import cats.effect.Async
 import fs2.kafka._
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.common.errors.TopicExistsException
+import org.typelevel.log4cats.LoggerFactory
 import shapeless.{
 	syntax => _,
 	_
@@ -17,9 +19,15 @@ import com.github.osxhacker.demo.chassis.domain.event.{
 	}
 
 import com.github.osxhacker.demo.chassis.effect._
+import com.github.osxhacker.demo.chassis.monitoring.logging.{
+	ContextualLoggerFactory,
+	LogInvocation
+	}
+
 import com.github.osxhacker.demo.chassis.monitoring.metrics.{
 	InvocationCounters,
-	MetricsAdvice
+	MetricsAdvice,
+	ScopeProducerOperations
 	}
 
 
@@ -42,7 +50,10 @@ abstract class AbstractPublishEvents[
 		protected val async : Async[F],
 
 		/// Needed for `measure`.
-		protected val pointcut : Pointcut[F]
+		protected val pointcut : Pointcut[F],
+
+		/// Needed for '''EventPublishing'''.
+		private val underlyingLoggerFactory : LoggerFactory[F]
 	)
 	extends EventProducer[F, ChannelT, DomainEventsT] (channel)
 {
@@ -167,17 +178,39 @@ object AbstractPublishEvents
 	final private case class EventPublishing[F[_], ChannelT <: Channel, ResultT] (
 		private val channel : ChannelT
 		)
+		(
+			implicit
+
+			override protected val monad : Monad[F],
+
+			/// Needed for '''ContextualLoggerFactory'''.
+			private val underlyingLoggerFactory : LoggerFactory[F]
+		)
 		extends DefaultAdvice[F, ResultT] ()
 			with MetricsAdvice[F, ResultT]
 			with InvocationCounters[F, ResultT]
+			with LogInvocation[F, ResultT]
+			with ScopeProducerOperations[F, ResultT]
 	{
 		/// Instance Properties
+		override val component = "kafka"
 		override val group = subgroup (
 			super.group,
 			"event",
 			"publish",
 			channel.entryName
 			)
+
+		override val operation =
+			s"PRODUCE ${channel.getClass.getSimpleName.stripSuffix ("$")}"
+
+		override protected val loggerFactory =
+			ContextualLoggerFactory[F](underlyingLoggerFactory) {
+				Map (
+					"channel" -> channel.entryName,
+					"operation" -> operation
+				)
+			}
 	}
 }
 

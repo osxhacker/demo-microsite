@@ -3,6 +3,7 @@ package com.github.osxhacker.demo.chassis.adapter.kafka
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
+import cats.Monad
 import cats.data.Kleisli
 import cats.effect.{
 	Async,
@@ -10,6 +11,7 @@ import cats.effect.{
 	}
 
 import fs2.kafka._
+import org.typelevel.log4cats.LoggerFactory
 
 import com.github.osxhacker.demo.chassis
 import com.github.osxhacker.demo.chassis.domain.Specification
@@ -19,6 +21,11 @@ import com.github.osxhacker.demo.chassis.domain.event.{
 	}
 
 import com.github.osxhacker.demo.chassis.effect._
+import com.github.osxhacker.demo.chassis.monitoring.logging.{
+	ContextualLoggerFactory,
+	LogInvocation
+	}
+
 import com.github.osxhacker.demo.chassis.monitoring.metrics._
 
 
@@ -47,7 +54,10 @@ abstract class AbstractConsumeEvents[
 		protected val pointcut : Pointcut[F],
 
 		/// Needed for `groupWithin`.
-		protected val temporal : Temporal[F]
+		protected val temporal : Temporal[F],
+
+		/// Needed for '''EventConsumption'''.
+		private val underlyingLoggerFactory : LoggerFactory[F]
 	)
 	extends EventConsumer[F, Channel, EventT, EnvT] (channel)
 {
@@ -147,9 +157,18 @@ object AbstractConsumeEvents
 	final private case class EventConsumption[F[_], ChannelT <: Channel] (
 		private val channel : ChannelT
 		)
+		(
+			implicit
+
+			override protected val monad : Monad[F],
+
+			/// Needed for '''ContextualLoggerFactory'''.
+			private val underlyingLoggerFactory : LoggerFactory[F]
+		)
 		extends DefaultAdvice[F, Option[CommittableOffset[F]]] ()
 			with MetricsAdvice[F, Option[CommittableOffset[F]]]
 			with InvocationCounters[F, Option[CommittableOffset[F]]]
+			with LogInvocation[F, Option[CommittableOffset[F]]]
 			with ScopeConsumerOperations[F, Option[CommittableOffset[F]]]
 	{
 		/// Instance Properties
@@ -163,5 +182,14 @@ object AbstractConsumeEvents
 
 		override val operation =
 			s"CONSUME ${channel.getClass.getSimpleName.stripSuffix ("$")}"
+
+		override protected val loggerFactory =
+			ContextualLoggerFactory[F](underlyingLoggerFactory) {
+				Map (
+					"channel" -> channel.entryName,
+					"operation" -> operation
+					)
+				}
 	}
 }
+
