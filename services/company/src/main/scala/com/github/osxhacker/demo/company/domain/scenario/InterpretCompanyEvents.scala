@@ -257,8 +257,7 @@ final case class InterpretCompanyEvents[F[_]] ()
 							_.addContext (
 								Map (
 									"eventId" -> event.id.show,
-									"eventType" -> event.getClass.getName,
-									"region" -> event.region.show
+									"eventType" -> event.getClass.getName
 									) ++
 									event.fingerprint
 										.map {

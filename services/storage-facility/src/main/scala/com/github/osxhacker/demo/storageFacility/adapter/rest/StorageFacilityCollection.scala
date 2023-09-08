@@ -155,11 +155,11 @@ final case class StorageFacilityCollection[F[_]] (
 		for {
 			slug <- Slug[F] (params.company)
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				params.`X-Correlation-ID`
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
@@ -183,11 +183,11 @@ final case class StorageFacilityCollection[F[_]] (
 		for {
 			slug <- Slug[F] (params.company)
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				params.`X-Correlation-ID`
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create

@@ -15,6 +15,10 @@ trait AuthenticationAware[KeyT <: SessionKey]
 		=>
 
 
+	/// Class Imports
+	import io.gatling.commons.validation._
+
+
 	/// Class Types
 	/**
 	 * The '''AuthenticationSyntax''' type extends
@@ -38,14 +42,13 @@ trait AuthenticationAware[KeyT <: SessionKey]
 		def bearerAuth (token : String) : HttpRequestBuilder =
 			self.header (
 				HttpHeaderNames.Authorization,
-				s"Bearer ${encode (token)}"
+				_ => s"Bearer ${encode (token)}".success
 				)
 
 
 		def saveBearerToken (key : KeyT) : HttpRequestBuilder =
 			self.check (
-				header (HttpHeaderNames.Authorization)
-					.find
+				header (HttpHeaderNames.Authorization).find
 					.transform (decode)
 					.saveAs (key.entryName)
 				)
@@ -71,3 +74,4 @@ trait AuthenticationAware[KeyT <: SessionKey]
 				.trim
 	}
 }
+

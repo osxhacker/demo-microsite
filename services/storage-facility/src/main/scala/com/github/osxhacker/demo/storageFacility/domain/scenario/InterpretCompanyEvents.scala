@@ -49,6 +49,7 @@ final case class InterpretCompanyEvents[F[_]] ()
 	extends AbstractEventInterpreter[F, Company, AllCompanyEvents] ()
 {
 	/// Class Imports
+	import InferCompanyChangeReport._
 	import cats.syntax.all._
 	import log4cats.syntax._
 
@@ -75,6 +76,12 @@ final case class InterpretCompanyEvents[F[_]] ()
 						company <- scenarios.save[CreateIntent] (
 							event.toCompany ()
 							)
+							.flatTap {
+								saved =>
+									InferCompanyChangeReport (
+										HavingCreated (saved)
+										)
+								}
 
 						unit <- debug"new company: ${company.id.show} (${company.slug.show})"
 						} yield unit
@@ -139,6 +146,12 @@ final case class InterpretCompanyEvents[F[_]] ()
 						_ <- scenarios.save[UpdateIntent] (
 							Company.slug.replace (event.to) (existing)
 							)
+							.flatTap {
+								saved =>
+									InferCompanyChangeReport (
+										HavingModified (existing, saved)
+										)
+								}
 
 						unit <- debug"slug changed: ${event.from.show} -> ${event.to.show}"
 					} yield unit
@@ -161,6 +174,12 @@ final case class InterpretCompanyEvents[F[_]] ()
 						_ <- scenarios.save[UpdateIntent] (
 							Company.status.replace (event.status) (existing)
 							)
+							.flatTap {
+								saved =>
+									InferCompanyChangeReport (
+										HavingModified (existing, saved)
+										)
+								}
 
 						unit <- debug"status changed: ${event.status.show}"
 					} yield unit

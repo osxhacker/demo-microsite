@@ -44,11 +44,9 @@ final case class Shutdown[F[_]] (
 			GlobalEnvironment[F]
 			],
 
-		/// Needed for `complete`, `failWith`, and 'flatMap'.
-		private val monadThrow : MonadThrow[F],
-
 		/// Needed for ''AbstractResource''.
-		override protected val loggerFactory : LoggerFactory[F]
+		override protected val loggerFactory : LoggerFactory[F],
+		override protected val monadThrow : MonadThrow[F]
 	)
 	extends AbstractResource[F] ()
 {

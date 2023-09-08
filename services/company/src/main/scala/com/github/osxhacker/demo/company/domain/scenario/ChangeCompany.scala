@@ -77,6 +77,7 @@ final case class ChangeCompany[F[_], SourceT <: AnyRef] (
 	)
 {
 	/// Class Imports
+	import InferChangeReport.HavingModified
 	import cats.syntax.all._
 	import chassis.syntax._
 	import mouse.boolean._
@@ -111,7 +112,9 @@ final case class ChangeCompany[F[_], SourceT <: AnyRef] (
 			.liftTo[EventLog[F, *, AllCompanyEvents]]
 			.flatMap {
 				intent =>
-					EventLog.liftF (save (intent))
+					EventLog.liftF (
+						save (intent).flatTap (logChanges (existing))
+						)
 				}
 			.mapBoth {
 				case (events, Some (saved)) =>
@@ -176,6 +179,13 @@ final case class ChangeCompany[F[_], SourceT <: AnyRef] (
 						submitted
 						)
 				}
+
+
+	private def logChanges (before : Company)
+		(saved : Option[Company])
+		(implicit env : ScopedEnvironment[F])
+		: F[Unit] =
+		InferChangeReport (saved.map (HavingModified (before, _)))
 
 
 	private def validate ()

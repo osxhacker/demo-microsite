@@ -50,7 +50,7 @@
             "uid": "c64d9077-25d3-44db-ab79-92dd3b500660"
           },
           "editorMode": "code",
-          "expr": "{microservice=\"company\", subsystem=\"$subsystem\"}",
+          "expr": "{microservice=\"company\", subsystem=~\"$subsystem\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -67,9 +67,9 @@
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "rest",
-          "value": "rest"
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "loki",
@@ -77,7 +77,7 @@
         },
         "definition": "",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Subsystem",
         "multi": false,
         "name": "subsystem",
@@ -97,13 +97,13 @@
     ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Company Logs",
   "uid": "d902ae35-a78b-4bac-b9ad-27ac9ed9a38d",
-  "version": 2,
+  "version": 7,
   "weekStart": ""
 }

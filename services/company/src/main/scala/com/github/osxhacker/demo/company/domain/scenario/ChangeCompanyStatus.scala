@@ -68,6 +68,7 @@ final class ChangeCompanyStatus[F[_], SourceT] (
 	)
 {
 	/// Class Imports
+	import InferChangeReport.HavingModified
 	import cats.syntax.all._
 	import chassis.syntax._
 	import mouse.foption._
@@ -112,6 +113,10 @@ final class ChangeCompanyStatus[F[_], SourceT] (
 			.second[Company]
 			.mapF[EventLog[F, *, AllCompanyEvents], Company] {
 				_.flatMap ((updateInstanceAndSave (desired) _).tupled)
+					.flatTap {
+						saved =>
+							InferChangeReport (HavingModified (existing, saved))
+						}
 					.deriveEvent (CompanyStatusChanged (_))
 				}
 		.run (existing -> versionSource)

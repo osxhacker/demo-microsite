@@ -50,7 +50,7 @@
             "uid": "c64d9077-25d3-44db-ab79-92dd3b500660"
           },
           "editorMode": "code",
-          "expr": "{microservice=\"storage-facility\", subsystem=\"$subsystem\"}",
+          "expr": "{microservice=\"storage-facility\", subsystem=~\"$subsystem\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -67,7 +67,7 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "rest",
           "value": "rest"
         },
@@ -77,7 +77,7 @@
         },
         "definition": "",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Subsystem",
         "multi": false,
         "name": "subsystem",
@@ -97,13 +97,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Storage Facility Logs",
   "uid": "f59e0df1-a11b-4acb-ac30-bf790e32d52f",
-  "version": 9,
+  "version": 13,
   "weekStart": ""
 }

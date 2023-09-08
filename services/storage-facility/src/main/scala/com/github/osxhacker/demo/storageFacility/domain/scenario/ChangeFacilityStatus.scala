@@ -68,6 +68,7 @@ final case class ChangeFacilityStatus[F[_], SourceT] (
 	)
 {
 	/// Class Imports
+	import InferFacilityChangeReport.HavingModified
 	import cats.syntax.all._
 	import chassis.syntax._
 	import mouse.foption._
@@ -112,6 +113,12 @@ final case class ChangeFacilityStatus[F[_], SourceT] (
 			.second[StorageFacility]
 			.mapF[EventLog[F, *, AllStorageFacilityEvents], StorageFacility] {
 				_.flatMap ((updateInstanceAndSave (desired) _).tupled)
+					.flatTap {
+						saved =>
+							InferFacilityChangeReport (
+								HavingModified (existing, saved)
+								)
+						}
 					.deriveEvent (StorageFacilityStatusChanged (_))
 				}
 			.run (existing -> versionSource)

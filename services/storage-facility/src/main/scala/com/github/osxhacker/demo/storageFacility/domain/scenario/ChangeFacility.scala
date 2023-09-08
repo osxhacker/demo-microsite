@@ -90,6 +90,7 @@ sealed abstract class ChangeFacility[F[_], SourceT <: AnyRef] (
 	)
 {
 	/// Class Imports
+	import InferFacilityChangeReport.HavingModified
 	import cats.syntax.all._
 	import chassis.syntax._
 	import mouse.boolean._
@@ -149,7 +150,9 @@ sealed abstract class ChangeFacility[F[_], SourceT <: AnyRef] (
 			.liftTo[EventLog[F, *, AllStorageFacilityEvents]]
 			.flatMap {
 				intent =>
-					EventLog.liftF (save (intent))
+					EventLog.liftF (
+						save (intent).flatTap (logChanges (existing))
+						)
 				}
 			.mapBoth {
 				case (events, Some (saved)) =>
@@ -222,6 +225,13 @@ sealed abstract class ChangeFacility[F[_], SourceT <: AnyRef] (
 						unit
 						)
 			}
+
+
+	private def logChanges (existing : StorageFacility)
+		(saved : Option[StorageFacility])
+		(implicit env : ScopedEnvironment[F])
+		: F[Unit] =
+		InferFacilityChangeReport (saved map (HavingModified (existing, _)))
 
 
 	private def validate (existing : StorageFacility, source : SourceT)

@@ -1,9 +1,10 @@
 package com.github.osxhacker.demo.chassis.effect
 
-import cats.Later
+import scala.language.postfixOps
+
+import cats.Now
 import cats.effect.IO
 import cats.effect.testing.scalatest.AsyncIOSpec
-import org.scalatest.diagrams.Diagrams
 import org.scalatest.wordspec.AsyncWordSpec
 
 
@@ -17,94 +18,76 @@ import org.scalatest.wordspec.AsyncWordSpec
 final class IOPointcutSpec ()
 	extends AsyncWordSpec
 		with AsyncIOSpec
-		with Diagrams
+		with PointcutBehaviours
 {
 	/// Class Imports
-	import cats.syntax.applicative._
+	import cats.syntax.either._
 
 
-	"The Pointcut support for IO" must {
-		"be able to invoke logic 'before'" in {
-			var boolean = false
-			val result = Pointcut[IO] ().before {
-				Later {
-					assert (boolean === true)
-					1.pure[IO]
+	"The Pointcut type class" when {
+		"bound to IO" must {
+			"not immediately evaluate the functor given to 'before'" in {
+				@volatile
+				var called = false
+				val result = Pointcut[IO] ().before (Now (IO ("the value"))) {
+					() => called = true
 					}
-				} (
-				() => {
-					assert (boolean === false)
-					boolean = true
-					}
-				)
-				.value
 
-			result map {
-				_ =>
-					assert (boolean === true)
+				/// The before functor should not be called during construction
+				/// of the Eval[IO[String]].
+				assert (called === false)
+
+				val operations = result value
+
+				/// The before functor should not be called during resolution
+				/// of the IO[String].
+				assert (called === false)
+				operations map {
+					s =>
+						/// This is when the before functor is expected to have
+						/// been evaluated by `Pointcut[IO]`.
+						assert (called === true)
+						assert (s nonEmpty)
+					}
 				}
+
+			"not immediately evaluate functors given to 'bracket'" in {
+				@volatile
+				var acquired = false
+
+				@volatile
+				var released = false
+
+				val result = Pointcut[IO] ().bracket (Now (IO (99))) (
+					() => (acquired = true).asRight[Throwable]
+					) {
+					_ => errorOrInt =>
+						errorOrInt.foreach (_ => released = true)
+					}
+
+				/// The acquire and release functors should not be called during
+				/// construction of the Eval[IO[Int]].
+				assert (acquired === false)
+				assert (released === false)
+
+				val operations = result value
+
+				/// The acquire and release functors should not be called during
+				/// resolution of the IO[Int].
+				assert (acquired === false)
+				assert (released === false)
+
+				operations map {
+					i =>
+						/// This is when functors are expected to have been
+						/// evaluated by `Pointcut[IO]`.
+						assert (acquired === true)
+						assert (released === true)
+						assert (i === 99)
+					}
 			}
 
-		"be able to invoke logic 'after'" in {
-			var int = 0
-			val result = Pointcut[IO] ().after {
-				Later {
-					assert (int === 0)
-					1.pure[IO]
-					}
-				} (
-				a => {
-					assert (int === 0)
-					int = a
-					}
-				)
-				.value
-
-			result map {
-				value =>
-					assert (int === value)
-				}
-			}
-
-		"be able to invoke logic 'around'" in {
-			val sequence = new StringBuilder ()
-			val result = Pointcut[IO] ().around (
-				Later {
-					assert (sequence.toString ().nonEmpty)
-					1.pure[IO]
-					}
-				) (
-				entering = () => sequence.append ("entering, "),
-				leaving = sequence.append ("leaving: ").append (_),
-				onError = _ => sequence.append (" error!")
-				)
-				.value
-
-			result map {
-				value =>
-					assert (value === 1)
-					assert (sequence.toString () === "entering, leaving: 1")
-				}
-			}
-
-		"be able to detect errors" in {
-			val sequence = new StringBuilder ()
-			val result = Pointcut[IO] ().always[Int] (
-				Later {
-					assert (sequence.toString ().isEmpty)
-					IO.raiseError (new Exception ("boom!"))
-					}
-				) (
-					leaving = _ => sequence.append ("leaving,"),
-					onError = _ => sequence.append ("errored!")
-				)
-				.value
-
-			result.flatMap (_ => fail ("expected an error condition"))
-				.recover {
-				_ =>
-					assert (sequence.toString () === "errored!")
-				}
+			behave like functionalAOP[IO] ()
 			}
 		}
 }

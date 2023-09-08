@@ -47,6 +47,7 @@ final case class DeleteCompany[F[_]] ()
 	)
 {
 	/// Class Imports
+	import InferChangeReport.HavingDeleted
 	import cats.syntax.all._
 	import chassis.syntax._
 	import log4cats.syntax._
@@ -75,10 +76,16 @@ final case class DeleteCompany[F[_]] ()
 
 			_ <- debug"${toString ()} : ${company.id.show}"
 			_ <- failWhenReserved (company)
-			result <- env.companies.delete (company)
+			wasDeleted <- env.companies.delete (company)
 
-			_ <- debug"${toString ()} : ${company.id.show} deleted? $result"
-			} yield result
+			_ <- logDeletion (Option.when (wasDeleted) (company))
+			} yield wasDeleted
+
+
+	private def logDeletion (deleted : Option[Company])
+		(implicit env : ScopedEnvironment[F])
+		: F[Unit] =
+		InferChangeReport (deleted.map (HavingDeleted))
 
 
 	private def failWhenReserved (company : Company)

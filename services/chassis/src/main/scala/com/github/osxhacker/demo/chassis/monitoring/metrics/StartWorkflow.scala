@@ -34,6 +34,7 @@ trait StartWorkflow[F[_], ResultT]
 
 	/// Class Imports
 	import MetricsAdvice.ManagedSpan
+	import cats.syntax.either._
 
 
 	/// Instance Properties
@@ -55,7 +56,7 @@ trait StartWorkflow[F[_], ResultT]
 					initialContext.withEntry (Span.Key, span)
 					)
 
-				ManagedSpan (span, scope)
+				ManagedSpan (span, scope).asRight
 				}
 			) (span => _.fold (span.failWith, _ => span.cleanup ()))
 

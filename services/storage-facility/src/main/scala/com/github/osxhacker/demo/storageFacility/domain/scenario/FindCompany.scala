@@ -1,5 +1,7 @@
 package com.github.osxhacker.demo.storageFacility.domain.scenario
 
+import cats.ApplicativeThrow
+
 import com.github.osxhacker.demo.chassis
 import com.github.osxhacker.demo.chassis.domain.entity.Identifier
 import com.github.osxhacker.demo.chassis.effect.{
@@ -31,6 +33,7 @@ final case class FindCompany[F[_]] ()
 		implicit
 
 		/// Needed for `measure`.
+		private val applicativeThrow : ApplicativeThrow[F],
 		private val pointcut : Pointcut[F]
 	)
 {

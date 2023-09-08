@@ -1,6 +1,10 @@
 package com.github.osxhacker.demo.chassis.adapter.kafka
 
-import cats.Monad
+import cats.{
+	ApplicativeThrow,
+	FlatMap
+	}
+
 import cats.effect.Async
 import fs2.kafka._
 import org.apache.kafka.clients.admin.NewTopic
@@ -181,7 +185,12 @@ object AbstractPublishEvents
 		(
 			implicit
 
-			override protected val monad : Monad[F],
+			/// Needed for '''Advice'''.
+			override protected val applicativeThrow : ApplicativeThrow[F],
+
+			/// Needed for '''LogInvocation'''.
+			override protected val flatMap : FlatMap[F],
+
 
 			/// Needed for '''ContextualLoggerFactory'''.
 			private val underlyingLoggerFactory : LoggerFactory[F]
@@ -205,12 +214,12 @@ object AbstractPublishEvents
 			s"PRODUCE ${channel.getClass.getSimpleName.stripSuffix ("$")}"
 
 		override protected val loggerFactory =
-			ContextualLoggerFactory[F](underlyingLoggerFactory) {
+			ContextualLoggerFactory[F] (underlyingLoggerFactory) {
 				Map (
 					"channel" -> channel.entryName,
 					"operation" -> operation
-				)
-			}
+					)
+				} (applicativeThrow)
 	}
 }
 

@@ -242,14 +242,14 @@ final case class StorageFacilityResource[F[_]] (
 		for {
 			slug <- Slug[F] (params.company)
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				params.`X-Correlation-ID`
+				path,
+				params
 				)
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			_ <- debug"looking up storage facility: ${params.facility}"
 			existing <- scenarios.findForChange (params)
@@ -288,14 +288,14 @@ final case class StorageFacilityResource[F[_]] (
 		for {
 			slug <- Slug[F] (companyId (params))
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				correlationId (params)
+				path,
+				params
 				)
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			_ <- debug"looking up storage facility: ${facility (params)}"
 			existing <- find (params)
@@ -324,14 +324,14 @@ final case class StorageFacilityResource[F[_]] (
 		for {
 			slug <- Slug[F] (params.company)
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				params.`X-Correlation-ID`
+				path,
+				params
 				)
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			_ <- debug"loading ${params.facility} storage facility"
 			facility <- scenarios.findForRemove (params)
@@ -362,14 +362,14 @@ final case class StorageFacilityResource[F[_]] (
 		for {
 			slug <- Slug[F] (params.company)
 
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
 				CompanyReference (slug),
-				params.`X-Correlation-ID`
+				path,
+				params
 				)
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			_ <- debug"loading ${params.facility} storage facility"
 			facility <- scenarios.findForRetrieve (params)

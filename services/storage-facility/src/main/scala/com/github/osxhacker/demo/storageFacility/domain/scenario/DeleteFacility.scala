@@ -70,6 +70,7 @@ sealed abstract class DeleteFacility[F[_]] private ()
 	)
 {
 	/// Class Imports
+	import InferFacilityChangeReport.HavingDeleted
 	import cats.syntax.all._
 	import chassis.syntax._
 	import log4cats.syntax._
@@ -126,7 +127,14 @@ sealed abstract class DeleteFacility[F[_]] private ()
 				.liftTo[F]
 
 			_ <- allowDeletion (facility)
-			result <- env.storageFacilities.delete (facility)
+			result <- env.storageFacilities
+				.delete (facility)
+				.flatTap (
+					_.fold (
+						InferFacilityChangeReport (HavingDeleted (facility)),
+						monadThrow.unit
+						)
+					)
 
 			_ <- debug"${toString ()} - ${facility.id.show} deleted? $result"
 			} yield result.option (facility)

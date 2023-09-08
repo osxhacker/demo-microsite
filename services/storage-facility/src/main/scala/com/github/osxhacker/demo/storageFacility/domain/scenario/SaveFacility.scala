@@ -2,7 +2,7 @@ package com.github.osxhacker.demo.storageFacility.domain.scenario
 
 import scala.language.postfixOps
 
-import cats.Monad
+import cats.MonadThrow
 import org.typelevel.log4cats.Logger
 
 import com.github.osxhacker.demo.chassis
@@ -25,8 +25,8 @@ final case class SaveFacility[F[_]] ()
 	(
 		implicit
 
-		/// Needed for `flatMap`.
-		private val monad : Monad[F],
+		/// Needed for `flatMap` and `measure`.
+		private val monadThrow : MonadThrow[F],
 
 		/// Needed for `measure`.
 		private val pointcut : Pointcut[F]
@@ -56,17 +56,23 @@ final case class SaveFacility[F[_]] ()
 		(implicit logger : Logger[F])
 		: F[Unit] =
 		intent.fold (
-			monad.unit,
-			sf => logger.debug (s"${toString ()} - saving storage facility: " + sf.id.show)
+			monadThrow.unit,
+			sf =>
+				logger.debug (
+					s"${toString ()} - saving storage facility: " + sf.id.show
+					)
 			)
 
 
 	private def leaving (result : Option[StorageFacility])
 		(implicit logger : Logger[F])
 		: F[Unit] =
-		result.fold (monad.unit) {
+		result.fold (monadThrow.unit) {
 			instance =>
-				logger.debug (s"${toString ()} - saved storage facility: " + instance.id.show)
+				logger.debug (
+					s"${toString ()} - saved storage facility: " +
+					instance.id.show
+					)
 			}
 
 

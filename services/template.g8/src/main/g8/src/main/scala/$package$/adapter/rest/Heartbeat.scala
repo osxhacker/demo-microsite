@@ -32,11 +32,9 @@ final case class Heartbeat[F[_]] (
 			GlobalEnvironment[F]
 			],
 
-		/// Needed for `log4cats.syntax`.
+		/// Needed for '''AbstractResource'''.
 		override protected val loggerFactory : LoggerFactory[F],
-
-		/// Needed for `complete`, `failWith`, and 'flatMap'.
-		private val monadThrow : MonadThrow[F],
+		override protected val monadThrow : MonadThrow[F],
 
 		/// Needed for `serverLogicWithEnvironment`.
 		private val pointcut : Pointcut[F]
