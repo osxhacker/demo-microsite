@@ -1,7 +1,10 @@
 package com.github.osxhacker.demo.company.adapter.rest
 
-import cats.Monad
+import scala.annotation.implicitNotFound
+
+import cats.MonadThrow
 import org.typelevel.log4cats.LoggerFactory
+import shapeless.Witness
 import sttp.model.StatusCode
 
 import com.github.osxhacker.demo.chassis.adapter.rest.{
@@ -10,9 +13,13 @@ import com.github.osxhacker.demo.chassis.adapter.rest.{
 	}
 
 import com.github.osxhacker.demo.chassis.effect.ReadersWriterResource
+import com.github.osxhacker.demo.chassis.domain.algorithm.FindField
 import com.github.osxhacker.demo.chassis.monitoring.Subsystem
 import com.github.osxhacker.demo.company.adapter.RuntimeSettings
-import com.github.osxhacker.demo.company.domain.GlobalEnvironment
+import com.github.osxhacker.demo.company.domain.{
+	GlobalEnvironment,
+	ScopedEnvironment
+	}
 
 import api.{
 	LogicErrorDetails,
@@ -31,7 +38,7 @@ abstract class AbstractResource[F[_]] ()
 	(
 		implicit
 		/// Needed for `complete` and `failWith`.
-		override protected val monad : Monad[F],
+		override protected val monadThrow : MonadThrow[F],
 
 		/// Needed for `log4cats.syntax`
 		override protected val loggerFactory : LoggerFactory[F]
@@ -42,6 +49,7 @@ abstract class AbstractResource[F[_]] ()
 	import cats.syntax.applicative._
 	import cats.syntax.either._
 	import cats.syntax.functor._
+	import cats.syntax.show._
 	import mouse.any._
 
 
@@ -87,11 +95,41 @@ abstract class AbstractResource[F[_]] ()
 
 
 	/**
+	 * The createScopedEnvironment method provides endpoint methods with a
+	 * convenient, consistent, mechanism for creating a
+	 * [[com.github.osxhacker.demo.company.domain.ScopedEnvironment]] from a
+	 * [[com.github.osxhacker.demo.company.domain.GlobalEnvironment]] and
+	 * endpoint-specific collaborators.
+	 */
+	final protected def createScopedEnvironment[ParamsT] (
+		path : Path,
+		params : ParamsT
+		)
+		(
+			implicit
+			@implicitNotFound ("could not find the GlobalEnvironment[${F}]")
+			global : GlobalEnvironment[F],
+
+			@implicitNotFound (
+				"could not find X-Correlation-ID of type String in ${ParamsT}"
+				)
+			findCorrelationId : FindField[
+				ParamsT,
+				Witness.`'X-Correlation-ID`.T,
+				String
+				]
+		)
+		: F[ScopedEnvironment[F]] =
+		global.scopeWith (findCorrelationId (params))
+			.map (_.addContext (Map ("url.path" -> path.show)))
+
+
+	/**
 	 * This version of the complete method indicates successful
 	 * [[sttp.tapir.Endpoint]] execution when the result type is ''Unit''.
 	 */
 	final protected def complete () : F[ResultType[Unit]] =
-		completeF (monad.unit)
+		completeF (monadThrow.unit)
 
 
 	/**

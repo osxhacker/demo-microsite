@@ -2,7 +2,7 @@ package com.github.osxhacker.demo.chassis.monitoring.logging
 
 import cats.{
 	Eval,
-	Monad
+	FlatMap
 	}
 
 import org.typelevel.log4cats
@@ -35,12 +35,13 @@ trait LogInvocation[F[_], ResultT]
 	extends Advice[F, ResultT]
 {
 	/// Class Imports
+	import cats.syntax.applicative._
 	import cats.syntax.flatMap._
 	import log4cats.syntax._
 
 
 	/// Instance Properties
-	implicit protected def monad : Monad[F]
+	implicit protected def flatMap : FlatMap[F]
 	protected def loggerFactory : LoggerFactory[F]
 
 	private lazy val aspectName = getClass.getSimpleName
@@ -49,7 +50,7 @@ trait LogInvocation[F[_], ResultT]
 	abstract override def apply (fa : Eval[F[ResultT]])
 		(implicit pointcut : Pointcut[F])
 		: Eval[F[ResultT]] =
-		pointcut.alwaysF (super.apply (fa)) (_ => monad.unit, failed)
+		pointcut.alwaysF (super.apply (fa)) (_.pure[F], failed)
 
 
 	private def emitLogEntry (implicit log : Logger[F]) : Throwable => F[Unit] =

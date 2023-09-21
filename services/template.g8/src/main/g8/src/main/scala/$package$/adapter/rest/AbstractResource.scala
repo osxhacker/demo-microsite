@@ -1,6 +1,6 @@
 package $package$.adapter.rest
 
-import cats.Monad
+import cats.MonadThrow
 import org.typelevel.log4cats.LoggerFactory
 import sttp.model.StatusCode
 
@@ -31,7 +31,7 @@ abstract class AbstractResource[F[_]] ()
 	(
 		implicit
 		/// Needed for `complete` and `failWith`.
-		override protected val monad : Monad[F],
+		override protected val monadThrow : MonadThrow[F],
 
 		/// Needed for `log4cats.syntax`
 		override protected val loggerFactory : LoggerFactory[F]
@@ -91,7 +91,7 @@ abstract class AbstractResource[F[_]] ()
 	 * [[sttp.tapir.Endpoint]] execution when the result type is ''Unit''.
 	 */
 	final protected def complete () : F[ResultType[Unit]] =
-		completeF (monad.unit)
+		completeF (monadThrow.unit)
 
 
 	/**

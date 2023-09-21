@@ -257,10 +257,10 @@ final case class CompanyResource[F[_]] (
 		(implicit global : GlobalEnvironment[F])
 		: F[ResultType[api.Company]] =
 		for {
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
-				params.`X-Correlation-ID`
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
@@ -297,10 +297,10 @@ final case class CompanyResource[F[_]] (
 		)
 		: F[ResultType[api.Company]] =
 		for {
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
-				correlationId (params)
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
@@ -328,10 +328,10 @@ final case class CompanyResource[F[_]] (
 		(implicit global : GlobalEnvironment[F])
 		: F[ResultType[Unit]] =
 		for {
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
-				params.`X-Correlation-ID`
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory
 				.create
@@ -364,10 +364,10 @@ final case class CompanyResource[F[_]] (
 		(implicit global : GlobalEnvironment[F])
 		: F[ResultType[api.Company]] =
 		for {
-			implicit0 (env : ScopedEnvironment[F]) <- global.scopeWith (
-				params.`X-Correlation-ID`
+			implicit0 (env : ScopedEnvironment[F]) <- createScopedEnvironment (
+				path,
+				params
 				)
-				.map (_.addContext (Map ("path" -> path.show)))
 
 			implicit0 (log : StructuredLogger[F]) <- env.loggingFactory.create
 

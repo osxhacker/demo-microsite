@@ -1,6 +1,5 @@
 package com.github.osxhacker.demo.company.adapter
 
-import scala.annotation.unused
 import scala.language.postfixOps
 
 import cats.Monad

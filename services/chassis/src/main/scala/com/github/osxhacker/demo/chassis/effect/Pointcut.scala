@@ -19,36 +19,71 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
 
 /**
  * The '''Pointcut''' type is a model of the TYPE CLASS pattern and provides the
- * ability to do limited
+ * ability to do limited functional
  * [[https://en.wikipedia.org/wiki/Aspect-oriented_programming Aspect Oriented Programming]]
  * natively in Scala.
+ *
+ * ==General Form==
+ *
+ * ===Entering Functors===
+ *
+ * {{{
+ *     type FunctorVersion = () => Unit
+ *     type ContainerVersion = () => F[Unit]
+ * }}}
+ *
+ * The '''entering''' functors are evaluated __before__ there exists a
+ * ''ResultT'' and, therefore, they produce ''Unit'', within or without
+ * ''F[_]''.  The `FunctorVersion` can be used in a referentially transparent
+ * manner when used in conjunction with other '''Pointcut''' methods to create
+ * a closure.
+ *
+ * ===Leaving Functors===
+ *
+ * {{{
+ *     type FunctorVersion = Endo[ResultT]
+ *     type ContainerVersion = ResultT => F[ResultT]
+ * }}}
+ *
+ * The '''leaving''' functors are evaluated during "happy path" execution and
+ * have the ability to modify the return value if desired.  Effects performed
+ * within ''F[_]'' in the `ContainerVersion` are supported and fully expected.
+ *
+ * ===OnError Functors===
+ *
+ * {{{
+ *     type Signature = Throwable => F[Unit]
+ * }}}
+ *
+ * The '''onError''' functors have a return type of ''F[Unit]'' in order to
+ * support error reporting effects.  Since the container ''F[_]'' is in an
+ * error state when '''onError''' functors are evaluated, recovering from them
+ * is out of scope for '''Pointcut''' logic.
  *
  * @see [[com.github.osxhacker.demo.chassis.effect.Advice]]
  */
 trait Pointcut[F[_]]
 {
 	/// Class Imports
-	import Pointcut.noop
 	import mouse.any._
 
 
 	/**
-	 * The after method ensures that '''leaving''' is always invoked when
-	 * '''efa''' is successful.
+	 * The after method ensures that '''leaving''' always has the opportunity to
+	 * manipulate the ''ResultT'' iff '''efa''' is successful.
 	 */
 	def after[ResultT] (efa : Eval[F[ResultT]])
-		(leaving : ResultT => Unit)
+		(leaving : Endo[ResultT])
 		: Eval[F[ResultT]]
 
 
 	/**
-	 * The afterF method ensures '''Pointcut''' logic has the opportunity to
-	 * manipulate '''efa''' __after__ it has been constructed.  There is no
-	 * `aroundF` equivalent as all it could do is introduce logic then
-	 * immediately ignore its result.
+	 * The afterF method ensures that '''leaving''' has the opportunity to
+	 * manipulate ''F[ResultT]'' __after__ it has been constructed iff '''efa'''
+	 * is successful.
 	 */
 	def afterF[ResultT] (efa : Eval[F[ResultT]])
-		(leaving : Endo[F[ResultT]])
+		(leaving : ResultT => F[ResultT])
 		: Eval[F[ResultT]]
 
 
@@ -57,7 +92,7 @@ trait Pointcut[F[_]]
 	 * successful and '''onError''' when not.
 	 */
 	def always[ResultT] (efa : Eval[F[ResultT]])
-		(leaving : ResultT => Unit, onError : Throwable => Unit)
+		(leaving : Endo[ResultT], onError : Throwable => F[Unit])
 		: Eval[F[ResultT]]
 
 
@@ -67,7 +102,7 @@ trait Pointcut[F[_]]
 	 * within the context of ''F''.
 	 */
 	def alwaysF[ResultT] (efa : Eval[F[ResultT]])
-		(leaving : ResultT => F[Unit], onError : Throwable => F[Unit])
+		(leaving : ResultT => F[ResultT], onError : Throwable => F[Unit])
 		: Eval[F[ResultT]]
 
 
@@ -77,22 +112,40 @@ trait Pointcut[F[_]]
 	 * is similar to:
 	 *
 	 * {{{
-	 *    entering ().andThen (efa)
-	 *        .andThen (r =&gt; leaving (r))
-	 *        .handleError (ex =&gt; onError (ex))
+	 *    entering ().andThen (_ =&gt; fa)
+	 *        .andThen (leaving)
+	 *        .handleErrorWith (ex =&gt; onError (ex))
 	 * }}}
-	 *
-	 * There is no `aroundF` equivalent as all it could do is introduce logic
-	 * then immediately ignore its result.
 	 */
 	def around[ResultT] (efa : Eval[F[ResultT]])
 		(
 			entering : () => Unit,
-			leaving : ResultT => Unit,
-			onError : Throwable => Unit = noop
+			leaving : Endo[ResultT],
+			onError : Throwable => F[Unit]
 		)
 		: Eval[F[ResultT]] =
 		before (efa) (entering) |> (always (_) (leaving, onError))
+
+
+	/**
+	 * The aroundF method allows logic to be invoked when '''entering''',
+	 * '''leaving''', and when '''efa''' encounters an error.  Conceptually, it
+	 * is similar to:
+	 *
+	 * {{{
+	 *    entering ().flatMap (_ =gt; fa)
+	 *        .flatMap (leaving)
+	 *        .handleErrorWith (ex =&gt; onError (ex))
+	 * }}}
+	 */
+	def aroundF[ResultT] (efa : Eval[F[ResultT]])
+		(
+			entering : () => F[Unit],
+			leaving : ResultT => F[ResultT],
+			onError : Throwable => F[Unit]
+		)
+		: Eval[F[ResultT]] =
+		beforeF (efa) (entering) |> (alwaysF (_) (leaving, onError))
 
 
 	/**
@@ -106,12 +159,10 @@ trait Pointcut[F[_]]
 
 	/**
 	 * The beforeF method ensures '''Pointcut''' logic has the opportunity to
-	 * manipulate '''efa''' __before__ it has been constructed.  There is no
-	 * `aroundF` equivalent as all it could do is introduce logic then
-	 * immediately remove it.
+	 * manipulate '''efa''' __before__ it has been constructed.
 	 */
 	def beforeF[ResultT] (efa : Eval[F[ResultT]])
-		(entering : () => F[ResultT])
+		(entering : () => F[Unit])
 		: Eval[F[ResultT]]
 
 
@@ -122,7 +173,7 @@ trait Pointcut[F[_]]
 	 * unconditionally afterward.
 	 */
 	def bracket[ResultT, ResourceT] (efa : Eval[F[ResultT]])
-		(acquire : () => ResourceT)
+		(acquire : () => ErrorOr[ResourceT])
 		(release : ResourceT => ErrorOr[ResultT] => Unit)
 		: Eval[F[ResultT]]
 
@@ -130,18 +181,29 @@ trait Pointcut[F[_]]
 	/**
 	 * The finalizeWith method is similar to `always` in that the given
 	 * '''finalizer''' is always evaluated after '''efa''' is computed, no
-	 * matter if '''efa''' succeeds, fails, or is cancelled.
+	 * matter if '''efa''' succeeds or fails.
 	 */
 	def finalizeWith[ResultT] (efa : Eval[F[ResultT]])
-		(finalizer : () => Unit)
-		: Eval[F[ResultT]] =
-		always (efa) (_ => finalizer (), _ => finalizer ())
+		(finalizer : () => F[Unit])
+		: Eval[F[ResultT]]
 }
 
 
 object Pointcut
 {
 	/// Class Types
+	/**
+	 * The '''IOPointcut''' `object` defines the
+	 * [[com.github.osxhacker.demo.chassis.effect.Pointcut]] contract for the
+	 * [[cats.effect.IO]] [[cats.Monad]].  Of note is that __all__ operations
+	 * are evaluated in the [[cats.Now]] [[cats.Eval]] container since program
+	 * evaluation __must__ be defined within [[cats.effect.IO]].
+	 *
+	 * Another thing to note about [[cats.effect.IO]] is that the implementation
+	 * will cancel fibers during normal operations as well as when explicitly
+	 * asked to do so.  This is why cancellations are not treated as errors
+	 * here.
+	 */
 	implicit object IOPointcut
 		extends Pointcut[IO]
 	{
@@ -150,97 +212,117 @@ object Pointcut
 
 
 		override def after[ResultT] (efa : Eval[IO[ResultT]])
-			(leaving : ResultT => Unit)
+			(leaving : Endo[ResultT])
 			: Eval[IO[ResultT]] =
-			efa map (_.flatTap (r => IO (leaving (r))))
+			efa map (_ map leaving)
 
 
 		override def afterF[ResultT] (efa : Eval[IO[ResultT]])
-			(leaving : Endo[IO[ResultT]])
+			(leaving : ResultT => IO[ResultT])
 			: Eval[IO[ResultT]] =
-			efa map (r => r <* leaving (r))
+			efa map (_ flatMap leaving)
 
 
 		override def always[ResultT] (efa : Eval[IO[ResultT]])
-			(leaving : ResultT => Unit, onError : Throwable => Unit)
+			(
+				leaving : Endo[ResultT],
+				onError : Throwable => IO[Unit]
+			)
 			: Eval[IO[ResultT]] =
 			efa map {
-				_.guaranteeCase {
-					_.fold (
-						canceled = IO.unit,
-						errored = ex => IO (onError (ex)),
-						completed = _ map leaving
-						)
-					}
+				_.map (leaving)
+					.onError (onError)
 				}
 
 
 		override def alwaysF[ResultT] (efa : Eval[IO[ResultT]])
-			(leaving : ResultT => IO[Unit], onError : Throwable => IO[Unit])
+			(
+				leaving : ResultT => IO[ResultT],
+				onError : Throwable => IO[Unit]
+			)
 			: Eval[IO[ResultT]] =
 			efa map {
-				_.guaranteeCase {
-					_.fold (
-						canceled = IO.unit,
-						errored = onError,
-						completed = _ flatMap leaving
-						)
-					}
+				_.flatMap (leaving)
+					.onError (onError)
 				}
 
 
 		override def around[ResultT] (efa : Eval[IO[ResultT]])
 			(
 				entering : () => Unit,
-				leaving : ResultT => Unit,
-				onError : Throwable => Unit = noop
+				leaving : Endo[ResultT],
+				onError : Throwable => IO[Unit]
 			)
 			: Eval[IO[ResultT]] =
-			new Later (entering) flatMap (_ => always (efa) (leaving, onError))
+			Now (IO delay entering ()) flatMap {
+				prior =>
+					always (efa map (prior >> _)) (leaving, onError)
+				}
+
+
+		override def aroundF[ResultT] (efa : Eval[IO[ResultT]])
+			(
+				entering : () => IO[Unit],
+				leaving : ResultT => IO[ResultT],
+				onError : Throwable => IO[Unit]
+			)
+			: Eval[IO[ResultT]] =
+			Now (IO defer entering ()).flatMap {
+				prior =>
+					efa map {
+						fa =>
+							(prior >> fa.flatMap (leaving)).onError (onError)
+						}
+				}
 
 
 		override def before[ResultT] (efa : Eval[IO[ResultT]])
 			(entering : () => Unit)
 			: Eval[IO[ResultT]] =
-			new Later (entering) flatMap (_ => efa)
+			Now (IO delay entering ()) flatMap {
+				prior =>
+					efa map (prior >> _)
+				}
 
 
 		override def beforeF[ResultT] (efa : Eval[IO[ResultT]])
-			(entering : () => IO[ResultT])
+			(entering : () => IO[Unit])
 			: Eval[IO[ResultT]] =
-			new Later (entering) flatMap {
+			Now (IO defer entering ()) flatMap {
 				prior =>
 					efa map (prior >> _)
 				}
 
 
 		override def bracket[ResultT, ResourceT] (efa : Eval[IO[ResultT]])
-			(acquire : () => ResourceT)
+			(acquire : () => ErrorOr[ResourceT])
 			(release : ResourceT => ErrorOr[ResultT] => Unit)
 			: Eval[IO[ResultT]] =
-			Later (
-				IO.uncancelable {
-					poll =>
-						IO (acquire ()).flatMap {
-							resource =>
-								IO.defer (poll (efa.value))
-									.start
-									.flatTap (_ => IO.cede)
-									.flatMap (_.join)
-									.flatMap (_.embedError)
-									.attemptTap {
-										result =>
-											IO (release (resource) (result))
-										}
-							}
-					}
-				)
+			efa map {
+				prior =>
+					IO.uncancelable {
+						poll =>
+							IO.fromEither (acquire ())
+								.flatMap {
+									resource =>
+										IO.defer (poll (prior))
+											.start
+											.flatTap (_ => IO.cede)
+											.flatMap (_.join)
+											.flatMap (_.embedError)
+											.attemptTap {
+												result =>
+													IO (release (resource) (result))
+												}
+									}
+						}
+				}
 
 
 		override def finalizeWith[ResultT] (efa : Eval[IO[ResultT]])
-			(finalizer : () => Unit)
+			(finalizer : () => IO[Unit])
 			: Eval[IO[ResultT]] =
-			efa map (_.guarantee (IO (finalizer ())))
+			efa map (_ guarantee finalizer ())
 	}
 
 
@@ -251,74 +333,78 @@ object Pointcut
 		import cats.syntax.all._
 
 
-		override def after[ResultT] (fa : Eval[Try[ResultT]])
-			(leaving : ResultT => Unit)
+		override def after[ResultT] (efa : Eval[Try[ResultT]])
+			(leaving : Endo[ResultT])
 			: Eval[Try[ResultT]] =
-			fa map (_.flatTap (leaving (_).pure[Try]))
+			efa map (_ map leaving)
 
 
-		override def afterF[ResultT] (fa : Eval[Try[ResultT]])
-			(leaving : Endo[Try[ResultT]])
+		override def afterF[ResultT] (efa : Eval[Try[ResultT]])
+			(leaving : ResultT => Try[ResultT])
 			: Eval[Try[ResultT]] =
-			fa map (r => r <* leaving (r))
+			efa map (_ flatMap leaving)
 
 
-		override def always[ResultT] (fa : Eval[Try[ResultT]])
-			(leaving : ResultT => Unit, onError : Throwable => Unit)
+		override def always[ResultT] (efa : Eval[Try[ResultT]])
+			(leaving : Endo[ResultT], onError : Throwable => Try[Unit])
 			: Eval[Try[ResultT]] =
-			fa map {
-				_.attemptTap {
-					_.fold (
-						 ex => onError (ex).pure[Try] *> ex.raiseError[Try, ResultT],
-						_.pure[Try].flatTap (leaving (_).pure[Try])
-						)
-					}
+			efa map {
+				_.map (leaving)
+					.onError (onError (_))
 				}
 
 
-		override def alwaysF[ResultT] (fa : Eval[Try[ResultT]])
-			(leaving : ResultT => Try[Unit], onError: Throwable => Try[Unit])
+		override def alwaysF[ResultT] (efa : Eval[Try[ResultT]])
+			(
+				leaving : ResultT => Try[ResultT],
+				onError : Throwable => Try[Unit]
+			)
 			: Eval[Try[ResultT]] =
-			fa map {
-				_.attemptTap {
-					_.fold (
-						ex => onError (ex) *> ex.raiseError[Try, ResultT],
-						_.pure[Try].flatTap (leaving)
-						)
-					}
+			efa map {
+				_.flatMap (leaving)
+					.onError (onError (_))
 				}
 
 
-		override def before[ResultT] (fa : Eval[Try[ResultT]])
+		override def before[ResultT] (efa : Eval[Try[ResultT]])
 			(entering : () => Unit)
 			: Eval[Try[ResultT]] =
-			new Later (entering) flatMap (_ => fa)
+			new Later (entering) flatMap (_ => efa)
 
 
-		override def beforeF[ResultT] (fa : Eval[Try[ResultT]])
-			(entering : () => Try[ResultT])
+		override def beforeF[ResultT] (efa : Eval[Try[ResultT]])
+			(entering : () => Try[Unit])
 			: Eval[Try[ResultT]] =
 			new Later (entering) flatMap {
 				prior =>
-					fa map (prior >> _)
+					efa map (prior >> _)
 				}
 
 
 		override def bracket[ResultT, ResourceT] (efa : Eval[Try[ResultT]])
-			(acquire : () => ResourceT)
+			(acquire : () => ErrorOr[ResourceT])
 			(release : ResourceT => ErrorOr[ResultT] => Unit)
 			: Eval[Try[ResultT]] =
 			Later (
-				Try (acquire ()).flatMap {
-					resource =>
-						efa.value
-							.attemptTap {
-								result =>
-									release (resource) (result)
-									Success ({})
-								}
-					}
+				acquire ().toTry
+					.flatMap {
+						resource =>
+							efa.value
+								.attemptTap {
+									result =>
+										release (resource) (result)
+										Success ({})
+									}
+						}
 				)
+
+
+		override def finalizeWith[ResultT] (efa : Eval[Try[ResultT]])
+			(finalizer : () => Try[Unit])
+			: Eval[Try[ResultT]] =
+			efa map {
+				_ attemptTap (_ => finalizer ())
+				}
 	}
 
 
@@ -331,33 +417,34 @@ object Pointcut
 
 
 			override def after[ResultT] (efa : Eval[Future[ResultT]])
-				(leaving : ResultT => Unit)
+				(leaving : Endo[ResultT])
 				: Eval[Future[ResultT]] =
-				efa map (_.flatTap (r => Future (leaving (r))))
+				efa map (_ map leaving)
 
 
 			override def afterF[ResultT] (efa : Eval[Future[ResultT]])
-				(leaving : Endo[Future[ResultT]])
+				(leaving : ResultT => Future[ResultT])
 				: Eval[Future[ResultT]] =
-				efa map (leaving (_))
+				efa map (_ flatMap leaving)
 
 
 			override def always[ResultT] (efa : Eval[Future[ResultT]])
-				(leaving : ResultT => Unit, onError : Throwable => Unit)
+				(leaving : Endo[ResultT], onError : Throwable => Future[Unit])
 				: Eval[Future[ResultT]] =
-				after (efa) (leaving) map {
-					_.onError (ex => Future (onError (ex)))
+				efa map {
+					_.map (leaving)
+						.onError (onError (_))
 					}
 
 
 			override def alwaysF[ResultT] (efa : Eval[Future[ResultT]])
 				(
-					leaving : ResultT => Future[Unit],
+					leaving : ResultT => Future[ResultT],
 					onError : Throwable => Future[Unit]
 				)
 				: Eval[Future[ResultT]] =
 				efa map {
-					_.flatTap (leaving)
+					_.flatMap (leaving)
 						.onError (onError (_))
 					}
 
@@ -369,33 +456,41 @@ object Pointcut
 
 
 			override def beforeF[ResultT] (efa : Eval[Future[ResultT]])
-				(entering : () => Future[ResultT])
+				(entering : () => Future[Unit])
 				: Eval[Future[ResultT]] =
-				new Later (entering) flatMap (_ => efa)
+				new Later (entering) flatMap {
+					prior =>
+						efa map (prior >> _)
+					}
 
 
 			override def bracket[ResultT, ResourceT] (
 				efa : Eval[Future[ResultT]]
 				)
-				(acquire : () => ResourceT)
+				(acquire : () => ErrorOr[ResourceT])
 				(release : ResourceT => ErrorOr[ResultT] => Unit)
 				: Eval[Future[ResultT]] =
 				Later {
-					Future (acquire ()).flatMap {
-						resource =>
-							efa.value
-								.attemptTap {
-									result =>
-										release (resource) (result)
-										Future.unit
-									}
-						}
+					Future.fromTry (acquire ().toTry)
+						.flatMap {
+							resource =>
+								efa.value
+									.attemptTap {
+										result =>
+											release (resource) (result)
+											Future.unit
+										}
+							}
 					}
+
+
+			override def finalizeWith[ResultT] (efa : Eval[Future[ResultT]])
+				(finalizer : () => Future[Unit])
+				: Eval[Future[ResultT]] =
+				efa map {
+					_ attemptTap (_ => finalizer ())
+				}
 		}
-
-
-	/// Instance Properties
-	private[effect] val noop : Throwable => Unit = _ => {}
 
 
 	/**

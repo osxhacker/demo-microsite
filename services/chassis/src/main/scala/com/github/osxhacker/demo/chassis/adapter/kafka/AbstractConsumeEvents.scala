@@ -3,7 +3,11 @@ package com.github.osxhacker.demo.chassis.adapter.kafka
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import cats.Monad
+import cats.{
+	ApplicativeThrow,
+	FlatMap
+	}
+
 import cats.data.Kleisli
 import cats.effect.{
 	Async,
@@ -133,8 +137,8 @@ abstract class AbstractConsumeEvents[
 							interpreter (committable.record.value -> env).as (
 								committable.offset.pure[Option]
 								)
-								.onError (_ => consumer.stopConsuming)
-								.measure (advice),
+								.measure (advice)
+								.onError (_ => consumer.stopConsuming),
 
 							consumer.stopConsuming
 								.as (none[CommittableOffset[F]])
@@ -160,7 +164,11 @@ object AbstractConsumeEvents
 		(
 			implicit
 
-			override protected val monad : Monad[F],
+			/// Needed for '''Advice'''.
+			override protected val applicativeThrow : ApplicativeThrow[F],
+
+			/// Needed for '''LogInvocation'''.
+			override protected val flatMap : FlatMap[F],
 
 			/// Needed for '''ContextualLoggerFactory'''.
 			private val underlyingLoggerFactory : LoggerFactory[F]
@@ -184,12 +192,12 @@ object AbstractConsumeEvents
 			s"CONSUME ${channel.getClass.getSimpleName.stripSuffix ("$")}"
 
 		override protected val loggerFactory =
-			ContextualLoggerFactory[F](underlyingLoggerFactory) {
+			ContextualLoggerFactory[F] (underlyingLoggerFactory) {
 				Map (
 					"channel" -> channel.entryName,
 					"operation" -> operation
 					)
-				}
+				} (applicativeThrow)
 	}
 }
 

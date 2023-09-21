@@ -55,6 +55,7 @@ final case class AddNewFacility[F[_], SourceT <: AnyRef] private (
 	)
 {
 	/// Class Imports
+	import InferFacilityChangeReport.HavingCreated
 	import cats.syntax.all._
 	import chassis.syntax._
 
@@ -79,6 +80,7 @@ final case class AddNewFacility[F[_], SourceT <: AnyRef] private (
 		: F[StorageFacility] =
 		findActiveCompany (env.tenant).map (source :: env.region :: _ :: HNil)
 			.flatMap (create (_))
+			.flatTap (added => InferFacilityChangeReport (HavingCreated (added)))
 }
 
 
@@ -129,3 +131,4 @@ object AddNewFacility
 	@inline
 	def apply[F[_]] : PartiallyApplied[F] = new PartiallyApplied[F]()
 }
+

@@ -26,6 +26,10 @@ abstract class Task[KeyT <: SessionKey] ()
 		with AuthenticationAware[KeyT]
 		with CirceAware[KeyT]
 {
+	/// Class Imports
+	import io.gatling.commons.validation._
+
+
 	/// Class Types
 	/**
 	 * The '''CorrelationIdSyntax''' type extends
@@ -36,7 +40,12 @@ abstract class Task[KeyT <: SessionKey] ()
 	implicit class CorrelationIdSyntax (private val self : HttpRequestBuilder)
 	{
 		def addCorrelationId () =
-			self.header (`X-Correlation-ID`, randomUUID ().toString)
+			self.header (
+				`X-Correlation-ID`,
+				_ =>
+					randomUUID ().toString
+						.success
+				)
 	}
 
 

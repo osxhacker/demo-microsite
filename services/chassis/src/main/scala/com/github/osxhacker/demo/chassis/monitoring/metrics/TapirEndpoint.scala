@@ -2,7 +2,12 @@ package com.github.osxhacker.demo.chassis.monitoring.metrics
 
 import scala.language.postfixOps
 
-import cats.Monad
+import cats.{
+	ApplicativeThrow,
+	FlatMap,
+	MonadThrow
+	}
+
 import org.typelevel.log4cats.LoggerFactory
 import kamon.context.Context
 import sttp.model.Method
@@ -11,7 +16,8 @@ import sttp.tapir.AnyEndpoint
 import com.github.osxhacker.demo.chassis.effect.DefaultAdvice
 import com.github.osxhacker.demo.chassis.monitoring.logging.{
 	ContextualLoggerFactory,
-	LogInvocation
+	LogInvocation,
+	LogSlowInvocation
 	}
 
 
@@ -28,7 +34,7 @@ final class TapirEndpoint[F[_], ResultT] private (
 	(
 		implicit
 
-		override protected val monad : Monad[F],
+		private val monadThrow : MonadThrow[F],
 
 		/// Needed for '''ContextualLoggerFactory'''.
 		private val underlyingLoggerFactory : LoggerFactory[F]
@@ -37,6 +43,7 @@ final class TapirEndpoint[F[_], ResultT] private (
 		with MetricsAdvice[F, ResultT]
 		with InvocationCounters[F, ResultT]
 		with LogInvocation[F, ResultT]
+		with LogSlowInvocation[F, ResultT]
 		with StartWorkflow[F, ResultT]
 {
 	/// Class Imports
@@ -44,6 +51,8 @@ final class TapirEndpoint[F[_], ResultT] private (
 
 
 	/// Instance Properties
+	override protected val applicativeThrow : ApplicativeThrow[F] = monadThrow
+	override protected val flatMap : FlatMap[F] = monadThrow
 	override val component = "tapir"
 	override val group = subgroup (
 		super.group,
@@ -99,7 +108,7 @@ object TapirEndpoint
 	 */
 	def apply[F[_], ResultT] (endpoint : AnyEndpoint)
 		(correlationId : String)
-		(implicit loggerFactory : LoggerFactory[F], monad : Monad[F])
+		(implicit loggerFactory : LoggerFactory[F], monadThrow : MonadThrow[F])
 		: TapirEndpoint[F, ResultT] =
 		new TapirEndpoint[F, ResultT] (
 			endpoint.method.getOrElse (Method.GET),

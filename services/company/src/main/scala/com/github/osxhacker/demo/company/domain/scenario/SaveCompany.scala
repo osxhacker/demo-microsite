@@ -2,7 +2,7 @@ package com.github.osxhacker.demo.company.domain.scenario
 
 import scala.language.postfixOps
 
-import cats.Monad
+import cats.MonadThrow
 import org.typelevel.log4cats
 import org.typelevel.log4cats.Logger
 
@@ -26,8 +26,8 @@ final case class SaveCompany[F[_]] ()
 	(
 		implicit
 
-		/// Needed for `flatMap`.
-		private val monad : Monad[F],
+		/// Needed for `flatMap` and `measure`.
+		private val monadThrow : MonadThrow[F],
 
 		/// Needed for `measure`.
 		private val pointcut : Pointcut[F]

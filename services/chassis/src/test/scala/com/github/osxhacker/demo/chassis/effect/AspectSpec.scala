@@ -3,6 +3,7 @@ package com.github.osxhacker.demo.chassis.effect
 import scala.util.Try
 
 import cats.{
+	ApplicativeThrow,
 	Eval,
 	Later
 	}
@@ -30,36 +31,55 @@ final class AspectSpec ()
 		private val prefix : String,
 		private val suffix : String
 		)
+		(implicit override protected val applicativeThrow : ApplicativeThrow[F])
 		extends Advice[F, String]
 	{
 		override def apply (fa : Eval[F[String]])
 			(implicit pointcut : Pointcut[F])
 			: Eval[F[String]] =
 			pointcut.after (fa) {
-				effect.append (prefix)
-					.append (_)
-					.append (suffix)
+				r =>
+					effect.append (prefix)
+						.append (r)
+						.append (suffix)
+
+					r
 				}
 	}
 
 
 	final case class StaticAdvice[F[_], A] (val history : StringBuilder)
+		(implicit override protected val applicativeThrow : ApplicativeThrow[F])
 		extends Advice[F, A]
 	{
+		/// Class Imports
+		import cats.syntax.functor._
+
+
 		override def apply (fa : Eval[F[A]])
 			(implicit pointcut : Pointcut[F])
 			: Eval[F[A]] =
 			pointcut.around (fa) (
 				entering = () => history.append ('e'),
-				leaving = _ => history.append ('l'),
-				onError = _ => history.append ('x')
+				leaving = a => {
+					history.append ('l')
+					a
+					},
+
+				onError = _ =>
+					history.append ('x')
+						.pure[F]
+						.void
 				)
 	}
 
 
 	object StaticAdvice
 	{
-		implicit def summon[F[_], A] : StaticAdvice[F, A] =
+		implicit def summon[F[_], A] (
+			implicit applicativeThrow : ApplicativeThrow[F]
+			)
+			: StaticAdvice[F, A] =
 			new StaticAdvice[F, A] (new StringBuilder ())
 	}
 

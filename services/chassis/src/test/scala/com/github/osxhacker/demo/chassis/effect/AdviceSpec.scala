@@ -3,6 +3,7 @@ package com.github.osxhacker.demo.chassis.effect
 import java.util.concurrent.atomic.AtomicInteger
 
 import cats.{
+	ApplicativeThrow,
 	Eval,
 	Later
 	}
@@ -61,7 +62,10 @@ final class AdviceSpec ()
 			(implicit pointcut : Pointcut[F])
 			: Eval[F[A]] =
 			pointcut.after (super.apply (fa)) {
-				_ => increment ()
+				a => {
+					increment ()
+					a
+					}
 				}
 	}
 
@@ -104,6 +108,7 @@ final class AdviceSpec ()
 	final case class MultipleAdvice[F[_], A] (
 		override val counter : AtomicInteger
 		)
+		(implicit override protected val applicativeThrow : ApplicativeThrow[F])
 		extends DefaultAdvice[F, A]
 			with Countable
 			with MetricsAdvice[F, A]
@@ -121,6 +126,7 @@ final class AdviceSpec ()
 	final case class SingleAdvice[F[_], A] (
 		override val counter : AtomicInteger
 		)
+		(implicit override protected val applicativeThrow : ApplicativeThrow[F])
 		extends DefaultAdvice[F, A]
 			with IncrementBefore[F, A]
 			with Countable

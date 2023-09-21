@@ -1,6 +1,9 @@
 package com.github.osxhacker.demo.chassis.effect
 
-import cats.Eval
+import cats.{
+	ApplicativeThrow,
+	Eval
+	}
 
 
 /**
@@ -38,7 +41,7 @@ import cats.Eval
  *         override def apply (fa : Eval[F[A]])
  *             (implicit pointcut : Pointcut[F])
  *             : F[A] =
- *             doSomethingAndReturn (fa)
+ *             maybeDoSomethingAndReturn (fa)
  *     }
  *
  *
@@ -55,6 +58,10 @@ import cats.Eval
  */
 trait Advice[F[_], ResultT]
 {
+	/// Instance Properties
+	implicit protected def applicativeThrow : ApplicativeThrow[F]
+
+
 	def apply (fa : Eval[F[ResultT]])
 		(implicit pointcut : Pointcut[F])
 		: Eval[F[ResultT]]

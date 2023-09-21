@@ -4,7 +4,7 @@ import scala.annotation.implicitNotFound
 
 import cats.{
 	Later,
-	Monad
+	MonadThrow
 	}
 
 import cats.data.Kleisli
@@ -38,9 +38,9 @@ abstract class ServiceResource[F[_]] ()
 		implicit
 
 		/// Needed for `serverLogicWithEnvironment`.
-		protected val monad : Monad[F],
+		protected val monadThrow : MonadThrow[F],
 
-		/// Needed for `log4cats.syntax`.
+		/// Needed for '''TapirEndpoint'''.
 		protected val loggerFactory : LoggerFactory[F]
 	)
 	extends (() => List[ServerEndpoint[Any, F]])

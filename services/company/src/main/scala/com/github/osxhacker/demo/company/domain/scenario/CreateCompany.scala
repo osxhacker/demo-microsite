@@ -64,6 +64,7 @@ final class CreateCompany[F[_], SourceT <: AnyRef] (
 	)
 {
 	/// Class Imports
+	import InferChangeReport.HavingCreated
 	import cats.syntax.all._
 	import chassis.syntax._
 	import mouse.foption._
@@ -98,6 +99,10 @@ final class CreateCompany[F[_], SourceT <: AnyRef] (
 					LogicError ("save did not produce a company")
 					)
 			}
+			.flatTap {
+				company =>
+					InferChangeReport (HavingCreated (company))
+				}
 			.deriveEvent (CompanyCreated (_))
 
 

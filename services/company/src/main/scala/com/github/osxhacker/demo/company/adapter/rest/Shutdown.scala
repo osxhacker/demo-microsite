@@ -16,6 +16,7 @@ import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
 
 import com.github.osxhacker.demo.chassis.adapter.ServiceDeactivator
+import com.github.osxhacker.demo.chassis.adapter.rest.Path
 import com.github.osxhacker.demo.chassis.effect.ReadersWriterResource
 import com.github.osxhacker.demo.company.adapter.RuntimeSettings
 import com.github.osxhacker.demo.company.domain.{
@@ -44,11 +45,9 @@ final case class Shutdown[F[_]] (
 			GlobalEnvironment[F]
 			],
 
-		/// Needed for `complete`, `failWith`, and 'flatMap'.
-		private val monadThrow : MonadThrow[F],
-
-		/// Needed for ''AbstractResource''.
-		override protected val loggerFactory : LoggerFactory[F]
+		/// Needed for '''AbstractResource'''.
+		override protected val loggerFactory : LoggerFactory[F],
+		override protected val monadThrow : MonadThrow[F]
 	)
 	extends AbstractResource[F] ()
 {
@@ -63,6 +62,7 @@ final case class Shutdown[F[_]] (
 	private[rest] val put : ServerEndpoint[Any, F] =
 		Endpoints.Internal
 			.putInternalShutdown
+			.extractPath ()
 			.out (statusCode)
 			.errorOut (statusCode)
 			.publishUnderApi ()
@@ -85,7 +85,8 @@ final case class Shutdown[F[_]] (
 
 	private def initiate (
 		params : Endpoints.Internal.PutInternalShutdownParams,
-		payload : ShutdownMessage
+		payload : ShutdownMessage,
+		path : Path
 		)
 		: F[ResultType[StatusCode]] =
 		environment.writer {
@@ -95,7 +96,8 @@ final case class Shutdown[F[_]] (
 			for {
 				global <- get[F, GlobalEnvironment[F]]
 				scoped <- inspectF[F, GlobalEnvironment[F], ScopedEnvironment[F]] (
-					_.scopeWith (params.`X-Correlation-ID`)
+					implicit env =>
+						createScopedEnvironment (path, params)
 					)
 
 				implicit0 (logger : SelfAwareStructuredLogger[F]) <- liftF {

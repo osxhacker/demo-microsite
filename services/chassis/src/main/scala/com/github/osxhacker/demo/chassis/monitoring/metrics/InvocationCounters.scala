@@ -1,6 +1,10 @@
 package com.github.osxhacker.demo.chassis.monitoring.metrics
 
-import cats.Eval
+import cats.{
+	Endo,
+	Eval
+	}
+
 import kamon.Kamon
 
 import com.github.osxhacker.demo.chassis.effect.{
@@ -23,6 +27,10 @@ trait InvocationCounters[F[_], ResultT]
 	this : MetricsAdvice[F, ResultT] =>
 
 
+	/// Class Imports
+	import cats.syntax.applicativeError._
+
+
 	/// Instance Properties
 	private[metrics] lazy val called =
 		Kamon.counter (mkName ("called"))
@@ -36,14 +44,31 @@ trait InvocationCounters[F[_], ResultT]
 		Kamon.counter (mkName ("succeeded"))
 			.withTags (tags)
 
+	private val whenCalled : () => Unit = () => called.increment ()
+
+	private val whenLeaving : Endo[ResultT] =
+		result => {
+			succeeded.increment ()
+			result
+			}
+
 
 	abstract override def apply (fa : Eval[F[ResultT]])
 		(implicit pointcut : Pointcut[F])
 		: Eval[F[ResultT]] =
 		pointcut.around (super.apply (fa)) (
-			entering = () => called.increment (),
-			leaving = _ => succeeded.increment (),
-			onError = _ => failed.increment ()
+			entering = whenCalled,
+			leaving = whenLeaving,
+			onError = whenFailed
 			)
+
+
+
+	@inline
+	private def whenFailed (problem : Throwable) : F[Unit] =
+	{
+		failed.increment ()
+		problem.raiseError
+	}
 }
 

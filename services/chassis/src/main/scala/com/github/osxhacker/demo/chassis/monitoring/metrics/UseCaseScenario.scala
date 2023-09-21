@@ -2,6 +2,8 @@ package com.github.osxhacker.demo.chassis.monitoring.metrics
 
 import scala.reflect.ClassTag
 
+import cats.ApplicativeThrow
+
 import com.github.osxhacker.demo.chassis.effect.DefaultAdvice
 
 
@@ -13,7 +15,11 @@ import com.github.osxhacker.demo.chassis.effect.DefaultAdvice
 final class UseCaseScenario[F[_], ScenarioT, ResultT] ()
 	(
 		implicit
-		private val classTag : ClassTag[ScenarioT]
+
+		/// Needed for '''DefaultAdvice'''.
+		override protected val applicativeThrow : ApplicativeThrow[F],
+
+		private val classTag : ClassTag[ScenarioT],
 	)
 	extends DefaultAdvice[F, ResultT] ()
 		with MetricsAdvice[F, ResultT]
@@ -36,7 +42,9 @@ object UseCaseScenario
 {
 	/// Implicit Conversions
 	implicit def summon[F[_], ScenarioT, ResultT] (
-		implicit classTag : ClassTag[ScenarioT]
+		implicit
+		applicativeThrow: ApplicativeThrow[F],
+		classTag : ClassTag[ScenarioT]
 		)
 		: UseCaseScenario[F, ScenarioT, ResultT] =
 		new UseCaseScenario[F, ScenarioT, ResultT] ()

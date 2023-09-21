@@ -1,6 +1,9 @@
 package com.github.osxhacker.demo.chassis.effect
 
-import cats.Eval
+import cats.{
+	ApplicativeThrow,
+	Eval
+	}
 
 
 /**
@@ -10,6 +13,7 @@ import cats.Eval
  * [[https://www.artima.com/articles/scalas-stackable-trait-pattern Stackable Trait Pattern]].
  */
 class DefaultAdvice[F[_], ResultT] ()
+	(implicit override protected val applicativeThrow : ApplicativeThrow[F])
 	extends Advice[F, ResultT]
 {
 	override def apply (fa : Eval[F[ResultT]])

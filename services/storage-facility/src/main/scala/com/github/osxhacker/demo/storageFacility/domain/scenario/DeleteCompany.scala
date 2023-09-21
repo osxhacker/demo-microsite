@@ -60,6 +60,11 @@ final class DeleteCompany[F[_]] private ()
 	)
 {
 	/// Class Imports
+	import InferCompanyChangeReport.{
+		HavingDeleted,
+		HavingModified
+		}
+
 	import cats.syntax.all._
 	import chassis.syntax._
 	import log4cats.syntax._
@@ -86,13 +91,17 @@ final class DeleteCompany[F[_]] private ()
 			] ()
 
 
-	private def deactivate (company : Company)
+	private def deactivate (existing : Company)
 		(implicit env : ScopedEnvironment[F])
 		: F[Company] =
 		saveCompany[UpdateIntent] (
 			Company.status
-				.replace (CompanyStatus.Inactive) (company)
+				.replace (CompanyStatus.Inactive) (existing)
 			)
+			.flatTap {
+				updated =>
+					InferCompanyChangeReport (HavingModified (existing, updated))
+				}
 
 
 	private def delete (company : Company)
@@ -109,7 +118,14 @@ final class DeleteCompany[F[_]] private ()
 			howMany <- deleteFacilitiesOwnedBy (inactive)
 
 			_ <- debug"${toString ()} - deleting company"
-			result <- env.companies.delete (inactive)
+			result <- env.companies
+				.delete (inactive)
+				.flatTap (
+					_.fold (
+						InferCompanyChangeReport (HavingDeleted (inactive)),
+						compiler.unit
+						)
+					)
 
 			_ <- debug"${toString ()} - ${company.id.show} deleted? $result (facilities=$howMany)"
 			} yield result

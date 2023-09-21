@@ -9,21 +9,34 @@
     <import class="ch.qos.logback.core.ConsoleAppender" />
     <import class="net.logstash.logback.appender.LogstashUdpSocketAppender" />
 
-    <if condition='isDefined("LOGSTASH")'>
+	<!-- see: https://logback.qos.ch/manual/configuration.html#shutdownHook -->
+	<shutdownHook/>
+
+	<if condition='isDefined("LOGSTASH")'>
         <then>
             <appender name="JSON" class="net.logstash.logback.appender.LogstashUdpSocketAppender">
 				<host>${LOGSTASH}</host>
                 <port>5514</port>
 
 				<layout class="net.logstash.logback.layout.LogstashLayout">
-					<customFields>{"microservice":"storage-facility"}</customFields>
+					<customFields>
+						{
+						"host.name":"${HOSTNAME}",
+						"service.name":"storage-facility"
+						}
+					</customFields>
 				</layout>
             </appender>
         </then>
         <else>
             <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
 				<layout class="net.logstash.logback.layout.LogstashLayout">
-					<customFields>{"microservice":"storage-facility"}</customFields>
+					<customFields>
+						{
+						"host.name":"${HOSTNAME}",
+						"service.name":"storage-facility"
+						}
+					</customFields>
 				</layout>
             </appender>
         </else>
@@ -50,14 +63,14 @@
 
 	<!--
 	LogstashEncoder apparently does not pick up changes in log levels.
-	Therefore, if LOGSTASH is defined, unconditionally use the DEBUG
+	Therefore, if LOGSTASH is defined, unconditionally use the INFO
 	log level.
 	-->
     <if condition='isDefined("LOGSTASH")'>
         <then>
 			<logger
 				name="com.github.osxhacker"
-				level="DEBUG"
+				level="INFO"
 				/>
 		</then>
 	</if>
@@ -87,7 +100,7 @@
     -->
     <if condition='isDefined("LOGSTASH")'>
         <then>
-			<root level="debug">
+			<root level="INFO">
 				<appender-ref ref="ASYNC" />
 			</root>
 		</then>
@@ -98,3 +111,4 @@
 		</else>
 	</if>
 </configuration>
+
