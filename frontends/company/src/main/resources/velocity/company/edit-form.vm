@@ -18,8 +18,11 @@
     hx-post="/company/save"
     hx-target="#work-area"
     hx-swap="innerHTML"
+    hx-ext="parsley-validation"
     >
     <fieldset>
+        <legend>All fields with '*' are required</legend>
+
         <div class='pure-control-group'>
             <label for='id'>Id</label>
             <span>$body.get("id").asText()</span>
@@ -57,6 +60,7 @@
                 type='text'
                 id='companySlug'
                 name='companySlug'
+                size='64'
                 value='$body.get("slug").asText()'
                 required
                 data-parsley-trigger="input"
@@ -81,6 +85,7 @@
                 type='text'
                 id='companyName'
                 name='companyName'
+                size='50'
                 value='$body.get("name").asText()'
                 required
                 data-parsley-trigger="input"
@@ -165,31 +170,10 @@
             hx-trigger='click'
             hx-target='body'
             hx-swap='outerHTML'
+            hx-ext="ignore:parsley-validation"
             >
             Cancel
         </button>
     </section>
-
-    <script>
-        $(function () {
-            var theForm = $('#edit-company-form').parsley ();
-
-            function validateForm (event) {
-                if (event.detail.elt.name == 'cancel' || theForm.isValid ())
-                    document.body.removeEventListener (
-                        'htmx:beforeRequest',
-                        validateForm
-                        );
-                else
-                    {
-                    theForm.validationResult = false;
-                    event.preventDefault ();
-                    event.stopPropagation ();
-                    }
-            }
-
-            document.body.addEventListener ('htmx:beforeRequest', validateForm);
-        });
-    </script>
 </form>
 

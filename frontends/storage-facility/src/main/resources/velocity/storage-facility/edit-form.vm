@@ -1,0 +1,310 @@
+#*
+    @(#) Existing Storage Facility Velocity template
+
+    Body: None
+
+    Headers:
+
+        slug - String
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+#set( $status = $body.get("status").asText() )
+#set( $state = $body.get("state").asText() )
+
+<form
+    id="new-storage-facility-form"
+    class='edit pure-form pure-form-aligned'
+    enctype="application/x-www-form-urlencoded"
+    data-parsley-validate
+    data-parsley-ui-enabled="true"
+    data-parsley-focus="first"
+    hx-post="/storage-facility/${headers.slug}/save"
+    hx-target="#work-area"
+    hx-swap="innerHTML"
+    hx-ext="json-enc, parsley-validation"
+    >
+    <fieldset>
+        <legend>All fields with '*' are required</legend>
+
+        <div class='pure-control-group'>
+            <label for='id'>Id</label>
+            <span>$body.get("id").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='version'>Version</label>
+            <span>$body.get("version").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='created-on'>Created</label>
+            <span>$body.get("createdOn").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='last-changed'>Last Changed</label>
+            <span>$body.get("lastChanged").asText()</span>
+        </div>
+
+        <hr/>
+
+        <div class='pure-control-group'>
+            <label for='status'>Status</label>
+            <select id='status' name='status'>
+                <option #if( $status == "Active") selected #end>Active</option>
+                <option #if( $status == "Closed") selected #end>Closed</option>
+                <option #if( $status == "UnderConstruction") selected #end>UnderConstruction</option>
+            </select>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='name'>Name</label>
+            <input
+                type='text'
+                id='name'
+                name='name'
+                size='50'
+                value='$body.get("name").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#new-storage-facility-form-name-errors"
+                data-parsley-pattern-message="Minimum two letters, no leading or trailing spaces"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 64]"
+                data-parsley-pattern="^[^ \t].*[^ \t]$"
+                />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-name-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='city'>City</label>
+            <input
+                type='text'
+                id='city'
+                name='city'
+                size='32'
+                value='$body.get("city").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#new-storage-facility-form-city-errors"
+                data-parsley-pattern-message="Minimum two letters, no leading or trailing spaces"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 32]"
+                data-parsley-pattern="^[A-Za-z][A-Za-z'. -]*[a-z]$"
+                />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-city-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='state'>State/Territory</label>
+			<select
+				id='state'
+				name='state'
+				required
+				>
+				<option #if( $state == "AL") selected #end value="AL">Alabama</option>
+				<option #if( $state == "AK") selected #end value="AK">Alaska</option>
+				<option #if( $state == "AZ") selected #end value="AZ">Arizona</option>
+				<option #if( $state == "AR") selected #end value="AR">Arkansas</option>
+				<option #if( $state == "CA") selected #end value="CA">California</option>
+				<option #if( $state == "CO") selected #end value="CO">Colorado</option>
+				<option #if( $state == "CT") selected #end value="CT">Connecticut</option>
+				<option #if( $state == "DE") selected #end value="DE">Delaware</option>
+				<option #if( $state == "DC") selected #end value="DC">District of Columbia</option>
+				<option #if( $state == "FL") selected #end value="FL">Florida</option>
+				<option #if( $state == "GA") selected #end value="GA">Georgia</option>
+				<option #if( $state == "HI") selected #end value="HI">Hawaii</option>
+				<option #if( $state == "ID") selected #end value="ID">Idaho</option>
+				<option #if( $state == "IL") selected #end value="IL">Illinois</option>
+				<option #if( $state == "IN") selected #end value="IN">Indiana</option>
+				<option #if( $state == "IA") selected #end value="IA">Iowa</option>
+				<option #if( $state == "KS") selected #end value="KS">Kansas</option>
+				<option #if( $state == "KY") selected #end value="KY">Kentucky</option>
+				<option #if( $state == "LA") selected #end value="LA">Louisiana</option>
+				<option #if( $state == "ME") selected #end value="ME">Maine</option>
+				<option #if( $state == "MD") selected #end value="MD">Maryland</option>
+				<option #if( $state == "MA") selected #end value="MA">Massachusetts</option>
+				<option #if( $state == "MI") selected #end value="MI">Michigan</option>
+				<option #if( $state == "MN") selected #end value="MN">Minnesota</option>
+				<option #if( $state == "MS") selected #end value="MS">Mississippi</option>
+				<option #if( $state == "MO") selected #end value="MO">Missouri</option>
+				<option #if( $state == "MT") selected #end value="MT">Montana</option>
+				<option #if( $state == "NE") selected #end value="NE">Nebraska</option>
+				<option #if( $state == "NV") selected #end value="NV">Nevada</option>
+				<option #if( $state == "NH") selected #end value="NH">New Hampshire</option>
+				<option #if( $state == "NJ") selected #end value="NJ">New Jersey</option>
+				<option #if( $state == "NM") selected #end value="NM">New Mexico</option>
+				<option #if( $state == "NY") selected #end value="NY">New York</option>
+				<option #if( $state == "NC") selected #end value="NC">North Carolina</option>
+				<option #if( $state == "ND") selected #end value="ND">North Dakota</option>
+				<option #if( $state == "OH") selected #end value="OH">Ohio</option>
+				<option #if( $state == "OK") selected #end value="OK">Oklahoma</option>
+				<option #if( $state == "OR") selected #end value="OR">Oregon</option>
+				<option #if( $state == "PA") selected #end value="PA">Pennsylvania</option>
+				<option #if( $state == "PR") selected #end value="PR">Puerto Rico</option>
+				<option #if( $state == "RI") selected #end value="RI">Rhode Island</option>
+				<option #if( $state == "SC") selected #end value="SC">South Carolina</option>
+				<option #if( $state == "SD") selected #end value="SD">South Dakota</option>
+				<option #if( $state == "TN") selected #end value="TN">Tennessee</option>
+				<option #if( $state == "TX") selected #end value="TX">Texas</option>
+				<option #if( $state == "UT") selected #end value="UT">Utah</option>
+				<option #if( $state == "VT") selected #end value="VT">Vermont</option>
+				<option #if( $state == "VI") selected #end value="VI">Virgin Islands</option>
+				<option #if( $state == "VA") selected #end value="VA">Virginia</option>
+				<option #if( $state == "WA") selected #end value="WA">Washington</option>
+				<option #if( $state == "WV") selected #end value="WV">West Virginia</option>
+				<option #if( $state == "WI") selected #end value="WI">Wisconsin</option>
+				<option #if( $state == "WY") selected #end value="WY">Wyoming</option>
+			</select>
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-state-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='zip'>Zip</label>
+            <input
+                type='text'
+                id='zip'
+                name='zip'
+                size='10'
+                value='$body.get("zip").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#new-storage-facility-form-zip-errors"
+                data-parsley-pattern-message="Must be either 5 digits or '5-4'"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[5, 10]"
+                data-parsley-pattern="^[0-9]{5}(?:-[0-9]{4})?$"
+                />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-zip-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='capacity'>Capacity</label>
+            <input
+                type='text'
+                id='capacity'
+                name='capacity'
+                size='10'
+                value='$body.get("capacity").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-type="number"
+                data-parsley-errors-container="#new-storage-facility-form-capacity-errors"
+                data-parsley-error-message="Must be between 0 and 300000 cubic meters"
+                data-parsley-validation-threshold="0"
+                data-parsley-min="0"
+                data-parsley-max="300000"
+                />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-capacity-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='available'>Available</label>
+            <input
+                type='text'
+                id='available'
+                name='available'
+                size='10'
+                value='$body.get("available").asText()'
+                required
+                data-parsley-trigger="input"
+                data-parsley-type="number"
+                data-parsley-errors-container="#new-storage-facility-form-available-errors"
+                data-parsley-error-message="Must be between 0 and 300000 cubic meters"
+                data-parsley-validation-threshold="0"
+                data-parsley-min="0"
+                data-parsley-max="300000"
+                />
+
+            <span class="pure-form-message-inline">*</span>
+            <span
+                id="new-storage-facility-form-available-errors"
+                class="pure-form-message-inline"
+                >
+            </span>
+        </div>
+
+        <input
+            type='hidden'
+            name='_action'
+            value='$body.at("/_links/edit/href").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='id'
+            value='$body.at("/id").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='version'
+            value='$body.at("/version").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='createdOn'
+            value='$body.at("/createdOn").asText()'
+            />
+
+        <input
+            type='hidden'
+            name='lastChanged'
+            value='$body.at("/lastChanged").asText()'
+            />
+    </fieldset>
+
+    <section class="pure-button-group" role="group">
+        <button class="pure-button save"
+            type="submit"
+            name="submit"
+            >
+            Save
+        </button>
+
+        <button class="pure-button"
+            name="cancel"
+            hx-get="/storage-facility/${headers.slug}"
+            hx-trigger="click"
+            hx-target='main'
+            hx-swap='outerHTML'
+            hx-ext="ignore:json-enc, ignore:parsley-validation"
+            >
+            Cancel
+        </button>
+    </section>
+</form>
+

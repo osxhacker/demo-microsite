@@ -1,0 +1,9 @@
+{
+  "name": "Northeast warehouse",
+  "status": "Active",
+  "city": "New York",
+  "state": "NY",
+  "zip": "10001",
+  "capacity": 20000,
+  "available": 20000
+}

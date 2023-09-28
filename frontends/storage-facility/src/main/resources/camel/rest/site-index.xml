@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:site-index' route defines the logic for loading the
+    microsite's home, or "index", page.
+    -->
+    <route>
+        <from uri="direct:site-index"/>
+
+        <to uri="direct:company-summary"/>
+
+        <filter>
+            <simple>${header.CamelHttpResponseCode} range '200..299'</simple>
+
+            <setHeader name="HomeDocumentTitle">
+                <constant>Available Companies</constant>
+            </setHeader>
+
+            <to uri="velocity:classpath:velocity/home-document.vm"/>
+            <to uri="direct:finish-html-file"/>
+        </filter>
+    </route>
+</routes>
+

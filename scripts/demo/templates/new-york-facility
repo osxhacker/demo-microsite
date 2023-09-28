@@ -1,0 +1,9 @@
+{
+  "name": "Southern warehouse",
+  "status": "Active",
+  "city": "Miami",
+  "state": "FL",
+  "zip": "33161",
+  "capacity": 75000,
+  "available": 75000
+}

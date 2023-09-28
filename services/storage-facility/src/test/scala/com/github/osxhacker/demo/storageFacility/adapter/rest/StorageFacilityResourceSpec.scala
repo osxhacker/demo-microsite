@@ -228,7 +228,7 @@ final class StorageFacilityResourceSpec ()
 				When ("the endpoint is evaluated in its published location")
 				val result = basicRequest
 					.post (
-						uri"$tenantRoot/storage-facilities/${initialFacility.id.toUuid ()}"
+						uri"$tenantRoot/storage-facilities/${initialFacility.id.toUuid ()}?expand=all"
 						)
 					.header ("X-Correlation-ID", randomUUID ().toString ())
 					.body {
@@ -260,6 +260,10 @@ final class StorageFacilityResourceSpec ()
 						assert (facility.isRight)
 						assert (
 							facility.exists (_.id.value == initialFacility.id.toUrn ())
+							)
+
+						assert (
+							facility.exists (_._embedded.exists (_.values.contains ("company")))
 							)
 
 						assert (

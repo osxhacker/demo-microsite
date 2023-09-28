@@ -26,38 +26,40 @@ $0 -h
 
 or
 
-$0 [-tv] <microservice> <DSL> <command> [command args]
+$0 [-tv] [gateway] <microservice> <DSL> <command> [command args]
 
 
 Flags:
 
-	-t			Print $CURL timing (implies verbosity)
-	-v			Enable verbosity
+	-h	Show this help information
+	-t	Print $CURL timing (implies verbosity)
+	-v	Enable verbosity
 
 
 Where microservice is one of:
 
-	company			TBD
+	company
 	inventory		TBD
 	purchase-order		TBD
 	storage-facility
 
 
-DSL is a combination of modifiers determining what resource
-endpoint is to be used.
+'DSL' is a combination of modifiers determining how a resource
+endpoint is interacted with.  The supported commands are:
 
-	heartbeat		- Determine availability
-	shutdown		- Initiate an orderly shutdown
-
-
-The supported commands are:
-
-	delete
-	find			TBD
-	get
-	patch			TBD
-	post
-	put
+$(
+	cd $SCRIPT_HOME/commands
+	ls -1 |
+		grep -v -e '^company$' \
+			-e '^gateway$' \
+			-e '^storage-facility$' |
+		xargs what |
+		paste -d ' ' - - |
+		column --table \
+			--table-columns-limit 2 \
+			--table-columns COMMAND,DESCRIPTION |
+		sed -e 's/^/\t/'
+)
 
 
 Example invocations:
@@ -69,11 +71,16 @@ Example invocations:
 	$0 storage-facility yoda-panda get
 	$0 storage-facility yoda-panda item '<uuid>' get
 	$0 storage-facility yoda-panda item '<uuid>' delete
-	$0 storage-facility shutdown put 'message="Stopping this instance"'
+	$0 storage-facility shutdown put 'message="Stopping instance"'
+
+To route traffic through the APISIX gateway, prefix service selection
+with 'gateway'.  For example:
+
+	$0 gateway storage-facility heartbeat get
 
 
 Note that command arguments which have string content should be
-quoted so that the shell does not consume the quotes which group
+quoted so that the shell does not consume the quotes which define
 the content.
 EOT
 
@@ -122,7 +129,7 @@ do
 			;;
 
 		?)
-			err 127 "\nSee '$0 --help'."
+			err 127 "\nSee '$0 -h'."
 			;;
 	esac
 done

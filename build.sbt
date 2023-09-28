@@ -61,8 +61,10 @@ ThisBuild / Compile / scalacOptions ++= Seq (
 	"-deprecation",
 	"-feature",
 	"-unchecked",
+	"-Wconf:cat=other-implicit-type:s",
 	"-Xlog-reflective-calls",
 	"-Xlint:-byname-implicit",
+	"-Xlint:-doc-detached",
 	"-Xlint:-unused,_",
 	"-Ymacro-annotations",
 	"-Ywarn-unused:-imports,_"
@@ -173,7 +175,8 @@ lazy val api = (project in file ("api"))
 lazy val frontends = (project in file ("frontends"))
 	.aggregate (
 		`frontends-site`,
-		`frontends-company`
+		`frontends-company`,
+		`frontends-storage-facility`
 		)
 
 lazy val `frontends-company` = (project in file ("frontends/company"))
@@ -194,10 +197,77 @@ lazy val `frontends-company` = (project in file ("frontends/company"))
 			CamelVelocity,
 			Htmx,
 			JacksonDatabind,
+			Janino,
 			JQuery,
 			Logback,
 			LogbackJackson,
 			LogbackJson,
+			LogstashLogbackEncoder,
+			Parsley,
+			PureCSS
+			),
+
+		Compile / resourceGenerators += generateCamelMainProperties (
+			"htmx" -> Versions.Htmx ::
+			"jquery" -> Versions.JQuery ::
+			"parsley" -> Versions.Parsley ::
+			"purecess" -> Versions.PureCSS ::
+			Nil
+			).taskValue,
+
+		docker / imageNames := Seq (
+			ImageName (s"${organization.value}/${name.value}:latest")
+			),
+
+		docker / dockerfile := {
+			val appDir = stage.value
+			val installDir = "/app"
+			val script = executableScriptName.value
+
+			new Dockerfile {
+				/// OpenJDK 19 is the base image.
+				from ("eclipse-temurin:19-jre-focal")
+
+				/// Allow traffic to the app ports.
+				expose (12000)
+
+				copy (appDir, installDir, chown = "daemon:daemon")
+
+				/// Set the entrypoint to be invoking java with the app.
+				entryPoint (
+					s"$installDir/bin/$script"
+					)
+				}
+			}
+		)
+	.dependsOn (services)
+	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+
+lazy val `frontends-storage-facility` =
+	(project in file ("frontends/storage-facility"))
+	.settings (
+		name := "frontends-storage-facility",
+		libraryDependencies ++= Seq (
+			CamelBean,
+			CamelCore,
+			CamelHttp,
+			CamelJackson,
+			CamelJetty,
+			CamelJslt,
+			CamelLog,
+			CamelMain,
+			CamelOgnl,
+			CamelRest,
+			CamelXmlDsl,
+			CamelVelocity,
+			Htmx,
+			JacksonDatabind,
+			Janino,
+			JQuery,
+			Logback,
+			LogbackJackson,
+			LogbackJson,
+			LogstashLogbackEncoder,
 			Parsley,
 			PureCSS
 			),

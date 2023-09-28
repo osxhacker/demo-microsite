@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bean id="jackson-object-mapper"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                "
+
+        beanType="com.fasterxml.jackson.databind.ObjectMapper"
+        scope="prototype"
+        >
+        <description>Provides a per-use Jackson ObjectMapper.</description>
+</bean>

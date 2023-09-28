@@ -1,0 +1,25 @@
+# @(#) Entry command for the using the APSIX gateway
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+[[ $# -ge 1 ]] || err 2 "missing service DSL command\n\nSee demo.sh -h"
+
+export ENDPOINT="http://localhost:9080/api"
+
+NEXT="$COMMANDS/$1"
+shift 1
+
+exec $SH $NEXT $@
+

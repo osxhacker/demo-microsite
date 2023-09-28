@@ -70,11 +70,7 @@ final case class StorageFacility (
 
 
 	override def equals (that : Any) : Boolean =
-		canEqual (that) && {
-			val other = that.asInstanceOf[StorageFacility]
-
-			id === other.id && version === other.version
-			}
+		canEqual (that) && this === that.asInstanceOf[StorageFacility]
 
 
 	override def hashCode () : Int = Objects.hash (id, version)

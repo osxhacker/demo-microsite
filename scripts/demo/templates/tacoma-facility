@@ -1,0 +1,9 @@
+{
+  "name": "Northwest warehouse",
+  "status": "Active",
+  "city": "Tacoma",
+  "state": "WA",
+  "zip": "98466",
+  "capacity": 200000,
+  "available": 200000
+}

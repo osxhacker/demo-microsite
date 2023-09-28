@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routeTemplates id="camel-xml-io-dsl"
+                xmlns="http://camel.apache.org/schema/spring"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                ">
+    <!--
+    REST Producer (client) POST Definition
+
+    Each HTTP POST endpoint follows the form of:
+
+    - Send JSON $body to the 'endpoint' route parameter.
+    - If the status code is 200, expect and parse returned JSON.
+    - If the status code is 201, retrieve resource by the 'Location' header.
+    - Optionally apply a transform route to $body.
+    - Handle errors resulting in endpoint interaction and returned payloads.
+    - Always produce a parsed JSON $body.
+
+    Error detection in calling routes can be done by inspecting the
+    CamelHttpResponseCode header.
+    -->
+    <routeTemplate id="rest-post">
+        <templateParameter name="service"/>
+        <templateParameter name="endpoint"/>
+        <templateParameter name="name"/>
+        <templateParameter name="queryParameters" defaultValue=""/>
+        <templateParameter name="transform" defaultValue="none"/>
+
+        <route>
+            <from uri="direct:{{name}}"/>
+
+            <log logName="com.github.osxhacker.demo"
+                 loggingLevel="info"
+                 message="REST POST '{{endpoint}}?host={{service}}&amp;queryParameters={{queryParameters}}': ${body}"
+                 />
+
+            <to uri="direct:prepare-service-invocation"/>
+
+            <doTry>
+                <to uri="direct:generate-correlation-id"/>
+                <to uri="rest:post:{{endpoint}}?host={{service}}&amp;queryParameters={{queryParameters}}"/>
+
+                <!-- Retrieve the resource if the service indicates it was created. -->
+                <filter>
+                    <simple>${header.CamelHttpResponseCode} == 201</simple>
+
+                    <to uri="rest:get:{Location}?host={{service}}"/>
+                </filter>
+
+                <transform>
+                    <simple>${mandatoryBodyAs(String)}</simple>
+                </transform>
+
+                <!-- Apply the optional JSLT transform if given. -->
+                <filter>
+                    <simple>'{{transform}}' != 'none'</simple>
+
+                    <to uri="jslt:{{transform}}?prettyPrint=true"/>
+                </filter>
+
+                <doCatch>
+                    <exception>org.apache.camel.http.base.HttpOperationFailedException</exception>
+
+                    <log logName="com.github.osxhacker.demo"
+                         loggingLevel="error"
+                         message="REST POST '{{endpoint}}?host={{service}}' : (${exception.statusCode}) ${exception.message} ${body}"
+                        />
+
+                    <to uri="direct:escape-json-quotes"/>
+
+                    <!--
+                    Ensure that an operation failure propagates the HTTP status
+                    code as 'CamelHttpResponseCode'.  For some reason, this is
+                    not the default behaviour.
+                    -->
+                    <setHeader name="CamelHttpResponseCode">
+                        <simple>${exception.statusCode}</simple>
+                    </setHeader>
+
+                    <transform>
+                        <simple>
+                            {
+                            "type" : "/problem/rest/post",
+                            "title" : "${exception.message}",
+                            "status" : ${exception.statusCode},
+                            "detail" : "${body}"
+                            }
+                        </simple>
+                    </transform>
+                </doCatch>
+
+                <!--
+                Any other exception when interacting with the endpoint is a 500.
+                -->
+                <doCatch>
+                    <exception>java.lang.Throwable</exception>
+
+                    <log logName="com.github.osxhacker.demo"
+                         loggingLevel="error"
+                         message="REST POST '{{endpoint}}?host={{service}}' : ${exception.message}"
+                        />
+
+                    <setHeader name="CamelHttpResponseCode">
+                        <constant resultType="int">500</constant>
+                    </setHeader>
+
+                    <setHeader name="CamelHttpResponseText">
+                        <constant>Internal Server Error.</constant>
+                    </setHeader>
+
+                    <setBody>
+                        <simple>
+                            {
+                            "type" : "/problem/internal-server-error",
+                            "title" : "${exception.message}",
+                            "status" : 500
+                            }
+                        </simple>
+                    </setBody>
+                </doCatch>
+            </doTry>
+
+            <!--
+            Any payload other than JSON is represented as a logic error.
+            -->
+            <doTry>
+                <transform>
+                    <method ref="com.fasterxml.jackson.databind.ObjectMapper"
+                        method="readTree"
+                        />
+                </transform>
+
+                <doCatch>
+                    <exception>java.lang.Throwable</exception>
+
+                    <setHeader name="CamelHttpResponseCode">
+                        <constant resultType="int">500</constant>
+                    </setHeader>
+
+                    <setHeader name="CamelHttpResponseText">
+                        <constant>Logic Error.</constant>
+                    </setHeader>
+
+                    <setBody>
+                        <simple>
+                            {
+                            "type" : "/problem/logic-error",
+                            "title" : "unable to parse resource",
+                            "status" : 500
+                            }
+                        </simple>
+                    </setBody>
+
+                    <transform>
+                        <method ref="com.fasterxml.jackson.databind.ObjectMapper"
+                            method="readTree"
+                            />
+                    </transform>
+                </doCatch>
+            </doTry>
+
+            <log logName="com.github.osxhacker.demo"
+                 loggingLevel="info"
+                 message="REST POST '{{endpoint}}?host={{service}}&amp;queryParameters={{queryParameters}}' : statusCode=${header.CamelHttpResponseCode} body=${body}"
+                />
+        </route>
+    </routeTemplate>
+</routeTemplates>
+

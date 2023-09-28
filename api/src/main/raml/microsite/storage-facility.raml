@@ -1,0 +1,51 @@
+#%RAML 1.0
+title: Demo Storage Facility Microsite API
+version: v1
+baseUri: http://localhost:12000/
+
+
+types:
+  !include ../types/company/CompanySlug
+
+# The default media type is HTML.
+mediaType: text/html
+
+
+########################################################################
+# Public Resources
+########################################################################
+
+/storage-facility:
+  displayName: Storage Facility Microsite Home Document
+  get:
+    description: >
+      The `/storage-facility` resource is the stable path, when
+      combined with the published scheme and FQDN, defines the
+      [URI](https://datatracker.ietf.org/doc/html/rfc3986/) to
+      access the `storage-facility` home document.
+
+      All
+      [URI's](https://datatracker.ietf.org/doc/html/rfc3986/)
+      related to the `storage-facility` microsite **must** be
+      relative to `/storage-facility`.
+
+    responses:
+      200:
+
+  /{company}:
+    displayName: Storage Facility Administration Home Document
+    uriParameters:
+      company:
+        type: CompanySlug
+
+    get:
+      description: >
+        The `/storage-facility/{company}`
+        [URI](https://datatracker.ietf.org/doc/html/rfc3986/)
+        is the published entry point for administrating
+        **all** `StorageFacility` resources associated with a
+        specific `Company`.
+
+      responses:
+        200:
+

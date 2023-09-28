@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:storage-facility-edit-form' route defines the logic for
+    rendering an HTML form snippet having the contents of an
+    existing StorageFacility.
+    -->
+    <route>
+        <from uri="direct:storage-facility-edit-form"/>
+
+        <to uri="direct:get-storage-facility-edit-form"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} range '200..299'</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <ognl>"Edit " + request.body.at("/name").asText()</ognl>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/storage-facility/edit-form.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <removeHeader name="self"/>
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

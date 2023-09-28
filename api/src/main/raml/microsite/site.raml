@@ -1,0 +1,33 @@
+#%RAML 1.0
+title: Demo Home Microsite API
+version: v1
+baseUri: http://localhost:12000/
+
+
+# The default media type is HTML.
+mediaType: text/html
+
+
+########################################################################
+# Public Resources
+########################################################################
+
+/:
+  displayName: Home Document
+  get:
+    description: >
+      The `/` resource is the stable path, when combined with the
+      published scheme and FQDN, defines the
+      [URI](https://datatracker.ietf.org/doc/html/rfc3986/) to
+      access the home document.
+
+      All published site
+      [URI's](https://datatracker.ietf.org/doc/html/rfc3986/)
+      unrelated to system microsites codified elsewhere are
+      defined here and **must not** conflict with entry point
+      [URI's](https://datatracker.ietf.org/doc/html/rfc3986/)
+      reserved for microsites.
+
+    responses:
+      200:
+

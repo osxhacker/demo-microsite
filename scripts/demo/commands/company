@@ -14,9 +14,10 @@ source "$SCRIPT_HOME/shell.subr" || {
 # MAIN
 ########################################################################
 
-export ENDPOINT="$(microserviceBaseUri 'company')"
+[[ -z "${ENDPOINT:-}" ]] && ENDPOINT="$(microserviceBaseUri 'company')"
+[[ $# -ge 1 ]] || err 2 "missing DSL command(s)\n\nSee demo.sh -h"
 
-[[ $# -ge 1 ]] || err 2 "missing DSL command(s)\n\nSee demo.sh --help"
+export ENDPOINT
 
 case "$1" in
 	heartbeat)

@@ -16,9 +16,9 @@
 
 <hr/>
 
-<section class="pure-g">
+<section class='listing'>
     #foreach( $company in $body.get("companies").elements() )
-        <details class="pure-u-1">
+        <details class='pure-u-1'>
             <summary>$company.get("name").asText()</summary>
 
             <h5>
@@ -32,25 +32,34 @@
             <p>
                 $company.get("description").asText()
             </p>
+
+			<section class='pure-button-group' role='group'>
+				<a class='pure-button'
+					## see: api/src/main/raml/microsite/storage-facility.raml
+					href='/storage-facility/$company.get("slug").asText()'
+					>
+					Storage Facilities
+				</a>
+			</section>
         </details>
     #end
 </section>
 
-<section class="pure-button-group" role="group">
-    <a class="pure-button"
-        hx-get="/company/summary"
-        hx-trigger="click"
-        hx-target="#work-area"
-        hx-swap="innerHTML"
+<section class='pure-button-group' role='group'>
+    <a class='pure-button'
+        hx-get='/company/summary'
+        hx-trigger='click'
+        hx-target='#work-area'
+        hx-swap='innerHTML'
         >
         Refresh
     </a>
 
-    <a class="pure-button"
-        hx-get="/company/create-form"
-        hx-trigger="click"
-        hx-target="#work-area"
-        hx-swap="innerHTML"
+    <a class='pure-button'
+        hx-get='/company/create-form'
+        hx-trigger='click'
+        hx-target='#work-area'
+        hx-swap='innerHTML'
         >
         Add Company
     </a>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:prepare-service-invocation' route defines logic to
+    ensure an invocation of an arbitrary API service does not
+    unintentionally contain residual header properties present due
+    to other components.
+    -->
+    <route>
+        <from uri="direct:prepare-service-invocation"/>
+
+        <!--
+        Remove the original HTTP method, path, query, and uri
+        headers so the request can be processed as a client
+        invocation without inclusion of information originally
+        from the server endpoint.
+        -->
+        <removeHeader name="CamelHttpMethod"/>
+        <removeHeader name="CamelHttpPath"/>
+        <removeHeader name="CamelHttpQuery"/>
+        <removeHeader name="CamelHttpRawQuery"/>
+        <removeHeader name="CamelHttpUri"/>
+        <removeHeader name="CamelHttpUrl"/>
+        <removeHeader name="CamelRestHttpQuery"/>
+        <removeHeader name="CamelRestHttpUri"/>
+    </route>
+</routes>

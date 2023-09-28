@@ -63,10 +63,7 @@ final case class Company (
 
 
 	override def equals (that : Any) : Boolean =
-		canEqual (that) && {
-			val other = that.asInstanceOf[Company]
-			id === other.id && version === other.version
-			}
+		canEqual (that) && this === that.asInstanceOf[Company]
 
 
 	override def hashCode () : Int = Objects.hash (id, version)

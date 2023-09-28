@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:heartbeat' route defines an internal operations route
+    for indicating that this microsite is operational.
+    -->
+    <route>
+        <from uri="direct:heartbeat"/>
+
+        <log logName="com.github.osxhacker.demo"
+             loggingLevel="debug"
+             message="evaluated heartbeat route"
+            />
+
+        <setHeader name="CamelHttpResponseCode">
+            <constant resultType="int">200</constant>
+        </setHeader>
+    </route>
+</routes>
+

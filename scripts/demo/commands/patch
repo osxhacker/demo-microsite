@@ -1,0 +1,17 @@
+# @(#) TBD
+#
+# vim: syntax=sh
+#
+
+
+source "$SCRIPT_HOME/shell.subr" || {
+	echo "unable to load subroutines" >/dev/stderr
+	exit 255
+}
+
+########################################################################
+# MAIN
+########################################################################
+
+echo "the HTTP 'patch' verb is not currently supported" > /dev/stderr
+exit 254

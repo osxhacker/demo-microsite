@@ -1,0 +1,193 @@
+#*
+    @(#) Company detail view Velocity template
+
+    Body: Company (RAML API)
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+#set( $slug = $body.at("/_embedded/company/slug").asText() )
+#set( $resourceRoot = "/storage-facility/$slug" )
+
+<section class='view pure-form pure-form-aligned'>
+    <fieldset>
+        <div class='pure-control-group'>
+            <label for='id'>Id</label>
+            <span>$body.get("id").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='version'>Version</label>
+            <span>$body.get("version").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='created-on'>Created</label>
+            <span>$body.get("createdOn").asText()</span>
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='last-changed'>Last Changed</label>
+            <span>$body.get("lastChanged").asText()</span>
+        </div>
+
+        <hr/>
+
+        <div class='pure-control-group'>
+            <label for='status'>Status</label>
+            <input
+                type='text'
+                id='status'
+                size='20'
+                placeholder='$body.get("status").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='name'>Name</label>
+            <input
+                type='text'
+                id='name'
+                size='64'
+                placeholder='$body.get("name").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='city'>City</label>
+            <input
+                type='text'
+                id='city'
+                size='32'
+                placeholder='$body.get("city").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='state'>State</label>
+            <input
+                type='text'
+                id='state'
+                size='3'
+                placeholder='$body.get("state").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='zip'>Zip</label>
+            <input
+                type='text'
+                id='zip'
+                size='10'
+                placeholder='$body.get("zip").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='capacity'>Capacity</label>
+            <input
+                type='text'
+                id='capacity'
+                size='10'
+                placeholder='$body.get("capacity").asText()'
+                readonly
+                />
+        </div>
+
+        <div class='pure-control-group'>
+            <label for='available'>Available</label>
+            <input
+                type='text'
+                id='available'
+                size='10'
+                placeholder='$body.get("available").asText()'
+                readonly
+                />
+        </div>
+    </fieldset>
+</section>
+
+<section class="pure-button-group" role="group">
+    <a class="pure-button"
+        hx-get='$resourceRoot/view?self=$body.at("/_links/self/href").asText()'
+        hx-trigger='click'
+        hx-target='main'
+        hx-swap='outerHTML'
+        >
+        Refresh
+    </a>
+
+    #if( $body.at("/_links/edit").isMissingNode() == false )
+        <button class="pure-button"
+            hx-get='$resourceRoot/edit-form?self=$body.at("/_links/self/href").asText()'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            Edit
+        </button>
+    #end
+
+    #*
+        Determine what semantic actions are available and render them.
+        Which are available is determined by the services and, as such,
+        must be inspected individually.
+    *#
+
+    #if( $body.at("/_links/urn:storage-facility:activate").isMissingNode() == false )
+        #set( $action = $body.at("/_links/urn:storage-facility:activate/href").asText() )
+        #set( $title = $body.at("/_links/urn:storage-facility:activate/title").asText("Activate") )
+        #set( $version = $body.get("version").asInt() )
+
+        <button class="pure-button"
+            hx-post='$resourceRoot/change-status?facilityAction=$action'
+            hx-vals='{ "version": $version }'
+            hx-ext='json-enc'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    #if( $body.at("/_links/urn:storage-facility:close").isMissingNode() == false )
+        #set( $action = $body.at("/_links/urn:storage-facility:close/href").asText() )
+        #set( $title = $body.at("/_links/urn:storage-facility:close/title").asText("Close") )
+        #set( $version = $body.get("version").asInt() )
+
+        <button class="pure-button"
+            hx-post='$resourceRoot/change-status?facilityAction=$action'
+            hx-vals='{ "version": $version }'
+            hx-ext='json-enc'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    #if( $body.at("/_links/delete").isMissingNode() == false )
+        #set( $action = $body.at("/_links/delete/href").asText() )
+        #set( $title = $body.at("/_links/delete/title").asText("Delete") )
+
+        <button class="pure-button"
+            hx-delete='$resourceRoot/delete?delete=$action'
+            hx-confirm='This action cannot be undone.  Continue?'
+            hx-trigger='click'
+            hx-target='#work-area'
+            >
+            $title
+        </button>
+    #end
+
+    <a class="pure-button"
+        href='$resourceRoot'
+        >
+        Summary
+    </a>
+</section>
+

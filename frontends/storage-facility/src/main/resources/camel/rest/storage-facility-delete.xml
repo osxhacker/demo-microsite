@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:storage-facility-delete' route defines the logic for
+    providing the ability to delete a storage facility resource
+    identified by the 'header.delete' semantic action associated
+    with it.
+    -->
+    <route>
+        <from uri="direct:storage-facility-delete"/>
+
+        <to uri="direct:delete-storage-facility"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} == 200</simple>
+
+                <to uri="velocity:classpath:velocity/storage-facility/delete-result.vm"/>
+
+                <setHeader name="HomeDocumentTitle">
+                    <constant>Company Deleted</constant>
+                </setHeader>
+
+                <transform>
+                    <simple>${mandatoryBodyAs(String)}</simple>
+                </transform>
+
+                <to uri="velocity:classpath:velocity/home-document.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <!--
+                The 'direct:delete-storage-facility' route categorizes
+                its result and always produces parsed JSON.
+                -->
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <removeHeader name="delete"/>
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

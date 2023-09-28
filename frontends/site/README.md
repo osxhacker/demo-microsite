@@ -10,6 +10,13 @@ A hypothesis being explored with this microsite is:
 The implementation here attempts to answer in the affirmative.
 
 
+## Published Entry Points
+
+All `site` [URI's](https://datatracker.ietf.org/doc/html/rfc3986/) considered "public", which can be defined as both stable and published, can be found in the [site RAML](../../api/src/main/raml/microsite/site.raml).
+
+Any other [URI](https://datatracker.ietf.org/doc/html/rfc3986/) **must** be considered transient.
+
+
 ## Apache Camel
 
 [Apache Camel](https://camel.apache.org/docs/index.html) is used to provide pre-defined components which serve and respond to HTML5 and CSS3 artifacts.  They are configured using [XML DSL](https://camel.apache.org/components/3.20.x/others/java-xml-io-dsl.html) located in the [camel resources](./src/main/resources/camel) directory.

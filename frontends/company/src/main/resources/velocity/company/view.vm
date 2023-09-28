@@ -35,6 +35,7 @@
             <input
                 type='text'
                 id='status'
+                size='20'
                 placeholder='$body.get("status").asText()'
                 readonly
                 />
@@ -45,6 +46,7 @@
             <input
                 type='text'
                 id='slug'
+                size='64'
                 placeholder='$body.get("slug").asText()'
                 readonly
                 />
@@ -55,6 +57,7 @@
             <input
                 type='text'
                 id='name'
+                size='64'
                 placeholder='$body.get("name").asText()'
                 readonly
                 />

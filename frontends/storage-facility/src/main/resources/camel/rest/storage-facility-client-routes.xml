@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templatedRoutes id="camel-xml-io-dsl"
+                 xmlns="http://camel.apache.org/schema/spring"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="
+                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                 ">
+    <!--
+    Note the use of the header property 'delete'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-delete">
+        <parameter name="name" value="delete-storage-facility"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{delete}"/>
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'self'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-storage-facility-edit-form"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{self}"/>
+        <parameter name="queryParameters" value="expand=company"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/resource-response.jslt"
+            />
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-storage-facility-summary"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="/api/{slug}/storage-facilities"/>
+        <parameter name="queryParameters" value="expand=company"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/collection-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'self'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-storage-facility-view"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{self}"/>
+        <parameter name="queryParameters" value="expand=company"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'facilityAction'.  It uses single
+    braces to indicate a header variable as per the REST DSL component
+    definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-post">
+        <parameter name="name" value="post-storage-facility-change-status"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{facilityAction}"/>
+        <parameter name="queryParameters" value="expand=company"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'edit'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-post">
+        <parameter name="name" value="post-storage-facility-save"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{edit}"/>
+        <parameter name="queryParameters" value="expand=company"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/resource-response.jslt"
+                   />
+    </templatedRoute>
+
+    <!--
+    Note the use of the header property 'create'.  It uses single braces
+    to indicate a header variable as per the REST DSL component definition.
+    -->
+    <templatedRoute routeTemplateRef="rest-put">
+        <parameter name="name" value="put-storage-facility-new"/>
+        <parameter name="service" value="{{service:STORAGE_FACILITY:{{demo.storage-facility.host}}:{{demo.storage-facility.port}}}}"/>
+        <parameter name="endpoint" value="{create}"/>
+        <parameter name="transform"
+                   value="jslt/storage-facility/resource-response.jslt"
+                   />
+    </templatedRoute>
+</templatedRoutes>
+

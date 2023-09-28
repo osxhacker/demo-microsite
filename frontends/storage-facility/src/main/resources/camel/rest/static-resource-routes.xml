@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templatedRoutes id="camel-xml-io-dsl"
+                 xmlns="http://camel.apache.org/schema/spring"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="
+                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                 ">
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-html-file"/>
+        <parameter name="resource" value="html/${header.filename}"/>
+        <parameter name="postprocessor" value="finish-html-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-htmx-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/htmx.org/{{demo.versions.htmx}}/dist/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-htmx-extension-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/htmx.org/{{demo.versions.htmx}}/dist/ext/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-javascript-file"/>
+        <parameter name="resource" value="javascript/${header.filename}"/>
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-jquery-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/jquery/{{demo.versions.jquery}}/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-parsley-javascript-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/parsleyjs/{{demo.versions.parsley}}/dist/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-pure-stylesheet-file"/>
+        <parameter name="resource"
+                   value="META-INF/resources/webjars/purecss/{{demo.versions.purecess}}/build/${header.filename}"
+                   />
+
+        <parameter name="postprocessor" value="finish-stylesheet-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-stylesheet-file"/>
+        <parameter name="resource" value="stylesheet/${header.filename}"/>
+        <parameter name="postprocessor" value="finish-stylesheet-file"/>
+    </templatedRoute>
+</templatedRoutes>
+

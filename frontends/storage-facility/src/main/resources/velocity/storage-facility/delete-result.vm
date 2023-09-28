@@ -1,0 +1,19 @@
+#*
+    @(#) Delete Result Velocity template
+
+    Body: None
+
+    Headers:
+
+        slug - String
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<section class="pure-button-group" role="group">
+    <a class="pure-button"
+       href='/storage-facility/${headers.slug}'
+       >
+        Summary
+    </a>
+</section>

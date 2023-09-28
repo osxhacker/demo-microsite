@@ -8,6 +8,7 @@
     hx-post="/company/create"
     hx-target="#work-area"
     hx-swap="innerHTML"
+    hx-ext="parsley-validation"
     >
     <fieldset>
         <legend>All fields with '*' are required</legend>
@@ -23,17 +24,18 @@
         <div class='pure-control-group'>
             <label for='companySlug'>Slug</label>
             <input
-                    type='text'
-                    id='companySlug'
-                    name='companySlug'
-                    required
-                    data-parsley-trigger="input"
-                    data-parsley-errors-container="#create-company-form-slug-errors"
-                    data-parsley-pattern-message="Must be: [a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*"
-                    data-parsley-validation-threshold="0"
-                    data-parsley-length="[2, 64]"
-                    data-parsley-pattern="^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"
-                    />
+                type='text'
+                id='companySlug'
+                name='companySlug'
+                size='64'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#create-company-form-slug-errors"
+                data-parsley-pattern-message="Must be: [a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 64]"
+                data-parsley-pattern="^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"
+                />
 
             <span class="pure-form-message-inline">*</span>
             <span
@@ -46,17 +48,18 @@
         <div class='pure-control-group'>
             <label for='companyName'>Name</label>
             <input
-                    type='text'
-                    id='companyName'
-                    name='companyName'
-                    required
-                    data-parsley-trigger="input"
-                    data-parsley-errors-container="#create-company-form-name-errors"
-                    data-parsley-pattern-message="Minimum two letters, no leading or trailing spaces"
-                    data-parsley-validation-threshold="0"
-                    data-parsley-length="[2, 64]"
-                    data-parsley-pattern="^[^ \t].*[^ \t]$"
-                    />
+                type='text'
+                id='companyName'
+                name='companyName'
+                size='64'
+                required
+                data-parsley-trigger="input"
+                data-parsley-errors-container="#create-company-form-name-errors"
+                data-parsley-pattern-message="Minimum two letters, no leading or trailing spaces"
+                data-parsley-validation-threshold="0"
+                data-parsley-length="[2, 64]"
+                data-parsley-pattern="^[^ \t].*[^ \t]$"
+                />
 
             <span class="pure-form-message-inline">*</span>
             <span
@@ -104,30 +107,9 @@
             hx-trigger="click"
             hx-target="#work-area"
             hx-swap="innerHTML"
+            hx-ext="ignore:parsley-validation"
             >
             Cancel
         </button>
     </section>
-
-    <script>
-        $(function () {
-            var theForm = $('#create-company-form').parsley ();
-
-            function validateForm (event) {
-                if (event.detail.elt.name == 'cancel' || theForm.isValid ())
-                    document.body.removeEventListener (
-                        'htmx:beforeRequest',
-                        validateForm
-                        );
-                else
-                    {
-                    theForm.validationResult = false;
-                    event.preventDefault ();
-                    event.stopPropagation ();
-                    }
-            }
-
-            document.body.addEventListener ('htmx:beforeRequest', validateForm);
-        });
-    </script>
 </form>

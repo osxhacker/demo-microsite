@@ -1,0 +1,9 @@
+{
+  "_links" : { for (._links)
+    .key : .value | { for (.)
+      .key : if (.key == "href") url-encode(.value) else .value
+      }
+    },
+
+  * : .
+}

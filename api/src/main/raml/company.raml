@@ -46,8 +46,12 @@ resourceTypes:
   post:
 
   # Individual company instances are made available under this endpoint.
-  # The "{company}" is the entity URN or UUID.
+  # The "company" is the entity URN or UUID.
   /{company}:
+    uriParameters:
+      company:
+        type: UUID | URN
+
     type:
       collection-item:
         resource: Company

@@ -1,0 +1,14 @@
+#*
+    @(#) Storage Facility resource unavailable Velocity template
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<section>
+    <p>
+    The requested <code>$headers.slug</code> $headers.ShortResourceDescription
+    is unavailable at this point in time due to service rules.  The most common
+    reason for this is that the <code>Company</code> is not currently
+    <code>Active</code>.
+    </p>
+</section>

@@ -10,14 +10,12 @@
 
     Each HTTP POST endpoint follows the form of:
 
-    - Take parameters as URL form encoded, present in Camel headers.
-    - Create JSON from the form parameters (done before this route).
-    - Send $body to the 'endpoint' route parameter.
+    - Send JSON $body to the 'endpoint' route parameter.
     - If the status code is 200, expect and parse returned JSON.
     - If the status code is 201, retrieve resource by the 'Location' header.
     - Optionally apply a transform route to $body.
     - Handle errors resulting in endpoint interaction and returned payloads.
-    - Always produce a parsed JSON $body.
+    - Always produce a valid JSON $body.
 
     Error detection in calling routes can be done by inspecting the
     CamelHttpResponseCode header.
@@ -34,15 +32,9 @@
             <log logName="com.github.osxhacker.demo"
                  loggingLevel="info"
                  message="REST POST '{{endpoint}}?host={{service}}': ${body}"
-                />
+                 />
 
-            <!--
-            Remove the original HTTP path, method, and uri headers so
-            the request can be processed as a client invocation.
-            -->
-            <removeHeader name="CamelHttpMethod"/>
-            <removeHeader name="CamelHttpPath"/>
-            <removeHeader name="CamelHttpUri"/>
+            <to uri="direct:prepare-service-invocation"/>
 
             <doTry>
                 <to uri="direct:generate-correlation-id"/>
@@ -50,7 +42,7 @@
 
                 <!-- Retrieve the resource if the service indicates it was created. -->
                 <filter>
-                    <simple>'${header.CamelHttpResponseCode}' == '201'</simple>
+                    <simple>${header.CamelHttpResponseCode} == 201</simple>
 
                     <to uri="rest:get:{Location}?host={{service}}"/>
                 </filter>
@@ -75,6 +67,15 @@
                         />
 
                     <to uri="direct:escape-json-quotes"/>
+
+                    <!--
+                    Ensure that an operation failure propagates the HTTP status
+                    code as 'CamelHttpResponseCode'.  For some reason, this is
+                    not the default behaviour.
+                    -->
+                    <setHeader name="CamelHttpResponseCode">
+                        <simple>${exception.statusCode}</simple>
+                    </setHeader>
 
                     <transform>
                         <simple>
@@ -102,6 +103,7 @@
                     <setHeader name="CamelHttpResponseCode">
                         <constant resultType="int">500</constant>
                     </setHeader>
+
                     <setHeader name="CamelHttpResponseText">
                         <constant>Internal Server Error.</constant>
                     </setHeader>
@@ -124,8 +126,8 @@
             <doTry>
                 <transform>
                     <method ref="com.fasterxml.jackson.databind.ObjectMapper"
-                            method="readTree"
-                            />
+                        method="readTree"
+                        />
                 </transform>
 
                 <doCatch>
@@ -134,8 +136,9 @@
                     <setHeader name="CamelHttpResponseCode">
                         <constant resultType="int">500</constant>
                     </setHeader>
+
                     <setHeader name="CamelHttpResponseText">
-                        <constant>Logic error.</constant>
+                        <constant>Logic Error.</constant>
                     </setHeader>
 
                     <setBody>
@@ -150,15 +153,15 @@
 
                     <transform>
                         <method ref="com.fasterxml.jackson.databind.ObjectMapper"
-                                method="readTree"
-                                />
+                            method="readTree"
+                            />
                     </transform>
                 </doCatch>
             </doTry>
 
             <log logName="com.github.osxhacker.demo"
                  loggingLevel="info"
-                 message="REST POST '{{endpoint}}?host={{service}}' : (${header.CamelHttpResponseCode}) ${body}"
+                 message="REST POST '{{endpoint}}?host={{service}}' : statusCode=${header.CamelHttpResponseCode} body=${body}"
                 />
         </route>
     </routeTemplate>
