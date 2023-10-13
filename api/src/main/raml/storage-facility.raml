@@ -42,15 +42,15 @@ resourceTypes:
 # Clients are expected to provide unique names.
 #
 /{company}/storage-facilities:
+  uriParameters:
+    company:
+      type: CompanySlug
+
   type:
     collection:
       collectionResource: StorageFacilities
       existingResource: StorageFacility
       newResource: NewStorageFacility
-
-  uriParameters:
-    company:
-      type: CompanySlug
 
   # The client can optionally provide what known embedded
   # resources should be resolved and returned within the
@@ -62,8 +62,12 @@ resourceTypes:
   put:
 
   # Individual storage facility instances are made available under
-  # this endpoint.  The "{facility}" is the entity URN or UUID.
+  # this endpoint.  The "facility" must be the entity URN or UUID.
   /{facility}:
+    uriParameters:
+      facility:
+        type: UUID | URN
+
     type:
       collection-item:
         resource: StorageFacility
@@ -74,6 +78,13 @@ resourceTypes:
     # resources should be resolved and returned within the
     # StorageFacility resource.
     get:
+      queryParameters:
+        expand?: StorageFacilityExpansion
+
+    # The client can optionally provide what known embedded
+    # resources should be resolved and returned within the
+    # StorageFacility resource.
+    post:
       queryParameters:
         expand?: StorageFacilityExpansion
 
@@ -89,6 +100,13 @@ resourceTypes:
           itemIdParameter: facility
           itemIdType: string
 
+      # The client can optionally provide what known embedded
+      # resources should be resolved and returned within the
+      # StorageFacility resource.
+      post:
+        queryParameters:
+          expand?: StorageFacilityExpansion
+
     # Attempt to close the StorageFacility, succeeding when the
     # current StorageFacilityStatus allows transitioning to
     # "Closed."  If it is semantically valid for this endpoint to
@@ -100,4 +118,11 @@ resourceTypes:
           resource: StorageFacility
           itemIdParameter: facility
           itemIdType: string
+
+      # The client can optionally provide what known embedded
+      # resources should be resolved and returned within the
+      # StorageFacility resource.
+      post:
+        queryParameters:
+          expand?: StorageFacilityExpansion
 

@@ -1,0 +1,70 @@
+#*
+    @(#) Storage Facility Summary Velocity template
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+#set( $slug = $body.at("/_embedded/company/slug").asText() )
+#set( $resourceRoot = "/storage-facility/$slug" )
+
+<section class="company-info pure-g">
+    <div class="pure-u-1-3">
+        $slug
+    </div>
+
+    <div class="pure-u-2-3">
+        $body.at("/_embedded/company/name").asText()
+    </div>
+</section>
+
+<div>
+    #if( $body.get("numberOfFacilities").asInt() == 0 )
+        No Storage Facilities found.
+    #elseif( $body.get("numberOfFacilities").asInt() == 1 )
+        Loaded 1 Storage Facility.
+    #else
+        Loaded $body.get("numberOfFacilities").asInt() Storage Facilities.
+    #end
+</div>
+
+<hr/>
+
+<section class="listing">
+    #foreach( $facility in $body.get("facilities").elements() )
+        <details class="pure-u-1">
+            <summary>$facility.get("name").asText()</summary>
+
+            <h5>
+                <a href='$resourceRoot/view?self=$facility.at("/_links/self/href").asText()'>
+                    $facility.get("status").asText()
+                </a>
+            </h5>
+
+            <div class="pure-g">
+                <div class="pure-u-9-24">$facility.get("city").asText()</div>
+                <div class="pure-u-1-12">$facility.get("state").asText()</div>
+                <div class="pure-u-1-4">$facility.get("zip").asText()</div>
+            </div>
+        </details>
+    #end
+</section>
+
+<section class="pure-button-group" role="group">
+    <a class='pure-button'
+        hx-get='$resourceRoot'
+        hx-trigger='click'
+        hx-target='main'
+        hx-swap='outerHTML'
+        >
+        Refresh
+    </a>
+
+    <a class="pure-button"
+        hx-get='$resourceRoot/create-form'
+        hx-trigger='click'
+        hx-target='#work-area'
+        hx-swap='innerHTML'
+        >
+        Add Facility
+    </a>
+</section>

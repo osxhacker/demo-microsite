@@ -1,0 +1,5 @@
+{
+  "capacity" : number (.capacity),
+  "available" : number (.available),
+  * - submit : .
+}

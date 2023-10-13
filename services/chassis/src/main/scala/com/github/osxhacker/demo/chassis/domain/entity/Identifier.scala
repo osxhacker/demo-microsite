@@ -2,6 +2,7 @@ package com.github.osxhacker.demo.chassis.domain.entity
 
 import java.util.UUID
 
+import scala.annotation.implicitNotFound
 import scala.util.{
 	Success,
 	Try
@@ -141,6 +142,39 @@ object Identifier
 
 
 		/// Implicit Conversions
+		/**
+		 * The parserForEither method defines a recursive navigation of an
+		 * [[scala.util.Either]]-based
+		 * [[com.github.osxhacker.demo.chassis.domain.entity.Identifier.Parser]]
+		 * binary tree defined during compilation.  The search terminates when
+		 * '''left''' or '''right''' is the terminal node used to attempt
+		 * parsing.
+		 *
+		 * To produce a prioritized list, ensure ''A'' __or__ ''B'' can be an
+		 * [[scala.util.Either]], but not both.  This will ensure the binary
+		 * tree degenerates into a cons (linked list).
+		 */
+		implicit def parserForEither[EntityT, A, B] (
+			implicit
+
+			@implicitNotFound (
+				"could not resolve an Identifier.Parser[$EntityT, $A] for Either[$A, $B]"
+				)
+			left : Parser[EntityT, A],
+
+			@implicitNotFound (
+				"could not resolve an Identifier.Parser[$EntityT, $B] for Either[$A, $B]"
+				)
+			right : Parser[EntityT, B]
+			)
+			: Parser[EntityT, Either[A, B]] =
+			new Parser[EntityT, Either[A, B]] {
+				override def apply (node : Either[A, B])
+					: Try[Identifier[EntityT]] =
+					node.fold (left, right)
+				}
+
+
 		implicit def parserForIdentity[EntityT]
 			: Parser[EntityT, Identifier[EntityT]] =
 			new Parser[EntityT, Identifier[EntityT]] {
@@ -151,7 +185,10 @@ object Identifier
 
 
 		implicit def parserForRefined[EntityT, P] (
-			implicit namespace : EntityNamespace[EntityT]
+			implicit
+
+			@implicitNotFound ("could not find a namespace for $EntityT")
+			namespace : EntityNamespace[EntityT]
 			)
 			: Parser[EntityT, Refined[String, P]] =
 			new Parser[EntityT, Refined[String, P]] {
@@ -164,7 +201,10 @@ object Identifier
 
 
 		implicit def parserForString[EntityT] (
-			implicit namespace : EntityNamespace[EntityT]
+			implicit
+
+			@implicitNotFound ("could not find a namespace for $EntityT")
+			namespace : EntityNamespace[EntityT]
 			)
 			: Parser[EntityT, String] =
 			new Parser[EntityT, String] {
@@ -193,7 +233,10 @@ object Identifier
 
 
 		implicit def parserForUuid[EntityT] (
-			implicit namespace : EntityNamespace[EntityT]
+			implicit
+
+			@implicitNotFound ("could not find a namespace for $EntityT")
+			namespace : EntityNamespace[EntityT]
 			)
 			: Parser[EntityT, UUID] =
 			new Parser[EntityT, UUID] {

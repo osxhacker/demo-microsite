@@ -61,3 +61,13 @@ stateDiagram-v2
 	UnderConstruction --> Active
 ```
 
+
+## Service Notes
+
+### Published Entry Points
+
+All `storage-facility` [URI's](https://datatracker.ietf.org/doc/html/rfc3986/) considered "public", which can be defined as both stable and published, can be found in the [storage facility service RAML](../../api/src/main/raml/storage-facility.raml).
+
+Any other [URI](https://datatracker.ietf.org/doc/html/rfc3986/) **must** be considered transient.
+
+

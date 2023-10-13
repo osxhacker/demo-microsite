@@ -95,10 +95,10 @@ object TapirEndpoint
 			Context.key[String] ("correlationId", "undefined")
 
 		val httpMethod : Context.Key[Method] =
-			Context.key ("http.method", Method.GET)
+			Context.key ("http.request.method", Method.GET)
 
 		val httpUrl : Context.Key[String] =
-			Context.key ("http.url", "undefined")
+			Context.key ("url.path", "undefined")
 	}
 
 

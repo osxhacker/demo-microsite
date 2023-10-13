@@ -28,8 +28,8 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  * ===Entering Functors===
  *
  * {{{
- *     type FunctorVersion = () => Unit
- *     type ContainerVersion = () => F[Unit]
+ *     type FunctorVersion = () =&gt; Unit
+ *     type ContainerVersion = () =&gt; F[Unit]
  * }}}
  *
  * The '''entering''' functors are evaluated __before__ there exists a
@@ -42,7 +42,7 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  *
  * {{{
  *     type FunctorVersion = Endo[ResultT]
- *     type ContainerVersion = ResultT => F[ResultT]
+ *     type ContainerVersion = ResultT =&gt; F[ResultT]
  * }}}
  *
  * The '''leaving''' functors are evaluated during "happy path" execution and
@@ -52,7 +52,7 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  * ===OnError Functors===
  *
  * {{{
- *     type Signature = Throwable => F[Unit]
+ *     type Signature = Throwable =&gt; F[Unit]
  * }}}
  *
  * The '''onError''' functors have a return type of ''F[Unit]'' in order to
@@ -299,13 +299,13 @@ object Pointcut
 			(release : ResourceT => ErrorOr[ResultT] => Unit)
 			: Eval[IO[ResultT]] =
 			efa map {
-				prior =>
+				inner =>
 					IO.uncancelable {
 						poll =>
 							IO.fromEither (acquire ())
 								.flatMap {
 									resource =>
-										IO.defer (poll (prior))
+										IO.defer (poll (inner))
 											.start
 											.flatTap (_ => IO.cede)
 											.flatMap (_.join)

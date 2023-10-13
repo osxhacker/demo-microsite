@@ -45,6 +45,27 @@ services:
       COMPANY_SERVICE_HOST: "gateway"
       COMPANY_SERVICE_PORT: 9080
 
+  storage-facility-site:
+    build: ../../../frontends/storage-facility/target/docker
+    container_name: "storage-facility-site"
+    hostname: "storage_facility_site"
+    restart: "no"
+    ports:
+      # Service API
+      - target: 12000
+        published: 11612
+        protocol: tcp
+        mode: host
+    networks:
+      - lan
+      - services
+    environment:
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -server"
+      COMPANY_SERVICE_HOST: "gateway"
+      COMPANY_SERVICE_PORT: 9080
+      STORAGE_FACILITY_SERVICE_HOST: "gateway"
+      STORAGE_FACILITY_SERVICE_PORT: 9080
+
   gateway:
     image: apache/apisix:3.4.0-debian
     container_name: "gateway"

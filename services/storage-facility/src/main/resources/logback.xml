@@ -37,6 +37,8 @@
 						"service.name":"storage-facility"
 						}
 					</customFields>
+
+					<jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator" />
 				</layout>
             </appender>
         </else>

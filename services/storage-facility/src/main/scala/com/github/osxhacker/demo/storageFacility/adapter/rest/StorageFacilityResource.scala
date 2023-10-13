@@ -91,6 +91,7 @@ final case class StorageFacilityResource[F[_]] (
 	import chimney.cats._
 	import chimney.dsl._
 	import domain.transformers._
+	import mouse.any._
 	import mouse.boolean._
 	import log4cats.syntax._
 
@@ -259,11 +260,12 @@ final case class StorageFacilityResource[F[_]] (
 
 			_ <- debug"saved storage facility: ${altered.id.show} ${altered.version.show}"
 			result <- completeF (
-				arrows.toApi ().run (
-					altered -> tag[api.StorageFacility] (
-						ResourceLocation (path)
-						)
-					)
+				arrows.toApi (embed (params.expand))
+					.run (
+						 altered -> tag[api.StorageFacility] (
+							  ResourceLocation (path)
+							  )
+						 )
 				)
 			} yield result
 
@@ -280,8 +282,19 @@ final case class StorageFacilityResource[F[_]] (
 		(
 			implicit
 			global : GlobalEnvironment[F],
-			correlationId : FindField[ParamsT, Witness.`'X-Correlation-ID`.T, String],
+			correlationId : FindField[
+				ParamsT,
+				Witness.`'X-Correlation-ID`.T,
+				String
+				],
+
 			companyId : FindField[ParamsT, Witness.`'company`.T, String],
+			expand : FindField[
+				ParamsT,
+				Witness.`'expand`.T,
+				Option[api.StorageFacilityExpansion]
+				],
+
 			facility : FindField[ParamsT, Witness.`'facility`.T, String]
 		)
 		: F[ResultType[api.StorageFacility]] =
@@ -305,7 +318,7 @@ final case class StorageFacilityResource[F[_]] (
 
 			_ <- debug"saved storage facility: ${altered.id.show} ${altered.version.show}"
 			result <- completeF (
-				arrows.toApi ()
+				arrows.toApi (expand (params) |> embed)
 					.run (
 						altered -> tag[api.StorageFacility] (
 							ResourceLocation (path.parent)
@@ -344,7 +357,7 @@ final case class StorageFacilityResource[F[_]] (
 				complete (),
 				failWith (
 					api.ObjectNotFoundDetails.from (
-						id = params.facility,
+						id = params.facility.merge.toString,
 						status = StatusCode.Gone.code,
 						title = "storage facility could not be removed"
 						)

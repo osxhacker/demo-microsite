@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templatedRoutes id="camel-xml-io-dsl"
+                 xmlns="http://camel.apache.org/schema/spring"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="
+                 http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+                 ">
+    <templatedRoute routeTemplateRef="rest-get">
+        <parameter name="name" value="get-company-summary"/>
+        <parameter name="service" value="{{service:COMPANY:{{demo.company.host}}:{{demo.company.port}}}}"/>
+        <parameter name="endpoint" value="/api/companies"/>
+        <parameter name="transform"
+                   value="jslt/company/collection-response.jslt"
+                   />
+    </templatedRoute>
+</templatedRoutes>
+

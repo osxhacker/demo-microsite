@@ -1,4 +1,4 @@
--Xmx6144M
+-Xmx8192M
 -Xss2M
 -XX:InitialCodeCacheSize=2m
 -XX:ReservedCodeCacheSize=128m

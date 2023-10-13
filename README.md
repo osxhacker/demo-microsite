@@ -18,10 +18,11 @@ Concepts explored include, but are not limited to:
 * Microservices
 * Generative Programming
 * JSON Hypertext Application Language
-* Using cats.effect.IO to define microservices
+* Using `cats.effect.IO` to define microservices
 * Abstracting logic via containers (`F[_]`) and `implicit` type classes
 * Using RAML to define API-first contracts
 * Inferring domain events with the Open/Closed principle
+* Defining inter-microsite contracts with RAML
 * Defining integration event representations with RAML
 * Defining persistent store representations with RAML
 * Using Kafka as a distributed, durable event bus
@@ -29,6 +30,8 @@ Concepts explored include, but are not limited to:
 * Pure Scala AOP
 * Using Kamon + Prometheus + pure Scala AOP
 * Logback + Logstash + Logstash-Logback-Encoder configuration and use
+* Inferring significant persistent store changes to report
+* Identifying and reporting individual slow invocations
 * Using Camel to define frontend services without custom components
 * Using APISIX as an application gateway
 * Using Giter8 to generate skeletal microservices

@@ -1,0 +1,88 @@
+<rests xmlns="http://camel.apache.org/schema/spring"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       ">
+    <!--
+    REST Endpoint (consumer) Definitions
+
+    In Camel, a consumer is a definition which *receives* messages.  Here,
+    all REST DSL endpoint routes are made available under '/storage-facility'
+    or '/internal'.
+    -->
+    <rest path="/storage-facility">
+        <get path="/javascript/htmx/ext/{filename}">
+            <to uri="direct:load-htmx-extension-javascript-file"/>
+        </get>
+
+        <get path="/javascript/htmx/{filename}">
+            <to uri="direct:load-htmx-javascript-file"/>
+        </get>
+
+        <get path="/javascript/jquery/{filename}">
+            <to uri="direct:load-jquery-javascript-file"/>
+        </get>
+
+        <get path="/javascript/parsley/{filename}">
+            <to uri="direct:load-parsley-javascript-file"/>
+        </get>
+
+        <get path="/javascript/{filename}">
+            <to uri="direct:load-javascript-file"/>
+        </get>
+
+        <get path="/stylesheet/pure/{filename}">
+            <to uri="direct:load-pure-stylesheet-file"/>
+        </get>
+
+        <get path="/stylesheet/{filename}">
+            <to uri="direct:load-stylesheet-file"/>
+        </get>
+
+        <get path="/index.html">
+            <to uri="direct:site-index"/>
+        </get>
+
+        <post path="/{slug}/change-status">
+            <to uri="direct:storage-facility-change-status"/>
+        </post>
+
+        <get path="/{slug}/create-form">
+            <to uri="direct:storage-facility-create-form"/>
+        </get>
+
+        <put path="/{slug}/create">
+            <to uri="direct:storage-facility-create"/>
+        </put>
+
+        <delete path="/{slug}/delete">
+            <param name="delete" type="query"/>
+
+            <to uri="direct:storage-facility-delete"/>
+        </delete>
+
+        <get path="/{slug}/edit-form">
+            <param name="self" type="query"/>
+
+            <to uri="direct:storage-facility-edit-form"/>
+        </get>
+
+        <post path="/{slug}/save">
+            <to uri="direct:storage-facility-save"/>
+        </post>
+
+        <get path="/{slug}/view">
+            <param name="self" type="query"/>
+
+            <to uri="direct:storage-facility-view"/>
+        </get>
+
+        <get path="/{slug}">
+            <to uri="direct:storage-facility-summary"/>
+        </get>
+
+        <get path="/">
+            <to uri="direct:site-index"/>
+        </get>
+    </rest>
+</rests>

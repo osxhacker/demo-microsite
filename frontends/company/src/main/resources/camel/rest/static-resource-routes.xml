@@ -27,6 +27,12 @@
     </templatedRoute>
 
     <templatedRoute routeTemplateRef="classpath-resource">
+        <parameter name="name" value="load-javascript-file"/>
+        <parameter name="resource" value="javascript/${header.filename}"/>
+        <parameter name="postprocessor" value="finish-javascript-file"/>
+    </templatedRoute>
+
+    <templatedRoute routeTemplateRef="classpath-resource">
         <parameter name="name" value="load-jquery-javascript-file"/>
         <parameter name="resource"
                    value="META-INF/resources/webjars/jquery/{{demo.versions.jquery}}/${header.filename}"

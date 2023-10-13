@@ -1,0 +1,31 @@
+#%RAML 1.0
+title: Demo Company Microsite API
+version: v1
+baseUri: http://localhost:12000/
+
+
+# The default media type is HTML.
+mediaType: text/html
+
+
+########################################################################
+# Public Resources
+########################################################################
+
+/company:
+  displayName: Company Administration Home Document
+  get:
+    description: >
+      The `/company` resource is the stable path, when
+      combined with the published scheme and FQDN, defines the
+      [URI](https://datatracker.ietf.org/doc/html/rfc3986/) to
+      access the `company` home document.
+
+      All
+      [URI's](https://datatracker.ietf.org/doc/html/rfc3986/)
+      related to the `company` microsite **must** be relative
+      to `/company`.
+
+    responses:
+      200:
+

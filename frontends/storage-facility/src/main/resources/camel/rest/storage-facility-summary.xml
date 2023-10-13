@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:storage-facility-summary' route defines the logic for providing
+    the ability to produce a summary of all storage facility resources as an
+    HTML snippet.
+    -->
+    <route>
+        <from uri="direct:storage-facility-summary"/>
+
+        <to uri="direct:get-storage-facility-summary"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} range '200..299'</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <constant>Storage Facility Administration</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/storage-facility/summary.vm"/>
+            </when>
+
+            <!--
+            An Unprocessable Content (422) error is raised when the facilities
+            collection cannot be currently used due to service rules.  This can
+            be a transient condition, such as when the owning company is not
+            currently active.
+            -->
+            <when>
+                <simple>${header.CamelHttpResponseCode} == 422</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <constant>Storage Facility Unavailable</constant>
+                </setHeader>
+
+                <setHeader name="ShortResourceDescription">
+                    <constant>storage facilities collection</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/storage-facility/unavailable.vm"/>
+                <removeHeader name="ShortResourceDescription"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <setHeader name="HomeDocumentTitle">
+                    <constant>Unable to Initialize Storage Facility Administration</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <to uri="velocity:classpath:velocity/home-document.vm"/>
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

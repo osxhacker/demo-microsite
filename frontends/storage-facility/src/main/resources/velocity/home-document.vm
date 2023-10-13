@@ -1,0 +1,78 @@
+#*
+    @(#) Storage Facility home document Velocity template
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>$headers.HomeDocumentTitle</title>
+        <meta charset="UTF-8"/>
+
+        <!--
+        Added due to the PureCSS recommendation found here:
+
+        https://purecss.io/start/#add-the-viewport-meta-element
+        -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!--
+        Disable attempting to retrieve a "favicon".
+
+        See: https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests/38917888#38917888
+        -->
+        <link rel="icon" href="data:,">
+		<link rel="stylesheet" href="/storage-facility/stylesheet/pure/base-min.css">
+        <link rel="stylesheet" href="/storage-facility/stylesheet/pure/pure-min.css">
+		<link rel="stylesheet" href="/storage-facility/stylesheet/microsite.css">
+
+		<script src="/storage-facility/javascript/htmx/htmx.min.js"></script>
+		<script src="/storage-facility/javascript/htmx/ext/json-enc.js"></script>
+		<script src="/storage-facility/javascript/jquery/jquery.min.js"></script>
+		<script src="/storage-facility/javascript/parsley/parsley.min.js"></script>
+		<script src="/storage-facility/javascript/parsley-validation.js"></script>
+    </head>
+    <body>
+        <main>
+			<section class="header">
+				<div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+					<a class="pure-menu-heading" href="/">Microsite</a>
+
+					<ul class="pure-menu-list">
+						<li class="pure-menu-item">
+                            <a href="/" class="pure-menu-link">Home</a>
+                        </li>
+
+						<li class="pure-menu-item">
+						    <a href="/company" class="pure-menu-link">Companies</a>
+                        </li>
+
+						<li class="pure-menu-item pure-menu-selected">
+                            <a href="/storage-facility" class="pure-menu-link">Storage Facilities</a>
+                        </li>
+					</ul>
+				</div>
+			</section>
+
+            <noscript>
+                <aside class="error">
+                    <p>
+                    This microsite requires JavaScript to function properly.
+                    Please enable it and reload the page or visit this site with
+                    a JavaScript-enabled browser.
+                    </p>
+                </aside>
+            </noscript>
+
+			<section class="content">
+				<h2 class="content-subhead">$headers.HomeDocumentTitle</h2>
+
+				<section id="work-area">
+				    $body
+				</section>
+			</section>
+        </main>
+    </body>
+</html>
+

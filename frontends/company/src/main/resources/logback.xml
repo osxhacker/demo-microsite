@@ -9,6 +9,9 @@
 	<import class="ch.qos.logback.core.ConsoleAppender" />
 	<import class="net.logstash.logback.appender.LogstashUdpSocketAppender" />
 
+	<!-- see: https://logback.qos.ch/manual/configuration.html#shutdownHook -->
+	<shutdownHook/>
+
 	<if condition='isDefined("LOGSTASH")'>
 		<then>
 			<appender name="JSON" class="net.logstash.logback.appender.LogstashUdpSocketAppender">
@@ -74,6 +77,29 @@
 		</then>
 	</if>
 
+	<!--
+	Enable Camel HTTP logging at LOG_LEVEL when running in a local
+	development environment.
+	-->
+	<if condition='!isDefined("LOGSTASH")'>
+		<then>
+			<logger
+				name="org.apache.camel.component.http"
+				level="${LOG_LEVEL:-info}"
+				/>
+		</then>
+	</if>
+
+	<logger
+		name="org.apache"
+		level="INFO"
+		/>
+
+	<logger
+		name="org.eclipse"
+		level="INFO"
+		/>
+
 	<logger
 		name="org.http4s"
 		level="INFO"
@@ -82,11 +108,6 @@
 	<logger
 		name="org.http4s.blaze.channel"
 		level="WARN"
-		/>
-
-	<logger
-		name="org.apache.kafka.clients"
-		level="INFO"
 		/>
 
 	<logger

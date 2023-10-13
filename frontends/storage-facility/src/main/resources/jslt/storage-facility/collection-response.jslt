@@ -1,0 +1,23 @@
+let numberOfFacilities = size (.facilities)
+
+{
+  "_links" : { for (._links)
+    .key : .value | { for (.)
+      .key : if (.key == "href") url-encode (.value) else .value
+      }
+    },
+
+  "facilities": [ for (.facilities) . | {
+      "_links" : { for (._links)
+        .key : .value | { for (.)
+          .key : if (.key == "href") url-encode (.value) else .value
+            }
+          },
+
+      * : .
+      }
+    ] | sort-by ("/name"),
+
+  "numberOfFacilities" : $numberOfFacilities,
+  * : .
+}

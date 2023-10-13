@@ -35,6 +35,7 @@
             </otherwise>
         </choice>
 
+        <removeHeader name="self"/>
         <to uri="direct:finish-html-file"/>
     </route>
 </routes>

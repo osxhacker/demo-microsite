@@ -8,7 +8,7 @@
     <!--
     The 'direct:company-view' route defines the logic for providing
     the ability to produce a detailed view of a company resource
-    identified by 'header.companyId' as an HTML snippet.
+    resolved by 'self' as an HTML snippet.
     -->
     <route>
         <from uri="direct:company-view"/>

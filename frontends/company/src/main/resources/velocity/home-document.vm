@@ -30,6 +30,7 @@
 		<script src="/company/javascript/htmx/htmx.min.js"></script>
 		<script src="/company/javascript/jquery/jquery.min.js"></script>
 		<script src="/company/javascript/parsley/parsley.min.js"></script>
+		<script src="/storage-facility/javascript/parsley-validation.js"></script>
     </head>
     <body>
         <main>
@@ -38,11 +39,30 @@
 					<a class="pure-menu-heading" href="/">Microsite</a>
 
 					<ul class="pure-menu-list">
-						<li class="pure-menu-item"><a href="/" class="pure-menu-link">Home</a></li>
-						<li class="pure-menu-item pure-menu-selected"><a href="/company" class="pure-menu-link">Companies</a></li>
+						<li class="pure-menu-item">
+						    <a href="/" class="pure-menu-link">Home</a>
+                        </li>
+
+						<li class="pure-menu-item pure-menu-selected">
+						    <a href="/company" class="pure-menu-link">Companies</a>
+                        </li>
+
+						<li class="pure-menu-item">
+						    <a href="/storage-facility" class="pure-menu-link">Storage Facilities</a>
+                        </li>
 					</ul>
 				</div>
 			</section>
+
+            <noscript>
+                <aside class="error">
+                    <p>
+                    This microsite requires JavaScript to function properly.
+                    Please enable it and reload the page or visit this site with
+                    a JavaScript-enabled browser.
+                    </p>
+                </aside>
+            </noscript>
 
 			<section class="content">
 				<h2 class="content-subhead">$headers.HomeDocumentTitle</h2>

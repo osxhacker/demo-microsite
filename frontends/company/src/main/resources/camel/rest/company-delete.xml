@@ -7,8 +7,8 @@
         ">
     <!--
     The 'direct:company-delete' route defines the logic for providing
-    the ability to produce a detailed view of a company resource
-    identified by 'header.companyId' as an HTML snippet.
+    the ability to delete a company resource identified by the
+    'header.delete' semantic action associated with it.
     -->
     <route>
         <from uri="direct:company-delete"/>
@@ -17,7 +17,7 @@
 
         <choice>
             <when>
-                <simple>${header.CamelHttpResponseCode} == 200</simple>
+                <simple>'${header.CamelHttpResponseCode}' == '200'</simple>
 
                 <setHeader name="filename">
                     <constant>company/delete-result.html</constant>
@@ -41,10 +41,15 @@
                     <constant resultType="int">200</constant>
                 </setHeader>
 
+                <!--
+                The 'direct:delete-company' route categorizes
+                its result and always produces parsed JSON.
+                -->
                 <to uri="velocity:classpath:velocity/error.vm"/>
             </otherwise>
         </choice>
 
+        <removeHeader name="delete"/>
         <to uri="direct:finish-html-file"/>
     </route>
 </routes>

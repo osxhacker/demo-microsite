@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:storage-facility-save' route defines the logic for providing
+    the ability to persist a storage-facility resource.
+    -->
+    <route>
+        <from uri="direct:storage-facility-save"/>
+
+        <!--
+        Because the 'edit' action is transmitted as a property,
+        it must be extracted from the JSON request before any
+        transformations are performed.
+        -->
+        <transform>
+            <method ref="com.fasterxml.jackson.databind.ObjectMapper"
+                method="readTree"
+                />
+        </transform>
+
+        <setHeader name="edit">
+            <ognl>@java.net.URLDecoder@decode(request.body.at("/_action").asText())</ognl>
+        </setHeader>
+
+        <!--
+        The JSLT component requires the request body to be a String.
+        -->
+        <transform>
+            <simple>${bodyAs(String)}</simple>
+        </transform>
+
+        <to uri="jslt:jslt/storage-facility/save-request.jslt"/>
+        <to uri="direct:post-storage-facility-save"/>
+
+        <choice>
+            <when>
+                <simple>${header.CamelHttpResponseCode} == 200</simple>
+
+                <setHeader name="HomeDocumentTitle">
+                    <ognl>request.body.at("/name").asText()</ognl>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/storage-facility/view.vm"/>
+            </when>
+
+            <otherwise>
+                <setHeader name="CamelHttpResponseCode">
+                    <constant resultType="int">200</constant>
+                </setHeader>
+
+                <to uri="velocity:classpath:velocity/error.vm"/>
+            </otherwise>
+        </choice>
+
+        <removeHeader name="edit"/>
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>
+

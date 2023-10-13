@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes id="camel-xml-io-dsl"
+        xmlns="http://camel.apache.org/schema/spring"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+    <!--
+    The 'direct:storage-facility-create-form' route defines the
+    logic for rendering an HTML form snippet capable of
+    initiating the creation of a new StorageFacility.
+    -->
+    <route>
+        <from uri="direct:storage-facility-create-form"/>
+
+        <to uri="velocity:classpath:velocity/storage-facility/create-form.vm"/>
+        <to uri="direct:finish-html-file"/>
+    </route>
+</routes>

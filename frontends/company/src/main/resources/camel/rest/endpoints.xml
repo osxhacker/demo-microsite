@@ -13,6 +13,8 @@
     -->
     <rest path="/company">
         <post path="/change-status">
+            <param name="companyAction" type="query"/>
+
             <to uri="direct:company-change-status"/>
         </post>
 
@@ -21,18 +23,26 @@
         </get>
 
         <post path="/create">
+            <param name="create" type="query"/>
+
             <to uri="direct:company-create"/>
         </post>
 
         <delete path="/delete">
+            <param name="delete" type="query"/>
+
             <to uri="direct:company-delete"/>
         </delete>
 
         <get path="/edit-form">
+            <param name="self" type="query"/>
+
             <to uri="direct:company-edit-form"/>
         </get>
 
         <post path="/save">
+            <param name="edit" type="query"/>
+
             <to uri="direct:company-save"/>
         </post>
 
@@ -60,6 +70,10 @@
 
         <get path="/stylesheet/pure/{filename}">
             <to uri="direct:load-pure-stylesheet-file"/>
+        </get>
+
+        <get path="/javascript/{filename}">
+            <to uri="direct:load-javascript-file"/>
         </get>
 
         <get path="/stylesheet/{filename}">

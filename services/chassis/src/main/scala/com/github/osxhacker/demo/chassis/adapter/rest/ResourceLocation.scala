@@ -59,7 +59,8 @@ object ResourceLocation
 	 * The '''Factory''' type is a model of the FACTORY pattern and provides the
 	 * ability to create __fully resolved__
 	 * [[com.github.osxhacker.demo.chassis.adapter.rest.ResourceLocation]]s,
-	 * erroring if either __all__ `endpoint` parameters
+	 * erroring if either __all__ `endpoint` parameters are not resolved or the
+	 * raw path cannot be parsed.
 	 */
 	final class Factory[-R, F[_]] (private val endpoint : ServerEndpoint[R, F])
 	{
@@ -124,7 +125,7 @@ object ResourceLocation
 
 	/// Implicit Conversions
 	implicit lazy val asHeader : EndpointIO.Header[ResourceLocation] =
-		sttp.tapir.header[ResourceLocation]("Location")
+		sttp.tapir.header[ResourceLocation] ("Location")
 
 	implicit val codec : Codec.PlainCodec[ResourceLocation] =
 		Codec.string.mapDecode (decode) (encode)

@@ -1,0 +1,64 @@
+#*
+    @(#) Company Summary Velocity template
+
+    Reference: https://velocity.apache.org/engine/devel/user-guide.html
+*#
+
+<div>
+    #if( $body.get("numberOfCompanies").asInt() == 0 )
+        No Companies found.
+    #elseif( $body.get("numberOfCompanies").asInt() == 1 )
+        Loaded 1 Company.
+    #else
+        Loaded $body.get("numberOfCompanies").asInt() Companies.
+    #end
+</div>
+
+<hr/>
+
+#if( $body.get("numberOfCompanies").asInt() > 0 )
+    <section class="listing">
+        <table class="pure-table pure-table-horizontal">
+            <thead>
+                <th>Status</th>
+                <th>Slug</th>
+                <th>Name</th>
+            </thead>
+
+            <tbody>
+                #foreach( $company in $body.get("companies").elements() )
+                    <tr>
+                        <td>
+                            $company.get("status").asText()
+                        </td>
+
+                        <td>
+                            #if( $company.get("status").asText() == "Active" )
+                                <a href='/storage-facility/$company.get("slug").asText()'>
+                                    $company.get("slug").asText()
+                                </a>
+                            #else
+                                $company.get("slug").asText()
+                            #end
+                        </td>
+
+                        <td>
+                            $company.get("name").asText()
+                        </td>
+                    </tr>
+                #end
+            </tbody>
+        </table>
+    </section>
+#end
+
+<section class="pure-button-group" role="group">
+    <a class="pure-button"
+        hx-get="/storage-facility"
+        hx-trigger="click"
+        hx-target="main"
+        hx-swap="outerHTML"
+        >
+        Refresh
+    </a>
+</section>

@@ -348,7 +348,7 @@ final case class CompanyResource[F[_]] (
 				failWith (
 					api.ObjectNotFoundDetails
 						.from (
-							id = params.company,
+							id = params.company.merge.toString,
 							status = StatusCode.Gone.code,
 							title = "company could not be removed"
 							)
