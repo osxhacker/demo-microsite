@@ -9,6 +9,7 @@ import cats.{
 
 import cats.data.{
 	Kleisli,
+	Validated,
 	ValidatedNec
 	}
 
@@ -72,7 +73,7 @@ trait NaturalTransformations
 			}
 
 
-	implicit def validatedNecToF[F[_]] (
+	implicit def validatedNecStringToF[F[_]] (
 		implicit applicativeThrow : ApplicativeThrow[F]
 		)
 		: ValidatedNec[String, *] ~> F =
@@ -89,13 +90,43 @@ trait NaturalTransformations
 sealed trait LowPriorityNaturalTransformations
 	extends LowestPriorityNaturalTransformations
 {
+	/// Class Imports
+	import cats.syntax.applicative._
+	import cats.syntax.applicativeError._
+
+
 	/// Implicit Conversions
+	implicit def errorOrToThrowableValidatedNec
+		: ErrorOr ~> ValidatedNec[Throwable, *] =
+		new (ErrorOr ~> ValidatedNec[Throwable, *]) {
+			override def apply[A] (fa : ErrorOr[A])
+				: ValidatedNec[Throwable, A] =
+				Validated.fromEither (fa)
+					.toValidatedNec
+			}
+
+
 	implicit def kleisliIdentityNaturalTransformation[F[_], A]
 		: Kleisli[F, A, *] ~> Kleisli[F, A, *] =
 		new (Kleisli[F, A, *] ~> Kleisli[F, A, *]) {
 			override def apply[B] (fa : Kleisli[F, A, B]) : Kleisli[F, A, B] =
 				fa
 			}
+
+
+	implicit def validatedNecThrowableToF[F[_]] (
+		implicit applicativeThrow : ApplicativeThrow[F]
+		)
+		: ValidatedNec[Throwable, *] ~> F =
+		new (ValidatedNec[Throwable, *] ~> F) {
+			override def apply[A] (fa : ValidatedNec[Throwable, A]) : F[A] =
+				fa.fold (
+					errors =>
+						ValidationError (errors.map (_.getMessage)).raiseError,
+
+					_.pure
+					)
+		}
 }
 
 

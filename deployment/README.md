@@ -29,6 +29,11 @@ The following table documents what `localhost` IP ports are exposed for each ser
 | Prometheus       |  9090     |         |              |         |
 | Grafana          |  3000     |         |              |         |
 
+Notes:
+
+- Unless otherwise specified, *all* ports are `TCP`.
+- All microsites bind to port `12000` within their containers *or* when running on `localhost`.
+
 
 ## Azure
 

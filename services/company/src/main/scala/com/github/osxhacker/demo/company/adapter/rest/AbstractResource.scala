@@ -41,7 +41,7 @@ abstract class AbstractResource[F[_]] ()
 		override protected val monadThrow : MonadThrow[F],
 
 		/// Needed for `log4cats.syntax`
-		override protected val loggerFactory : LoggerFactory[F]
+		protected val loggerFactory : LoggerFactory[F]
 	)
 	extends ServiceResource[F] ()
 {

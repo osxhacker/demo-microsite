@@ -53,7 +53,11 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.6.0-SNAPSHOT"
+ThisBuild / version := "0.6.1"
+
+/// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
+ThisBuild / versionScheme := Some ("semver-spec")
+
 ThisBuild / scalaVersion := "2.13.12"
 ThisBuild / Compile / scalacOptions ++= Seq (
 	"-encoding", "UTF-8",
@@ -69,6 +73,9 @@ ThisBuild / Compile / scalacOptions ++= Seq (
 	"-Ymacro-annotations",
 	"-Ywarn-unused:-imports,_"
 	)
+
+ThisBuild / githubOwner := "osxhacker"
+ThisBuild / githubRepository := "demo-microsite"
 
 
 /// Ensure output is not as choppy
@@ -173,6 +180,7 @@ lazy val api = (project in file ("api"))
 //////////////////////////////
 
 lazy val frontends = (project in file ("frontends"))
+	.settings (publish / skip := true)
 	.aggregate (
 		`frontends-site`,
 		`frontends-company`,
@@ -182,6 +190,7 @@ lazy val frontends = (project in file ("frontends"))
 lazy val `frontends-company` = (project in file ("frontends/company"))
 	.settings (
 		name := "frontends-company",
+		publish / skip := true,
 		libraryDependencies ++= Seq (
 			CamelBean,
 			CamelCore,
@@ -247,6 +256,7 @@ lazy val `frontends-storage-facility` =
 	(project in file ("frontends/storage-facility"))
 	.settings (
 		name := "frontends-storage-facility",
+		publish / skip := true,
 		libraryDependencies ++= Seq (
 			CamelBean,
 			CamelCore,
@@ -311,6 +321,7 @@ lazy val `frontends-storage-facility` =
 lazy val `frontends-site` = (project in file ("frontends/site"))
 	.settings (
 		name := "frontends-site",
+		publish / skip := true,
 		libraryDependencies ++= Seq (
 			CamelBean,
 			CamelCore,
@@ -368,6 +379,7 @@ lazy val `frontends-site` = (project in file ("frontends/site"))
 //////////////////////////////
 
 lazy val services = (project in file ("services"))
+	.settings (publish / skip := true)
 	.aggregate (
 		chassis,
 		company,
@@ -383,7 +395,9 @@ lazy val chassis = (project in file ("services/chassis"))
 		libraryDependencies ++= Seq (
 			/// Testing Artifacts
 			ScalatestScalacheck
-			)
+			),
+
+		Test / publishArtifact := true
 		)
 	.dependsOn (api)
 
@@ -393,6 +407,7 @@ lazy val company = (project in file ("services/company"))
 		Defaults.itSettings,
 		commonServiceSettings ("it,test"),
 		name := "services-company",
+		publish / skip := true,
 		ramlDefinitions := Seq (
 			scraml.ModelDefinition (
 				raml = file ("api/src/main/raml/company.raml"),
@@ -464,8 +479,9 @@ lazy val company = (project in file ("services/company"))
 
 lazy val inventory = (project in file ("services/inventory"))
 	.settings (
-		commonServiceSettings (),
 		name := "services-inventory",
+		publish / skip := true,
+		commonServiceSettings (),
 		libraryDependencies ++= Seq (
 			DoobieCore,
 			DoobieHikari,
@@ -521,7 +537,8 @@ lazy val inventory = (project in file ("services/inventory"))
 lazy val `purchase-order` = (project in file ("services/purchase-order"))
 	.settings (
 		commonServiceSettings (),
-		name := "services-purchase-order"
+		name := "services-purchase-order",
+		publish / skip := true
 		)
 	.dependsOn (
 		chassis % "compile->compile;test->test"
@@ -533,6 +550,7 @@ lazy val `storage-facility` = (project in file ("services/storage-facility"))
 		Defaults.itSettings,
 		commonServiceSettings ("it,test"),
 		name := "services-storage-facility",
+		publish / skip := true,
 		libraryDependencies ++= Seq (
 			DoobieCore,
 			DoobieHikari,
@@ -651,6 +669,7 @@ lazy val `storage-facility` = (project in file ("services/storage-facility"))
 val gatling = (project in file ("gatling"))
 	.settings (
 		name := "gatling-tests",
+		publish / skip := true,
 		libraryDependencies ++=
 			Seq (
 				Enumeratum,

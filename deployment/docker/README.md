@@ -39,7 +39,7 @@ sudo port install colima
 Next, provision a `colima` VM:
 
 ```
-colima start --cpu 4 --memory 12 --disk 20
+colima start --cpu 6 --memory 14 --disk 20
 ```
 
 If you intend on having a large amount of data, increase the `disk` value from 10 Gb to what you think you will need.  While `cpu` and `memory` can be changed later, the amount of disk space cannot without reinitializing `colima`.

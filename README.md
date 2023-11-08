@@ -17,6 +17,7 @@ Concepts explored include, but are not limited to:
 * Microsites
 * Microservices
 * Generative Programming
+* [Autonomous Production Support](https://github.com/osxhacker/demo-microsite/issues/16)
 * JSON Hypertext Application Language
 * Using `cats.effect.IO` to define microservices
 * Abstracting logic via containers (`F[_]`) and `implicit` type classes

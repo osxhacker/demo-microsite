@@ -40,8 +40,6 @@ abstract class ServiceResource[F[_]] ()
 		/// Needed for `serverLogicWithEnvironment`.
 		protected val monadThrow : MonadThrow[F],
 
-		/// Needed for '''TapirEndpoint'''.
-		protected val loggerFactory : LoggerFactory[F]
 	)
 	extends (() => List[ServerEndpoint[Any, F]])
 {
@@ -131,6 +129,11 @@ abstract class ServiceResource[F[_]] ()
 					],
 
 				@implicitNotFound (
+					"could not resolve a log4cats.LoggerFactory[${F}]"
+					)
+				loggerFactory : LoggerFactory[F],
+
+				@implicitNotFound (
 					"an implicit EnvironmentUsagePolicy[${F}, ${EnvT}, ${ErrorT}] " +
 					"must be in scope to use serverLogicWithEnvironment"
 					)
@@ -186,6 +189,11 @@ abstract class ServiceResource[F[_]] ()
 					Witness.`'X-Correlation-ID`.T,
 					String
 					],
+
+				@implicitNotFound (
+					"could not resolve a log4cats.LoggerFactory[${F}]"
+					)
+				loggerFactory : LoggerFactory[F],
 
 				@implicitNotFound (
 					"an implicit ReadersWriterResource[${F}, ${ResourceT}] " +
