@@ -16,3 +16,6 @@ addSbtPlugin ("io.gatling" % "gatling-sbt" % "4.3.2")
 /// see: https://github.com/sbt/sbt-native-packager
 addSbtPlugin ("com.github.sbt" % "sbt-native-packager" % "1.9.9")
 
+/// see: https://github.com/djspiewak/sbt-github-packages
+addSbtPlugin("com.codecommit" % "sbt-github-packages" % "0.5.3")
+

@@ -36,9 +36,9 @@ object Dependencies
 		val Http4sBlaze = "0.23.14"
 		val Janino = "3.1.10"
 		val JQuery = "3.7.0"
-		val Kamon = "2.6.3"
+		val Kamon = "2.6.5"
 		val Log4Cats = "2.6.0"
-		val Logback = "1.4.6"
+		val Logback = "1.4.11"
 		val LogbackContrib = "0.1.5"
 		val LogstashLogbackEncoder ="7.4"
 		val Monocle = "3.2.0"
@@ -49,8 +49,8 @@ object Dependencies
 		val Refined = "0.10.3"
 		val Shapeless = "2.3.10"
 		val Squants = "1.8.3"
-		val Sttp ="3.8.8"
-		val Tapir = "1.4.0"
+		val Sttp ="3.9.0"
+		val Tapir = "1.8.1"
 
 		/// Testing Artifacts
 		val Scalacheck = "1.17.0"
@@ -63,6 +63,7 @@ object Dependencies
 	/// Per-project Compiler Plugins
 	val BetterMonadicFor = "com.olegpy" %% "better-monadic-for" % Versions.BetterMonadicFor
 	val KindProjector = "org.typelevel" % "kind-projector" % Versions.KindProjector cross CrossVersion.full
+
 
 	/// Main Artifacts
 	val CamelBean = "org.apache.camel" % "camel-bean" % Versions.Camel
@@ -117,7 +118,7 @@ object Dependencies
 	val Http4sBlaze = "org.http4s" %% "http4s-blaze-server" % Versions.Http4sBlaze
 	val JacksonDatabind = "com.fasterxml.jackson.core" %
 		"jackson-databind" %
-		"2.14.2" %
+		"2.14.3" %
 		Runtime
 
 	val Janino = "org.codehaus.janino" % "janino" % Versions.Janino
@@ -149,8 +150,12 @@ object Dependencies
 	val MonocleMacro = "dev.optics" %% "monocle-macro" % Versions.Monocle
 	val Mouse = "org.typelevel" %% "mouse" % Versions.Mouse
 	val Parsley = "org.webjars.npm" % "parsleyjs" % Versions.Parsley
-	val Pureconfig = "com.github.pureconfig" %% "pureconfig" % Versions.Pureconfig
-	val PureconfigCats = "com.github.pureconfig" %% "pureconfig-cats" % Versions.Pureconfig
+	val Pureconfig = "com.github.pureconfig" %% "pureconfig" %
+		Versions.Pureconfig
+
+	val PureconfigCats = "com.github.pureconfig" %% "pureconfig-cats" %
+		Versions.Pureconfig
+
 	val PureCSS = "org.webjars.npm" % "purecss" % Versions.PureCSS
 	val Refined = "eu.timepit" %% "refined" % Versions.Refined
 	val RefinedCats = "eu.timepit" %% "refined-cats" % Versions.Refined
@@ -161,9 +166,15 @@ object Dependencies
 
 	val Squants = "org.typelevel" %% "squants" % Versions.Squants
 	val Shapeless = "com.chuusai" %% "shapeless" % Versions.Shapeless
-	val TapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" % Versions.Tapir
-	val TapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % Versions.Tapir
-	val TapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % Versions.Tapir
+	val TapirCore = "com.softwaremill.sttp.tapir" %% "tapir-core" %
+		Versions.Tapir
+
+	val TapirHttp4s = "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" %
+		Versions.Tapir
+
+	val TapirJsonCirce = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" %
+		Versions.Tapir
+
 
 	/// Testing Artifacts
 	val CatsEffectTesting = "org.typelevel" %%

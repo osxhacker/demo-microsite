@@ -68,7 +68,8 @@ abstract class AbstractErrorReporter[F[_], ProblemDetailsT <: AnyRef] ()
 	protected val statusCodeLens : Getter[ProblemDetailsT, StatusCode]
 	protected def service : HandlerType = PartialFunction.empty
 
-	private val default : HandlerType = {
+	private val default : HandlerType =
+	{
 		case coe : ConflictingObjectsError[_] =>
 			conflict (coe).leftFlatMap (unknownError)
 
@@ -98,7 +99,7 @@ abstract class AbstractErrorReporter[F[_], ProblemDetailsT <: AnyRef] ()
 
 		case iae : IllegalArgumentException =>
 			badRequest (iae).leftFlatMap (unknownError)
-		}
+	}
 
 	private lazy val handlers = service orElse default
 

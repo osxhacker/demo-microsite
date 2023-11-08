@@ -340,12 +340,13 @@ object StorageFacility
 
 
 	/// Implicit Conversions
-	implicit val storageFacilityDiff : Diff[StorageFacility] = {
+	implicit val storageFacilityDiff : Diff[StorageFacility] =
+	{
 		implicit val volumeDiff : Diff[Volume] = Diff.useEquals
 
 		Diff.derived[StorageFacility]
 			.ignore (_.timestamps)
-		}
+	}
 
 	implicit val storageFacilityEq : Eq[StorageFacility] =
 		Eq.and[StorageFacility] (Eq.by (_.id), Eq.by (_.version))

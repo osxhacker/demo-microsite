@@ -272,6 +272,47 @@ final class StorageFacilityResourceSpec ()
 					}
 			}
 
+		Scenario ("gracefully reject altering with an invalid 'expand'") {
+			implicit env =>
+				Given ("the resource configured with default settings")
+				val resource = StorageFacilityResource[IO] (defaultSettings)
+
+				And ("a stub 'post' endpoint")
+				val stub = stubInterpreter[IO, Any] ()
+					.whenServerEndpoint (resource.post)
+					.thenRunLogic ()
+					.backend ()
+
+				When ("the endpoint is evaluated in its published location")
+				val result = basicRequest
+					.post (
+						uri"$tenantRoot/storage-facilities/${initialFacility.id.toUuid ()}?expand=unknown-expansion"
+						)
+					.header ("X-Correlation-ID", randomUUID ().toString ())
+					.body {
+						Kleisli.liftF (initialFacility.touch[ErrorOr] ())
+							.flatMapF {
+								sf =>
+									arrows.toApi ().run (
+										sf -> mockResourceLocation
+										)
+								}
+							.run (initialFacility)
+							.orFail ()
+						}
+					.send (stub)
+
+				Then ("the request should not succeed")
+				result map {
+					response =>
+						/// Note that the Tapir stub mechanism does not run
+						/// errors through the same flow as when endpoints are
+						/// evaluated within a server.  Therefore, only check to
+						/// see if the response is not a 2xx.
+						assert (!response.isSuccess)
+					}
+			}
+
 		Scenario ("gracefully reject altering non-existent instance") {
 			implicit env =>
 				Given ("the resource configured with default settings")
