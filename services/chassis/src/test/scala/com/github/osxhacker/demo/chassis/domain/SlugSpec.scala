@@ -19,18 +19,47 @@ final class SlugSpec ()
 		with ScalaCheckPropertyChecks
 {
 	"The Slug type" must {
-		"accept well-formed content" in {
+		"support functional-style creation" in {
 			assert (Slug[ErrorOr] ("yoda-panda").isRight)
 			}
 
+		"accept well-formed content" in {
+			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
+			val validSlugs = Table (
+				"a-valid-slug",
+				"a-0-valid-slug",
+				"a-0valid-slug",
+				"a-valid0-slug",
+				"a-0valid0-slug",
+				"a0-valid-slug",
+				"a0-0valid-slug",
+				"a0-valid0-slug",
+				"a0-0valid0-slug",
+				"bus-4-us"
+				)
+
+			forAll (validSlugs) {
+				candidate =>
+					val result = Slug[ErrorOr] (candidate)
+
+					assert (
+						result.isRight,
+						s"failed to allow valid slug: '$candidate'"
+						)
+				}
+		}
+
 		"be able to detect and reject invalid content" in {
-			/// Valid pattern: "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"
+			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
 			val invalidSlugs = Table (
 				/// Leading and trailing spaces are not allowed
 				" abcde", "abcde ", "\tabcde", "abcde\t",
 
+				/// Single word definitions must have at least two characters
+				"x", "0",
+
 				/// Leading or only digits are not allowed
-				"0-abcde", "123456789",
+				"0bad", "0-abcde", "123456789", "123abcde-efg",
 
 				/// Upper case characters are not allowed
 				"ABCDE"

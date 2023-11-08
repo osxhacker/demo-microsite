@@ -11,5 +11,10 @@ description: >
 type: string
 minLength: 2
 maxLength: 64
-pattern: "^[a-z][a-z0-9]+(?:-[a-z0-9]+)*$"
+# For this system, a slug can be either a word with at least
+# two characters or multiple words separated by a hyphen
+# (with the first allowed to be a single letter).
+#
+# In all cases, the first character must be alphabetic.
+pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
 

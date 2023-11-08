@@ -74,12 +74,44 @@ final class CompanySpec ()
 				}
 			}
 
+		"allow valid slugs" in {
+			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
+			val validSlugs = Table (
+				"a-valid-slug",
+				"a-0-valid-slug",
+				"a-0valid-slug",
+				"a-valid0-slug",
+				"a-0valid0-slug",
+				"a0-valid-slug",
+				"a0-0valid-slug",
+				"a0-valid0-slug",
+				"a0-0valid0-slug",
+				"bus-4-us"
+				)
+
+			forAll (validSlugs) {
+				candidate =>
+					val result = Company.SlugType.from (candidate)
+
+					assert (
+						result.isRight,
+						s"failed to allow valid slug: '$candidate'"
+						)
+				}
+			}
+
 		"be able to detect and reject invalid slugs" in {
-			/// Valid pattern: "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:-(?:dev|qa|prod|stage|[0-9]+))?$"
+			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
 			val invalidSlugs = Table (
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
+
+				/// Single word definitions must have at least two characters
+				"x", "0",
+
+				/// Definition words cannot start with digits
+				"0abc", "99bad-multi-word"
 				)
 
 			forAll (invalidSlugs) {
