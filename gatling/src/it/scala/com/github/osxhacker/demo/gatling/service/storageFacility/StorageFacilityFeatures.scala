@@ -13,7 +13,7 @@ import com.github.osxhacker.demo.api.storageFacility.{
 
 
 /**
- * The '''CompanyFeatures''' type is a minimal
+ * The '''StorageFacilityFeatures''' type is a minimal
  * [[com.github.osxhacker.demo.gatling.FeatureSimulation]] intended to verify
  * functionality of the Storage Facility service using
  * [[https://gatling.io/docs/gatling/tutorials/quickstart/ Gatling]].

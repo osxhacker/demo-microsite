@@ -9,9 +9,12 @@ import cats.Show
 /**
  * The '''Specification''' type is a contract for identifying Domain Object
  * Model types which satisfy the requirements of concrete implementations.
- * They can be viewed as
+ * They can be viewed as model of
  * [[http://refactoring.com/catalog/replaceMethodWithMethodObject.html Method Objects]]
- * suitable for use in `filter`ing candidate instances.
+ * suitable for use in `filter`ing candidate instances and a manifestation of
+ * the
+ * [[https://en.wikipedia.org/wiki/Specification_pattern Specification Pattern]]
+ * for which it is named.
  */
 trait Specification[A]
 	extends (A => Boolean)
