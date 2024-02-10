@@ -26,6 +26,9 @@ final class SlugSpec ()
 		"accept well-formed content" in {
 			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
 			val validSlugs = Table (
+				/// Title
+				"valid slug",
+
 				"a-valid-slug",
 				"a-0-valid-slug",
 				"a-0valid-slug",
@@ -52,6 +55,9 @@ final class SlugSpec ()
 		"be able to detect and reject invalid content" in {
 			/// Valid pattern: "^[a-z](?:[a-z0-9]+|(?:[a-z0-9]*(?:-[a-z0-9]+)+))$"
 			val invalidSlugs = Table (
+				/// Title
+				"invalid slug",
+
 				/// Leading and trailing spaces are not allowed
 				" abcde", "abcde ", "\tabcde", "abcde\t",
 

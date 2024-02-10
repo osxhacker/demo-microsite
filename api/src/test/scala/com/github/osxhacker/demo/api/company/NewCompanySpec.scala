@@ -30,6 +30,9 @@ final class NewCompanySpec ()
 		"be able to detect and reject invalid names" in {
 			/// Valid pattern: "^[^ \t].+[^ \t]$"
 			val invalidNames = Table (
+				/// Title
+				"invalid name",
+
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
@@ -56,6 +59,9 @@ final class NewCompanySpec ()
 		"be able to detect and reject invalid descriptions" in {
 			/// Valid pattern: "^[^ \t].+[^ \t]$"
 			val invalidDescriptions = Table (
+				/// Title
+				"invalid description",
+
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",

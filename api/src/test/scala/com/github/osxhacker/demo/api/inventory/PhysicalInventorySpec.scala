@@ -55,6 +55,9 @@ final class PhysicalInventorySpec ()
 		"be able to detect and reject invalid sku's" in {
 			/// Valid pattern: "^(?:[A-Z0-9]+-)*[A-Z0-9]$"
 			val invalidSkus = Table (
+				/// Title
+				"invalid sku",
+
 				/// A sku must be uppercase.
 				"abcde",
 
@@ -81,6 +84,9 @@ final class PhysicalInventorySpec ()
 		"be able to detect and reject invalid short descriptions" in {
 			/// Valid pattern: "^[^ \t].+[^ \t]$"
 			val invalidDescriptions = Table (
+				/// Title
+				"invalid description",
+
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",

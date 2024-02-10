@@ -39,6 +39,9 @@ final class StorageFacilitySpec ()
 		"be able to detect and reject invalid names" in {
 			/// Valid pattern: "^[^ \t].*[^ \t]$"
 			val invalidNames = Table (
+				/// Title
+				"invalid name",
+
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
@@ -64,6 +67,9 @@ final class StorageFacilitySpec ()
 		"be able to detect and reject invalid city names" in {
 			/// Valid pattern: "^[A-Za-z'][A-Za-z'-. ]*[a-z]$"
 			val invalidCities = Table (
+				/// Title
+				"invalid city name",
+
 				/// Leading and trailing spaces are not allowed
 				" test", "\ttest", " \ttest", "\t test",
 				"TEST ", "TEST\t", "TEST \t", "TEST\t ",
@@ -94,6 +100,9 @@ final class StorageFacilitySpec ()
 		"be able to detect and reject invalid state names" in {
 			/// Valid pattern: "^[A-Z]+$"
 			val invalidStates = Table (
+				/// Title
+				"invalid state name",
+
 				/// Cannot be empty or spaces
 				"", "  ", "   ", "\t ", " \t ", "  \t",
 
@@ -115,6 +124,9 @@ final class StorageFacilitySpec ()
 		"be able to detect and reject invalid zip codes" in {
 			/// Valid pattern: "^[0-9]{5}(?:-[0-9]{4})?$"
 			val invalidZips = Table (
+				/// Title
+				"invalid zip code",
+
 				/// Cannot be empty or spaces
 				"", "     ", "\t    ", "  \t  ", "    \t",
 
@@ -134,3 +146,4 @@ final class StorageFacilitySpec ()
 			}
 		}
 }
+
