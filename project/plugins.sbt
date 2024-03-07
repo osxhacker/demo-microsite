@@ -8,13 +8,13 @@ addDependencyTreePlugin
 addSbtPlugin ("com.commercetools" % "sbt-scraml" % "0.13.1")
 
 /// see: https://github.com/marcuslonnberg/sbt-docker
-addSbtPlugin ("se.marcuslonnberg" % "sbt-docker" % "1.9.0")
+addSbtPlugin ("se.marcuslonnberg" % "sbt-docker" % "1.11.0")
 
 /// see: https://gatling.io/docs/gatling/reference/current/extensions/sbt_plugin/
-addSbtPlugin ("io.gatling" % "gatling-sbt" % "4.3.2")
+addSbtPlugin ("io.gatling" % "gatling-sbt" % "4.6.0")
 
 /// see: https://github.com/sbt/sbt-native-packager
-addSbtPlugin ("com.github.sbt" % "sbt-native-packager" % "1.9.9")
+addSbtPlugin ("com.github.sbt" % "sbt-native-packager" % "1.9.16")
 
 /// see: https://github.com/djspiewak/sbt-github-packages
 addSbtPlugin("com.codecommit" % "sbt-github-packages" % "0.5.3")

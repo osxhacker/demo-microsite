@@ -16,7 +16,7 @@ object Dependencies
 	{
 		/// Per-project Compiler Plugins
 		val BetterMonadicFor = "0.3.1"
-		val KindProjector = "0.13.2"
+		val KindProjector = "0.13.3"
 
 		/// Main Artifacts
 		val Camel = "3.20.4"

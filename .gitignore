@@ -4,6 +4,7 @@ todo
 # Known temporary files
 .DS_Store
 .sass-cache/
+default.profraw
 *~
 *.log
 *.out

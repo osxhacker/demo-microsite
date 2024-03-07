@@ -53,12 +53,12 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.6.2"
+ThisBuild / version := "0.6.3"
 
 /// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
 ThisBuild / versionScheme := Some ("semver-spec")
 
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.13"
 ThisBuild / Compile / scalacOptions ++= Seq (
 	"-encoding", "UTF-8",
 	"-release:9",
@@ -397,6 +397,7 @@ lazy val chassis = (project in file ("services/chassis"))
 			ScalatestScalacheck
 			),
 
+		Test / parallelExecution := false,
 		Test / publishArtifact := true
 		)
 	.dependsOn (api)
