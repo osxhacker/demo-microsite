@@ -36,7 +36,7 @@ object Dependencies
 		val Http4sBlaze = "0.23.14"
 		val Janino = "3.1.10"
 		val JQuery = "3.7.0"
-		val Kamon = "2.6.5"
+		val Kamon = "2.6.6"
 		val Log4Cats = "2.6.0"
 		val Logback = "1.4.11"
 		val LogbackContrib = "0.1.5"
