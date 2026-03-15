@@ -16,47 +16,47 @@ object Dependencies
 	{
 		/// Per-project Compiler Plugins
 		val BetterMonadicFor = "0.3.1"
-		val KindProjector = "0.13.3"
+		val KindProjector = "0.13.4"
 
 		/// Main Artifacts
-		val Camel = "3.20.4"
-		val Cats = "2.9.0"
-		val CatsEffect = "3.4.8"
-		val CatsEffectTesting = "1.5.0"
+		val Camel = "3.22.4"
+		val Cats = "2.13.0"
+		val CatsEffect = "3.6.3"
+		val CatsEffectTesting = "1.7.0"
 		val Chimney = "0.6.2"
-		val Circe = "0.14.5"
-		val Decline = "2.4.1"
+		val Circe = "0.14.9"
+		val Decline = "2.5.0"
 		val Diffx = "0.8.2"
-		val Doobie = "1.0.0-RC2"
-		val Enumeratum = "1.7.2"
-		val Fs2 = "3.6.1"
-		val Fs2Kafka = "3.0.1"
-		val Gatling = "3.9.5"
-		val Htmx = "1.9.2"
-		val Http4sBlaze = "0.23.14"
+		val Doobie = "1.0.0-RC12"
+		val Enumeratum = "1.9.2"
+		val Fs2 = "3.12.2"
+		val Fs2Kafka = "3.9.1"
+		val Gatling = "3.14.9"
+		val Htmx = "1.9.12"
+		val Http4sBlaze = "0.23.17"
 		val Janino = "3.1.10"
 		val JQuery = "3.7.0"
-		val Kamon = "2.6.6"
-		val Log4Cats = "2.6.0"
-		val Logback = "1.4.11"
+		val Kamon = "2.8.1"
+		val Log4Cats = "2.7.1"
+		val Logback = "1.4.14"
 		val LogbackContrib = "0.1.5"
 		val LogstashLogbackEncoder ="7.4"
-		val Monocle = "3.2.0"
-		val Mouse = "1.2.1"
+		val Monocle = "3.3.0"
+		val Mouse = "1.4.0"
 		val Parsley = "2.9.2"
-		val Pureconfig = "0.17.4"
+		val Pureconfig = "0.17.9"
 		val PureCSS = "3.0.0"
-		val Refined = "0.10.3"
-		val Shapeless = "2.3.10"
+		val Refined = "0.11.3"
+		val Shapeless = "2.3.13"
 		val Squants = "1.8.3"
-		val Sttp ="3.9.0"
-		val Tapir = "1.8.1"
+		val Sttp ="3.11.0"
+		val Tapir = "1.12.6"
 
 		/// Testing Artifacts
-		val Scalacheck = "1.17.0"
-		val ScalacheckShapeless = "1.3.1"
-		val Scalatest = "3.2.15"
-		val ScalatestScalacheck = "3.2.14.0"
+		val Scalacheck = "1.18.0"
+		val ScalacheckShapeless = "1.3.2"
+		val Scalatest = "3.2.19"
+		val ScalatestScalacheck = "3.2.19.0"
 	}
 
 
@@ -199,12 +199,12 @@ object Dependencies
 
 	val Scalacheck = "org.scalacheck" %% "scalacheck" % Versions.Scalacheck
 	val ScalacheckShapeless = "com.github.alexarchambault" %%
-		"scalacheck-shapeless_1.16" %
+		"scalacheck-shapeless_1.18" %
 		Versions.ScalacheckShapeless
 
 	val Scalatest = "org.scalatest" %% "scalatest" % Versions.Scalatest
 	val ScalatestScalacheck = "org.scalatestplus" %%
-		"scalacheck-1-16" %
+		"scalacheck-1-18" %
 		Versions.ScalatestScalacheck
 
 	val SttpClientCirce = "com.softwaremill.sttp.client3" %%

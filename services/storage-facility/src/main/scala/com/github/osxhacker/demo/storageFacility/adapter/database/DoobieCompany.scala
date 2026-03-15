@@ -8,7 +8,11 @@ import cats.data.{
 	ValidatedNec
 	}
 
-import cats.effect.MonadCancelThrow
+import cats.effect.{
+	Concurrent,
+	MonadCancelThrow
+	}
+
 import doobie._
 import fs2.Stream
 import org.typelevel.log4cats.LoggerFactory
@@ -47,6 +51,9 @@ final class DoobieCompany[F[_]] (
 	)
 	(
 		implicit
+
+		/// Needed for `transact`.
+		private val concurrent : Concurrent[F],
 
 		/// Needed for `flatMap` and `transact`.
 		private val monadCancelThrow : MonadCancelThrow[F],

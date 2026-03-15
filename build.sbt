@@ -1,3 +1,5 @@
+import java.time.Instant
+import com.typesafe.sbt.packager.docker._
 import com.github.osxhacker.demo.GenerateSchemaDefinitions
 import com.github.osxhacker.demo.Dependencies._
 
@@ -6,6 +8,8 @@ import com.github.osxhacker.demo.Dependencies._
 /// Manifest Constants
 //////////////////////////////
 
+val dockerDaemonUserName = "appservice"
+val dockerBaseImageName = "eclipse-temurin:25-jre-noble"
 val systemName = "demo"
 
 
@@ -27,6 +31,16 @@ addCommandAlias (
 		"compile",
 		"Test / compile",
 		"IntegrationTest / compile"
+		).mkString (" ; ")
+	)
+
+addCommandAlias (
+	"docker",
+	List (
+		"compile",
+		"Test / compile",
+		"stage",
+		"Docker / publishLocal"
 		).mkString (" ; ")
 	)
 
@@ -53,12 +67,12 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.6.4"
+ThisBuild / version := "0.7.0"
 
 /// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
 ThisBuild / versionScheme := Some ("semver-spec")
 
-ThisBuild / scalaVersion := "2.13.13"
+ThisBuild / scalaVersion := "2.13.18"
 ThisBuild / Compile / scalacOptions ++= Seq (
 	"-encoding", "UTF-8",
 	"-release:9",
@@ -224,33 +238,13 @@ lazy val `frontends-company` = (project in file ("frontends/company"))
 			Nil
 			).taskValue,
 
-		docker / imageNames := Seq (
-			ImageName (s"${organization.value}/${name.value}:latest")
-			),
-
-		docker / dockerfile := {
-			val appDir = stage.value
-			val installDir = "/app"
-			val script = executableScriptName.value
-
-			new Dockerfile {
-				/// OpenJDK 19 is the base image.
-				from ("eclipse-temurin:19-jre-focal")
-
-				/// Allow traffic to the app ports.
-				expose (12000)
-
-				copy (appDir, installDir, chown = "daemon:daemon")
-
-				/// Set the entrypoint to be invoking java with the app.
-				entryPoint (
-					s"$installDir/bin/$script"
-					)
-				}
-			}
+		dockerSettings (
+			mainClassName = s"com.github.osxhacker.$systemName.company.Server",
+			ports = 12000 :: Nil
+			)
 		)
 	.dependsOn (services)
-	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+	.enablePlugins (DockerPlugin, JavaAppPackaging)
 
 lazy val `frontends-storage-facility` =
 	(project in file ("frontends/storage-facility"))
@@ -290,33 +284,13 @@ lazy val `frontends-storage-facility` =
 			Nil
 			).taskValue,
 
-		docker / imageNames := Seq (
-			ImageName (s"${organization.value}/${name.value}:latest")
-			),
-
-		docker / dockerfile := {
-			val appDir = stage.value
-			val installDir = "/app"
-			val script = executableScriptName.value
-
-			new Dockerfile {
-				/// OpenJDK 19 is the base image.
-				from ("eclipse-temurin:19-jre-focal")
-
-				/// Allow traffic to the app ports.
-				expose (12000)
-
-				copy (appDir, installDir, chown = "daemon:daemon")
-
-				/// Set the entrypoint to be invoking java with the app.
-				entryPoint (
-					s"$installDir/bin/$script"
-					)
-				}
-			}
+		dockerSettings (
+			mainClassName = s"com.github.osxhacker.$systemName.storageFacility.Server",
+			ports = 12000 :: Nil
+			)
 		)
 	.dependsOn (services)
-	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+	.enablePlugins (DockerPlugin, JavaAppPackaging)
 
 lazy val `frontends-site` = (project in file ("frontends/site"))
 	.settings (
@@ -346,32 +320,12 @@ lazy val `frontends-site` = (project in file ("frontends/site"))
 			Nil
 			).taskValue,
 
-		docker / imageNames := Seq (
-			ImageName(s"${organization.value}/${name.value}:latest")
-			),
-
-		docker / dockerfile := {
-			val appDir = stage.value
-			val installDir = "/app"
-			val script = executableScriptName.value
-
-			new Dockerfile {
-				/// OpenJDK 19 is the base image.
-				from ("eclipse-temurin:19-jre-focal")
-
-				/// Allow traffic to the app ports.
-				expose (12000)
-
-				copy (appDir, installDir, chown = "daemon:daemon")
-
-				/// Set the entrypoint to be invoking java with the app.
-				entryPoint (
-					s"$installDir/bin/$script"
-					)
-				}
-			}
+		dockerSettings (
+			mainClassName = s"com.github.osxhacker.$systemName.site.Server",
+			ports = 12000 :: Nil
+			)
 		)
-	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+	.enablePlugins (DockerPlugin, JavaAppPackaging)
 
 
 //////////////////////////////
@@ -445,38 +399,17 @@ lazy val company = (project in file ("services/company"))
 
 		Compile / sourceGenerators += runScraml,
 		IntegrationTest / parallelExecution := false,
-		docker / imageNames := Seq (
-			ImageName(s"${organization.value}/${name.value}:latest")
-			),
 
-		docker / dockerfile := {
-			val appDir = stage.value
-			val installDir = "/app"
-			val script = executableScriptName.value
-
-			new Dockerfile {
-				/// OpenJDK 19 is the base image.
-				from ("eclipse-temurin:19-jre-focal")
-
-				/// Allow traffic to the app and administrative ports.
-				expose (6891)
-
-				copy (appDir, installDir, chown = "daemon:daemon")
-
-				/// Set the entrypoint to be invoking java with the app.
-				entryPoint (
-					s"$installDir/bin/$script",
-					"--",
-					"--docker",
-					"--json"
-					)
-				}
-			}
+		dockerSettings (
+			mainClassName = s"com.github.osxhacker.$systemName.company.adapter.Server",
+			ports = 6891 :: Nil,
+			flags = "--" :: "--docker" :: "--json" :: Nil
+			)
 		)
 	.dependsOn (
 		chassis % "compile->compile;test->test;it->test"
 		)
-	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+	.enablePlugins (DockerPlugin, JavaAppPackaging)
 
 lazy val inventory = (project in file ("services/inventory"))
 	.settings (
@@ -629,38 +562,17 @@ lazy val `storage-facility` = (project in file ("services/storage-facility"))
 
 		Compile / sourceGenerators += runScraml,
 		IntegrationTest / parallelExecution := false,
-		docker / imageNames := Seq (
-			ImageName(s"${organization.value}/${name.value}:latest")
-			),
 
-		docker / dockerfile := {
-			val appDir = stage.value
-			val installDir = "/app"
-			val script = executableScriptName.value
-
-			new Dockerfile {
-				/// OpenJDK 19 is the base image.
-				from ("eclipse-temurin:19-jre-focal")
-
-				/// Allow traffic to the app and administrative ports.
-				expose (6890)
-
-				copy (appDir, installDir, chown = "daemon:daemon")
-
-				/// Set the entrypoint to be invoking java with the app.
-				entryPoint (
-					s"$installDir/bin/$script",
-					"--",
-					"--docker",
-					"--json"
-					)
-				}
-			}
+		dockerSettings (
+			mainClassName = s"com.github.osxhacker.$systemName.storageFacility.adapter.Server",
+			ports = 6890 :: Nil,
+			flags = "--" :: "--docker" :: "--json" :: Nil
+			)
 		)
 	.dependsOn (
 		chassis % "compile->compile;test->test;it->test"
 		)
-	.enablePlugins (sbtdocker.DockerPlugin, JavaAppPackaging)
+	.enablePlugins (DockerPlugin, JavaAppPackaging)
 
 
 //////////////////////////////
@@ -804,6 +716,36 @@ def commonServiceSettings (testScopes : String = "test") = Seq (
 			TapirStubServer
 			).map (_ % testScopes)
 	)
+
+
+def dockerSettings (
+	mainClassName : String,
+	ports : Seq[Int],
+	flags : List[String] = Nil
+	)
+	: Seq[Def.Setting[_]] =
+	Seq (
+		/// see: https://www.scala-sbt.org/sbt-native-packager/formats/docker.html
+		Compile / mainClass := Some (mainClassName),
+		Compile / discoveredMainClasses := Nil,
+		Docker / daemonUser := dockerDaemonUserName,
+		Docker / packageName := s"${organization.value}/${name.value}",
+		Docker / version := version.value,
+		dockerBaseImage := dockerBaseImageName,
+		dockerExposedPorts := ports,
+		dockerLabels := Map (
+			"org.opencontainers.image.created" -> Instant.now ().toString,
+			"org.opencontainers.image.version" -> version.value
+			),
+
+		dockerCommands := dockerCommands.value.map {
+			case ExecCmd ("ENTRYPOINT", shellScript) =>
+				ExecCmd ("ENTRYPOINT", shellScript :: flags :_*)
+
+			case other =>
+				other
+			}
+		)
 
 
 def generateCamelMainProperties (versions : Seq[(String, String)]) = Def.task {

@@ -42,7 +42,7 @@ Next, provision a `colima` VM:
 colima start --cpu 6 --memory 14 --disk 20
 ```
 
-If you intend on having a large amount of data, increase the `disk` value from 10 Gb to what you think you will need.  While `cpu` and `memory` can be changed later, the amount of disk space cannot without reinitializing `colima`.
+If you intend on having a large amount of data, increase the `disk` value from 20 Gb to what you think you will need.  While `cpu` and `memory` can be changed later, the amount of disk space cannot without reinitializing `colima`.
 
 
 ## Build Frontends and Services

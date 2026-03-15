@@ -16,7 +16,6 @@ import com.github.osxhacker.demo.chassis.monitoring.{
  * intended to be emitted effectually.
  */
 sealed abstract class LogEntry (
-	/// TODO: incorporate the subsystem property into context
 	private val subsystem : Subsystem,
 	private val message : String,
 	private val cause : Option[Throwable],
@@ -27,6 +26,10 @@ sealed abstract class LogEntry (
 {
 	/// Class Imports
 	import mouse.option._
+
+
+	/// Instance Properties
+	private lazy val entries = subsystem.addTo (context)
 
 
 	/**
@@ -44,7 +47,7 @@ sealed abstract class LogEntry (
 		(implicit logger : Logger)
 		: Unit =
 		if (logger.isDebugEnabled)
-			Using (ScopedMDC (context)) {
+			Using (ScopedMDC (entries)) {
 				 emit (_.debug (message), problem => _.debug (message, problem))
 				 }
 
@@ -56,7 +59,7 @@ sealed abstract class LogEntry (
 	final def error ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (context)) {
+		Using (ScopedMDC (entries)) {
 			emit (_.error (message), problem => _.error (message, problem))
 			}
 
@@ -68,7 +71,7 @@ sealed abstract class LogEntry (
 	final def info ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (context)) {
+		Using (ScopedMDC (entries)) {
 			emit (_.info (message), problem => _.info (message, problem))
 			}
 
@@ -80,7 +83,7 @@ sealed abstract class LogEntry (
 	final def warn ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (context)) {
+		Using (ScopedMDC (entries)) {
 			emit (_.warn (message), problem => _.warn (message, problem))
 			}
 
@@ -163,6 +166,15 @@ final case class SystemLogEntry (
 }
 
 
+/**
+ * The '''WorkflowLogEntry''' type is the default
+ * [[com.github.osxhacker.demo.chassis.monitoring.logging.LogEntry]]
+ * implementation used when an application is performing a specific Use-Case
+ * scenario.  As such, each __must__ have a
+ * [[com.github.osxhacker.demo.chassis.monitoring.CorrelationId]] to identify
+ * same in addition to the requirements of other
+ * [[com.github.osxhacker.demo.chassis.monitoring.logging.LogEntry]] types.
+ */
 final case class WorkflowLogEntry (
 	private val correlationId : CorrelationId,
 	private val message : String,

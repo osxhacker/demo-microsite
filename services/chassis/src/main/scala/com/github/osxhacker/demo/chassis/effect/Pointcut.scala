@@ -6,10 +6,7 @@ import scala.concurrent.{
 	}
 
 import scala.language.postfixOps
-import scala.util.{
-	Success,
-	Try
-	}
+import scala.util.Try
 
 import cats._
 import cats.effect.IO
@@ -28,8 +25,8 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  * ===Entering Functors===
  *
  * {{{
- *     type FunctorVersion = () =&gt; Unit
- *     type ContainerVersion = () =&gt; F[Unit]
+ *     type FunctorVersion = () => Unit
+ *     type ContainerVersion = () => F[Unit]
  * }}}
  *
  * The '''entering''' functors are evaluated __before__ there exists a
@@ -42,7 +39,7 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  *
  * {{{
  *     type FunctorVersion = Endo[ResultT]
- *     type ContainerVersion = ResultT =&gt; F[ResultT]
+ *     type ContainerVersion = ResultT => F[ResultT]
  * }}}
  *
  * The '''leaving''' functors are evaluated during "happy path" execution and
@@ -52,7 +49,7 @@ import com.github.osxhacker.demo.chassis.domain.ErrorOr
  * ===OnError Functors===
  *
  * {{{
- *     type Signature = Throwable =&gt; F[Unit]
+ *     type Signature = Throwable => F[Unit]
  * }}}
  *
  * The '''onError''' functors have a return type of ''F[Unit]'' in order to
@@ -112,9 +109,9 @@ trait Pointcut[F[_]]
 	 * is similar to:
 	 *
 	 * {{{
-	 *    entering ().andThen (_ =&gt; fa)
+	 *    entering ().andThen (_ => fa)
 	 *        .andThen (leaving)
-	 *        .handleErrorWith (ex =&gt; onError (ex))
+	 *        .handleErrorWith (ex => onError (ex))
 	 * }}}
 	 */
 	def around[ResultT] (efa : Eval[F[ResultT]])
@@ -133,9 +130,9 @@ trait Pointcut[F[_]]
 	 * is similar to:
 	 *
 	 * {{{
-	 *    entering ().flatMap (_ =gt; fa)
+	 *    entering ().flatMap (_ => fa)
 	 *        .flatMap (leaving)
-	 *        .handleErrorWith (ex =&gt; onError (ex))
+	 *        .handleErrorWith (ex => onError (ex))
 	 * }}}
 	 */
 	def aroundF[ResultT] (efa : Eval[F[ResultT]])
@@ -195,9 +192,9 @@ object Pointcut
 	/**
 	 * The '''IOPointcut''' `object` defines the
 	 * [[com.github.osxhacker.demo.chassis.effect.Pointcut]] contract for the
-	 * [[cats.effect.IO]] [[cats.Monad]].  Of note is that __all__ operations
-	 * are evaluated in the [[cats.Now]] [[cats.Eval]] container since program
-	 * evaluation __must__ be defined within [[cats.effect.IO]].
+	 * [[cats.effect.IO]] [[cats.Monad]].  Of note is that `around` and `before`
+	 * operations are evaluated in the [[cats.Now]] [[cats.Eval]] container
+	 * since program evaluation __must__ be defined within [[cats.effect.IO]].
 	 *
 	 * Another thing to note about [[cats.effect.IO]] is that the implementation
 	 * will cancel fibers during normal operations as well as when explicitly
@@ -208,7 +205,7 @@ object Pointcut
 		extends Pointcut[IO]
 	{
 		/// Class Imports
-		import cats.syntax.monadError._
+		import PartialFunction.fromFunction
 
 
 		override def after[ResultT] (efa : Eval[IO[ResultT]])
@@ -231,7 +228,7 @@ object Pointcut
 			: Eval[IO[ResultT]] =
 			efa map {
 				_.map (leaving)
-					.onError (onError)
+					.onError (fromFunction (onError))
 				}
 
 
@@ -243,7 +240,7 @@ object Pointcut
 			: Eval[IO[ResultT]] =
 			efa map {
 				_.flatMap (leaving)
-					.onError (onError)
+					.onError (fromFunction (onError))
 				}
 
 
@@ -267,11 +264,13 @@ object Pointcut
 				onError : Throwable => IO[Unit]
 			)
 			: Eval[IO[ResultT]] =
-			Now (IO defer entering ()).flatMap {
+			Later (entering ()) flatMap {
 				prior =>
 					efa map {
 						fa =>
-							(prior >> fa.flatMap (leaving)).onError (onError)
+							(prior >> fa.flatMap (leaving)).onError (
+								fromFunction (onError)
+								)
 						}
 				}
 
@@ -288,7 +287,7 @@ object Pointcut
 		override def beforeF[ResultT] (efa : Eval[IO[ResultT]])
 			(entering : () => IO[Unit])
 			: Eval[IO[ResultT]] =
-			Now (IO defer entering ()) flatMap {
+			Later (entering ()) flatMap {
 				prior =>
 					efa map (prior >> _)
 				}
@@ -326,6 +325,11 @@ object Pointcut
 	}
 
 
+	/**
+	 * The '''TryPointcut''' `object` defines the
+	 * [[com.github.osxhacker.demo.chassis.effect.Pointcut]] contract for the
+	 * [[scala.util.Try]] [[cats.Monad]].
+	 */
 	implicit object TryPointcut
 		extends Pointcut[Try]
 	{
@@ -392,8 +396,7 @@ object Pointcut
 							efa.value
 								.attemptTap {
 									result =>
-										release (resource) (result)
-										Success ({})
+										Try (release (resource) (result))
 									}
 						}
 				)
@@ -409,6 +412,11 @@ object Pointcut
 
 
 	/// Implicit Conversions
+	/**
+	 * The '''FuturePointcut''' `object` defines the
+	 * [[com.github.osxhacker.demo.chassis.effect.Pointcut]] contract for the
+	 * [[scala.concurrent.Future]] type.
+	 */
 	implicit def futurePointcut (implicit ec : ExecutionContext)
 		: Pointcut[Future] =
 		new Pointcut[Future] {

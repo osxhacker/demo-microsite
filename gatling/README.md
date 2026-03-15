@@ -6,7 +6,7 @@ This sub-project defines the [Gatling](https://gatling.io/docs/gatling/tutorials
 Each [simulation](https://gatling.io/docs/gatling/reference/current/core/simulation/) defaults to interacting with services running on `localhost` (as defined in service entrypoint RAML's [here](../api/src/main/raml)).  To have a [simulation](https://gatling.io/docs/gatling/reference/current/core/simulation/) interact with services deployed elsewhere, the following JVM system properties can be used:
 
 - **service.endpoint**: This defines the "primary" service under test.
-- **service.<symbolic name>**: These define locations for individual supporting services.
+- **service.`symbolic name`**: These define locations for individual supporting services.
 
 For example, to run `StorageFacilityFeatures` using the micro-service deployed at `my.cool.cloud` (port `9999`) and the company service running locally, one would run:
 

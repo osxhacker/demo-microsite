@@ -17,7 +17,8 @@ final class ProgramArgumentsSpec ()
 	/// Class Imports
 	import ProgramArguments.{
 		DockerInvocation,
-		NativeInvocation
+		NativeInvocation,
+		OperatingMode
 		}
 
 
@@ -33,7 +34,7 @@ final class ProgramArgumentsSpec ()
 			) (arguments ())
 
 
-		def apply (parameters : Seq[String]): Either[Help, Product] =
+		def apply (parameters : Seq[String]): Either[Help, OperatingMode] =
 			parser.parse (parameters)
 	}
 
