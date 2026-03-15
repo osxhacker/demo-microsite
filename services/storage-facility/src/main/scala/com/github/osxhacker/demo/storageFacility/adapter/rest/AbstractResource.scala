@@ -38,6 +38,7 @@ import api.{
 abstract class AbstractResource[F[_]] ()
 	(
 		implicit
+
 		/// Needed for `complete` and `failWith`.
 		override protected val monadThrow : MonadThrow[F],
 

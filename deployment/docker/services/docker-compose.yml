@@ -6,7 +6,7 @@ version: '3.8'
 
 services:
   company:
-    build: ../../../services/company/target/docker
+    build: ../../../services/company/target/docker/stage
     container_name: "company"
     hostname: "company"
     restart: "no"
@@ -33,13 +33,13 @@ services:
       - "loki.docker:172.28.100.110"
       - "kafka.docker:172.28.100.100"
     environment:
-      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -DLOGSTASH=logstash -server"
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -XX:+UseG1GC -DLOGSTASH=logstash -server"
     depends_on:
       logstash:
         condition: service_healthy
 
   storage-facility:
-    build: ../../../services/storage-facility/target/docker
+    build: ../../../services/storage-facility/target/docker/stage
     container_name: "storage-facility"
     hostname: "storage_facility"
     restart: "no"
@@ -66,7 +66,7 @@ services:
       - "loki.docker:172.28.100.110"
       - "kafka.docker:172.28.100.100"
     environment:
-      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -DLOGSTASH=logstash -server"
+      JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -XX:+UseG1GC -DLOGSTASH=logstash -server"
     depends_on:
       logstash:
         condition: service_healthy

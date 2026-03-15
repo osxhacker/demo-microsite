@@ -10,7 +10,7 @@ version: '3.8'
 # properties).
 services:
   site:
-    build: ../../../frontends/site/target/docker
+    build: ../../../frontends/site/target/docker/stage
     container_name: "site"
     hostname: "site"
     restart: "no"
@@ -27,7 +27,7 @@ services:
       JAVA_OPTS: "-Xmx512M -Xss1M -XX:ReservedCodeCacheSize=128m -XX:+DoEscapeAnalysis -XX:+UseCodeCacheFlushing -server"
 
   company-site:
-    build: ../../../frontends/company/target/docker
+    build: ../../../frontends/company/target/docker/stage
     container_name: "company-site"
     hostname: "company_site"
     restart: "no"
@@ -46,7 +46,7 @@ services:
       COMPANY_SERVICE_PORT: 9080
 
   storage-facility-site:
-    build: ../../../frontends/storage-facility/target/docker
+    build: ../../../frontends/storage-facility/target/docker/stage
     container_name: "storage-facility-site"
     hostname: "storage_facility_site"
     restart: "no"

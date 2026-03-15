@@ -63,7 +63,7 @@ trait ProgramArguments
 	 * The arguments method determines what operating mode has been requested of
 	 * the service based on the command line options given.
 	 */
-	def arguments () : Opts[Product] = dockerMode orElse nativeMode
+	def arguments () : Opts[OperatingMode] = dockerMode orElse nativeMode
 }
 
 

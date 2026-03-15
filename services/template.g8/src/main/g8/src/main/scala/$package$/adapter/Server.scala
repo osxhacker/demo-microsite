@@ -6,16 +6,14 @@ import scala.language.postfixOps
 
 import cats.Monad
 import cats.effect._
-import com.monovore.decline.Opts
-import com.monovore.decline.effect.CommandIOApp
 import eu.timepit.refined
-import kamon.Kamon
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats
 import org.typelevel.log4cats.LoggerFactory
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 
 import com.github.osxhacker.demo.chassis.adapter.{
+	AbstractServer,
 	ProgramArguments,
 	ServiceDeactivator
 	}
@@ -26,9 +24,9 @@ import com.github.osxhacker.demo.chassis.adapter.{
  * process.
  */
 object Server
-	extends CommandIOApp (
+	extends AbstractServer (
 		name = "$name$",
-		header = "$description$"
+		description = "$description$"
 		)
 		with ProgramArguments
 {
@@ -36,47 +34,19 @@ object Server
 	import ProgramArguments.OperatingMode
 	import cats.syntax.flatMap._
 	import log4cats.syntax._
-	import mouse.boolean._
 	import refined.auto._
 
 
 	/// Instance Properties
-	implicit private val logFactory : LoggerFactory[IO] = Slf4jFactory[IO]
+	implicit override protected val loggerFactory : LoggerFactory[IO] =
+		Slf4jFactory.create[IO]
 
 
-	override def main : Opts[IO[ExitCode]] =
-		arguments () map {
-			case mode : OperatingMode =>
-				configureLogging (mode.loggingLayout, mode.verbose) >>
-				IO.delay (Kamon.init ()) >>
-				Monad[IO].flatMap2 (
-					RuntimeSettings[IO] (mode.settings.value),
-					ServiceDeactivator[IO] ()
-					) (services)
-
-			case other =>
-				IO.raiseError (
-					new RuntimeException (
-						s"unknown program argument detected: \$other"
-						)
-					)
-					.as (ExitCode.Error)
-			}
-
-
-	/**
-	 * The configureLogging method ensures the Logback environment properties
-	 * are configured to what the '''Server''' was invoked with.
-	 */
-	private def configureLogging (layout : String, verbose : Boolean)
-		: IO[Unit] =
-		IO.delay (System.setProperty ("LOG_LAYOUT", layout.toUpperCase)) >>
-			IO.delay (
-				System.setProperty (
-					"LOG_LEVEL",
-					verbose.fold ("DEBUG", "INFO")
-					)
-				)
+	override def main (mode : OperatingMode) : IO[ExitCode] =
+		Monad[IO].flatMap2 (
+			RuntimeSettings[IO] (mode.settings.value),
+			ServiceDeactivator[IO] ()
+			) (services)
 
 
 	/**
@@ -165,7 +135,6 @@ object Server
 		)
 		: IO[ExitCode] =
 		IO.both (kafka (settings, deactivator), http (settings, deactivator))
-			.flatTap (_ => IO.fromFuture (IO (Kamon.stopModules ())))
 			.map {
 				case (fromKafka, _) if fromKafka != ExitCode.Success =>
 					fromKafka

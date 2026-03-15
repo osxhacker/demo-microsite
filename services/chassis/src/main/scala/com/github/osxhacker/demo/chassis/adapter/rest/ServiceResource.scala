@@ -38,7 +38,7 @@ abstract class ServiceResource[F[_]] ()
 		implicit
 
 		/// Needed for `serverLogicWithEnvironment`.
-		protected val monadThrow : MonadThrow[F],
+		protected val monadThrow : MonadThrow[F]
 
 	)
 	extends (() => List[ServerEndpoint[Any, F]])

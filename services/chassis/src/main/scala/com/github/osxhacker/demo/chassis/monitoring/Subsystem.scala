@@ -12,6 +12,14 @@ import cats.{
  * databases for example.
  */
 final case class Subsystem (val name : String)
+{
+	/**
+	 * The addTo method incorporates the value of '''this''' '''Subsystem'''
+	 * into the contents of the given ''Map'' '''instance'''.
+	 */
+	def addTo (instance : Map[String, String]) : Map[String, String] =
+		instance.updated ("subsystem", name)
+}
 
 
 object Subsystem
