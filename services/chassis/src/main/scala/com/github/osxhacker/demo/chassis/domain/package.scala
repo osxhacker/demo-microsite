@@ -24,5 +24,14 @@ package object domain
 	 * which represent an error or an instance of ''A''.
 	 */
 	type ErrorOr[+A] = Either[Throwable, A]
+
+
+	/**
+	 * The ReaderWriterStateErrorT type defines the contract for using
+	 * [[com.github.osxhacker.demo.chassis.domain.IndexedReaderWriterStateErrorT]]
+	 * with the same initial and ending state types.
+	 */
+	type ReaderWriterStateErrorT[F[_], EnvT, LogT, ErrorT, S, A] =
+		IndexedReaderWriterStateErrorT[F, EnvT, LogT, ErrorT, S, S, A]
 }
 
