@@ -20,7 +20,7 @@ import shapeless.ops.{
 /**
  * The '''InferDomainEvents''' type defines the algorithm for determining, or
  * "inferring", what ''AllowableEventsT'' should be produced.  What ones created
- * are the responsibility of the ''InferPoly'' [[shapeless.Poly2]].  Its
+ * are the responsibility of the ''InferPolyT'' [[shapeless.Poly2]].  Its
  * `implicit` signatures must be of the form:
  *
  * {{{
@@ -36,8 +36,8 @@ import shapeless.ops.{
  * Each defined [[shapeless.Cases.Case2]] is evaluated with `from` and `to` (in
  * that order).  Note that requisite collaborators __must__ be resolvable in the
  * `implicit` scope.  When they are needed, the [[shapeless.Cases.Case2]]
- * __must__ be an `implicit def`.  A common collaborator is an `implicit` scoped
- * environment and can be found in most ''InferPolyT'' definitions.
+ * __must__ be an `implicit def`.  A common collaborator is an `implicit`ly
+ * scoped environment and can be found in many ''InferPolyT'' definitions.
  */
 final class InferDomainEvents[
 	EntityT,
@@ -64,6 +64,7 @@ final class InferDomainEvents[
 	{
 		implicit def summoner[PolyT <: Poly2, EventT] (
 			implicit
+
 			@implicitNotFound (
 				"could not resolve a handler in ${PolyT} having the " +
 				"signature of " +
@@ -109,6 +110,7 @@ final class InferDomainEvents[
 		] ()
 		(
 			implicit
+
 			@unused
 			toHList : coproduct.ToHList.Aux[
 				AllowableEventsT,

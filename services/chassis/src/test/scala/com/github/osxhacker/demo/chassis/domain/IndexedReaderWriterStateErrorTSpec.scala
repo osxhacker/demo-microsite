@@ -247,8 +247,8 @@ final class IndexedReaderWriterStateErrorTSpec ()
 							_ <- tell[Int] (logEntries (1))
 							env <- ask
 							_ <- tell[Int] (logEntries (2))
-						} yield env.coefficient * initial
-					}
+							} yield env.coefficient * initial
+						}
 
 				assert (steps ne null)
 
