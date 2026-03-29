@@ -28,7 +28,7 @@ import shapeless.labelled.FieldType
  * requisite instance.
  *
  * Conceptually, '''FindField''' abstracts a named field's location.  Another
- * way to think about it is as being a higher-kinded [[monacle.Getter]].
+ * way to think about it is as being a higher-kinded [[monocle.Getter]].
  */
 trait FindField[A, K <: Symbol, V]
 {

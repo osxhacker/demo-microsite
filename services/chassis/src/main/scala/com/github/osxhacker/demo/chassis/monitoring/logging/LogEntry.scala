@@ -16,20 +16,21 @@ import com.github.osxhacker.demo.chassis.monitoring.{
  * intended to be emitted effectually.
  */
 sealed abstract class LogEntry (
+	override val message : String,
+	override val cause : Option[Throwable],
 	private val subsystem : Subsystem,
-	private val message : String,
-	private val cause : Option[Throwable],
-	private val context : Map[String, String]
+	private val entries : Map[String, String]
 	)
 	extends Product
 		with Serializable
+		with Loggable
 {
 	/// Class Imports
 	import mouse.option._
 
 
 	/// Instance Properties
-	private lazy val entries = subsystem.addTo (context)
+	override lazy val context = subsystem addTo entries
 
 
 	/**
@@ -47,7 +48,7 @@ sealed abstract class LogEntry (
 		(implicit logger : Logger)
 		: Unit =
 		if (logger.isDebugEnabled)
-			Using (ScopedMDC (entries)) {
+			Using (ScopedMDC (context)) {
 				 emit (_.debug (message), problem => _.debug (message, problem))
 				 }
 
@@ -59,7 +60,7 @@ sealed abstract class LogEntry (
 	final def error ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (entries)) {
+		Using (ScopedMDC (context)) {
 			emit (_.error (message), problem => _.error (message, problem))
 			}
 
@@ -71,7 +72,7 @@ sealed abstract class LogEntry (
 	final def info ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (entries)) {
+		Using (ScopedMDC (context)) {
 			emit (_.info (message), problem => _.info (message, problem))
 			}
 
@@ -83,18 +84,18 @@ sealed abstract class LogEntry (
 	final def warn ()
 		(implicit logger : Logger)
 		: Unit =
-		Using (ScopedMDC (entries)) {
+		Using (ScopedMDC (context)) {
 			emit (_.warn (message), problem => _.warn (message, problem))
 			}
 
 
 	@inline
 	private def emit (
-		withoutError : ScopedMDC => Unit,
-		withError : Throwable => ScopedMDC => Unit
+		withoutCause : ScopedMDC => Unit,
+		withCause : Throwable => ScopedMDC => Unit
 		)
 		: ScopedMDC => Unit =
-		cause.cata (withError, withoutError)
+		cause.cata (withCause, withoutCause)
 }
 
 
@@ -107,16 +108,16 @@ object LogEntry
 	/**
 	 * This version of the apply method creates a
 	 * [[com.github.osxhacker.demo.chassis.monitoring.logging.LogEntry]] with
-	 * the given '''correlationId''', '''message''', and execution
+	 * the given '''correlationId''', '''message''', and an empty execution
 	 * '''context'''.
 	 */
 	def apply (correlationId : CorrelationId, message : String)
 		(implicit subsystem : Subsystem)
 		: LogEntry =
 		WorkflowLogEntry (
-			correlationId,
 			message,
 			none[Throwable],
+			correlationId,
 			Map.empty
 			)
 
@@ -125,8 +126,8 @@ object LogEntry
 	 * This version of the apply method creates a
 	 * [[com.github.osxhacker.demo.chassis.monitoring.logging.LogEntry]] in the
 	 * presence of the '''cause''' of a problem.  The given '''correlationId''',
-	 * '''message''', and execution '''context''' detail information known when
-	 * the problem was encountered.
+	 * '''message''', and an empty execution '''context''' detail information
+	 * known when the problem was encountered.
 	 */
 	def apply (
 		correlationId : CorrelationId,
@@ -136,9 +137,9 @@ object LogEntry
 		(implicit subsystem : Subsystem)
 		: LogEntry =
 		WorkflowLogEntry (
-			correlationId,
 			message,
-			cause.some,
+			Option (cause),
+			correlationId,
 			Map.empty
 			)
 }
@@ -153,16 +154,16 @@ object LogEntry
  * cannot be made.
  */
 final case class SystemLogEntry (
-	private val message : String,
-	private val cause : Option[Throwable],
-	private val context : Map[String, String]
+	override val message : String,
+	override val cause : Option[Throwable],
+	private val entries : Map[String, String]
 	)
 	(implicit private val subsystem : Subsystem)
-	extends LogEntry (subsystem, message, cause, context)
+	extends LogEntry (message, cause, subsystem, entries)
 {
 	override def addContext (additional : Map[String, String])
 		: SystemLogEntry =
-		copy (context = context ++ additional)
+		copy (entries = context ++ additional)
 }
 
 
@@ -176,17 +177,17 @@ final case class SystemLogEntry (
  * [[com.github.osxhacker.demo.chassis.monitoring.logging.LogEntry]] types.
  */
 final case class WorkflowLogEntry (
+	override val message : String,
+	override val cause : Option[Throwable],
 	private val correlationId : CorrelationId,
-	private val message : String,
-	private val cause : Option[Throwable],
-	private val context : Map[String, String]
+	private val entries : Map[String, String]
 	)
 	(implicit private val subsystem : Subsystem)
 	extends LogEntry (
-		subsystem,
 		message,
 		cause,
-		context.updated (
+		subsystem,
+		entries.updated (
 			"correlationId",
 			Show[CorrelationId].show (correlationId)
 			)
@@ -194,6 +195,6 @@ final case class WorkflowLogEntry (
 {
 	override def addContext (additional : Map[String, String])
 		: WorkflowLogEntry =
-		copy (context = context ++ additional)
+		copy (entries = context ++ additional)
 }
 

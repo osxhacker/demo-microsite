@@ -14,13 +14,13 @@ import org.typelevel.log4cats.SelfAwareStructuredLogger
 
 
 /**
- * The '''AbstractChangeReport''' `object` defines the algorithm for
- * producing a report of significant changes relevant to the ''DomainT''
- * entity.  Key to this is what exists in the persistent store ''before'' and
- * ''after'' a persistence operation.  [[cats.data.Ior]] is the ideal
- * representation of this.  ''HavingCreated'', ''HavingDeleted'', and
- * ''HavingModified'' are defined to enhance semantic value beyond the contract
- * established by [[cats.data.Ior]].
+ * The '''AbstractChangeReport''' type defines the algorithm for producing a
+ * report of significant changes relevant to the ''DomainT'' entity.  Key to
+ * this is what exists in the persistent store ''before'' and ''after'' a
+ * persistence operation.  [[cats.data.Ior]] is the ideal representation of
+ * this.  ''HavingCreated'', ''HavingDeleted'', and ''HavingModified'' are
+ * defined to enhance semantic value beyond the contract established by
+ * [[cats.data.Ior]].
  *
  * When there was no ''DomainT'' ''before'' and now there is one ''after'', the
  * ''DomainT'' has been created.  This equates to a [[cats.data.Ior.Right]].
@@ -33,7 +33,7 @@ import org.typelevel.log4cats.SelfAwareStructuredLogger
  * existing ''DomainT'' has been performed.  This equates to a
  * [[cats.data.Ior.Both]].
  */
-abstract class AbstractChangeReport[DomainT, EnvT[F[_]]] ()
+abstract class AbstractChangeReport[DomainT, EnvT[_[_]]] ()
 {
 	/// Class Imports
 	import cats.syntax.all._
@@ -97,6 +97,7 @@ abstract class AbstractChangeReport[DomainT, EnvT[F[_]]] ()
 	final def apply[F[_]] (change : Option[Ior[DomainT, DomainT]])
 		(
 			implicit
+
 			env : EnvT[F],
 			monad : Monad[F]
 		)
@@ -116,12 +117,13 @@ abstract class AbstractChangeReport[DomainT, EnvT[F[_]]] ()
 	final def apply[F[_]] (change : Ior[DomainT, DomainT])
 		(
 			implicit
+
 			env : EnvT[F],
 			monad : Monad[F]
 		)
 		: F[Unit] =
 		change.fold[ReportType[F]] (deleted, created, modified)
-			.written (monad)
+			.written
 			.product (createLogger[F] (env))
 			.flatMap {
 				case (report, log) =>
