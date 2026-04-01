@@ -13,6 +13,6 @@ addSbtPlugin ("com.github.sbt" % "sbt-native-packager" % "1.11.7")
 /// see: https://gatling.io/docs/gatling/reference/current/extensions/sbt_plugin/
 addSbtPlugin ("io.gatling" % "gatling-sbt" % "4.6.0")
 
-/// see: https://github.com/djspiewak/sbt-github-packages
-addSbtPlugin("com.codecommit" % "sbt-github-packages" % "0.5.3")
+/// see: https://github.com/sbt/sbt-github-actions
+addSbtPlugin ("com.github.sbt" % "sbt-github-actions" % "0.25.0")
 

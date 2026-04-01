@@ -2,6 +2,7 @@ import java.time.Instant
 import com.typesafe.sbt.packager.docker._
 import com.github.osxhacker.demo.GenerateSchemaDefinitions
 import com.github.osxhacker.demo.Dependencies._
+import com.github.osxhacker.demo.ConfigureGitHubActions
 
 
 //////////////////////////////
@@ -67,7 +68,7 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.7.1"
+ThisBuild / version := "0.7.2"
 
 /// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
 ThisBuild / versionScheme := Some ("semver-spec")
@@ -88,10 +89,6 @@ ThisBuild / Compile / scalacOptions ++= Seq (
 	"-Ywarn-unused:-imports,_"
 	)
 
-ThisBuild / githubOwner := "osxhacker"
-ThisBuild / githubRepository := "demo-microsite"
-
-
 /// Ensure output is not as choppy
 ThisBuild / Test / logBuffered := false
 
@@ -100,6 +97,31 @@ ThisBuild / shellPrompt := {
 	state =>
 		Project.extract (state).currentRef.project + "> "
 	}
+
+
+//////////////////////////////
+/// GitHub Actions
+//////////////////////////////
+
+ConfigureGitHubActions ()
+
+
+//////////////////////////////
+/// Publishing
+//////////////////////////////
+
+publishTo := Some (
+	"GitHub osxhacker Apache Maven Packages" at
+		"https://maven.pkg.github.com/osxhacker/demo-microsite"
+	).filterNot (_ => isSnapshot.value)
+
+publishMavenStyle := true
+credentials += Credentials(
+	"GitHub Package Registry",
+	"maven.pkg.github.com",
+	"osxhacker",
+	System.getenv ("GITHUB_TOKEN")
+	)
 
 
 //////////////////////////////
@@ -742,8 +764,8 @@ def dockerSettings (
 			case ExecCmd ("ENTRYPOINT", shellScript) =>
 				ExecCmd ("ENTRYPOINT", shellScript :: flags :_*)
 
-			case other =>
-				other
+			case unchanged =>
+				unchanged
 			}
 		)
 
