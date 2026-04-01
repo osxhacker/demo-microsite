@@ -197,7 +197,13 @@ final class IndexedReaderWriterStateErrorTSpec ()
 								)
 
 							_ <- tell ("after error".pure[List])
-							} yield 0
+							_ <- pure[Int, Nothing] (
+								fail ("flatMap did not detect an error state")
+								)
+							} yield {
+								fail ("unexpected invocation of 'map'")
+								Int.MinValue
+								}
 
 						val alternate = for {
 							_ <- tell[Int] (expectedLogEntries (1))
@@ -205,10 +211,10 @@ final class IndexedReaderWriterStateErrorTSpec ()
 							_ <- tell (expectedLogEntries (2))
 							env <- ask
 							_ <- tell (expectedLogEntries (3))
-						} yield env.coefficient * initial
+							} yield env.coefficient * initial
 
 						initial handleErrorWith (_ => alternate)
-				}
+					}
 
 				assert (steps ne null)
 
