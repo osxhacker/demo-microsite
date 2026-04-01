@@ -68,7 +68,7 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.7.2"
+ThisBuild / version := "0.7.3"
 
 /// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
 ThisBuild / versionScheme := Some ("semver-spec")

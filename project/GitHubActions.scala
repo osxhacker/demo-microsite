@@ -24,15 +24,13 @@ object ConfigureGitHubActions
 	private lazy val detectSnapshotVersions = WorkflowStep.Run (
 		name = Some ("Reject attempts to publish snapshots"),
 		commands =
-			"""grep -qi
-			|'^\s*thisbuild\s*/\s*version\s*:=.*snapshot'
-			|build.sbt
+			"""test
+			|"`grep -i '^\s*thisbuild\s*/\s*version\s*:=.*snapshot' build.sbt`"
+			|= "" || {
 			|"""
 			.stripMargin
 			.replaceAll ("\n", " ")
 			.trim ::
-			"" ::
-			"test $? -ne 0 || {" ::
 			"  echo 'Publishing snapshots is not supported' > /dev/stderr" ::
 			"  exit 1" ::
 			"  }" ::
