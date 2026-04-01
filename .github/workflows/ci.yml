@@ -97,9 +97,7 @@ jobs:
 
       - name: Reject attempts to publish snapshots
         run: |
-          grep -qi '^\s*thisbuild\s*/\s*version\s*:=.*snapshot' build.sbt
-
-          test $? -ne 0 || {
+          test "`grep -i '^\s*thisbuild\s*/\s*version\s*:=.*snapshot' build.sbt`" = "" || {
             echo 'Publishing snapshots is not supported' > /dev/stderr
             exit 1
             }
