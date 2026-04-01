@@ -13,10 +13,11 @@ object ConfigureGitHubActions
 		"JAVA_OPTS" -> javaOpts.mkString (" ")
 		)
 
-	private lazy val compileProject = WorkflowStep.Run (
-		name = Some ("Compile project before running tests"),
+	private lazy val compileThenTest = WorkflowStep.Sbt (
+		name = Some ("Build project"),
 		commands =
-			"sbt '++ ${{ matrix.scala }}' compile" ::
+			"compile" ::
+			"test" ::
 			Nil
 		)
 
@@ -62,8 +63,8 @@ object ConfigureGitHubActions
 				RefPredicate.Equals (Ref.Branch ("master")) ::
 				Nil,
 
-			ThisBuild / githubWorkflowBuildPreamble :=
-				compileProject ::
+			ThisBuild / githubWorkflowBuild :=
+				compileThenTest ::
 				Nil,
 
 			ThisBuild / githubWorkflowPublishPreamble :=

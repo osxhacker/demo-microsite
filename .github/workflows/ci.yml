@@ -43,14 +43,11 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Compile project before running tests
-        run: sbt '++ ${{ matrix.scala }}' compile
-
       - name: Check that workflows are up to date
         run: sbt '++ ${{ matrix.scala }}' githubWorkflowCheck
 
       - name: Build project
-        run: sbt '++ ${{ matrix.scala }}' test
+        run: sbt '++ ${{ matrix.scala }}' compile test
 
       - name: Compress target directories
         run: tar cf targets.tar services/inventory/target services/target frontends/site/target services/storage-facility/target frontends/target frontends/company/target gatling/target frontends/storage-facility/target services/company/target target services/purchase-order/target services/chassis/target api/target project/target
