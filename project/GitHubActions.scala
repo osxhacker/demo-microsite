@@ -13,6 +13,13 @@ object ConfigureGitHubActions
 		"JAVA_OPTS" -> javaOpts.mkString (" ")
 		)
 
+	private lazy val compileProject = WorkflowStep.Run (
+		name = Some ("Compile project before running tests"),
+		commands =
+			"sbt '++ ${{ matrix.scala }}' compile" ::
+			Nil
+		)
+
 	private lazy val detectSnapshotVersions = WorkflowStep.Run (
 		name = Some ("Reject attempts to publish snapshots"),
 		commands =
@@ -32,10 +39,12 @@ object ConfigureGitHubActions
 		)
 
 	private lazy val javaOpts =
-		"-Xms1024M" ::
+		"-Xms2048M" ::
 		"-Xmx4096M" ::
 		"-Xss2M" ::
-		"-XX:ReservedCodeCacheSize=128m" ::
+		"-XX:ReservedCodeCacheSize=256m" ::
+		"-XX:+UseG1GC" ::
+		"-server" ::
 		"-Dfile.encoding=UTF-8" ::
 		Nil
 
@@ -51,6 +60,10 @@ object ConfigureGitHubActions
 			ThisBuild / githubWorkflowPublishTargetBranches :=
 				RefPredicate.Equals (Ref.Branch ("main")) ::
 				RefPredicate.Equals (Ref.Branch ("master")) ::
+				Nil,
+
+			ThisBuild / githubWorkflowBuildPreamble :=
+				compileProject ::
 				Nil,
 
 			ThisBuild / githubWorkflowPublishPreamble :=

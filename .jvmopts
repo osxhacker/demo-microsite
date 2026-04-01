@@ -1,7 +1,8 @@
+-Xms2048M
 -Xmx8192M
 -Xss2M
 -XX:InitialCodeCacheSize=16m
--XX:ReservedCodeCacheSize=128m
+-XX:ReservedCodeCacheSize=256m
 -XX:+DoEscapeAnalysis
 -XX:+UseCodeCacheFlushing
 -XX:+UseG1GC
