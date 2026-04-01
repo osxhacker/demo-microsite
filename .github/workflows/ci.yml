@@ -15,6 +15,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  JAVA_OPTS: '-Xms1024M -Xmx4096M -Xss2M -XX:ReservedCodeCacheSize=128m -Dfile.encoding=UTF-8'
 
 jobs:
   build:

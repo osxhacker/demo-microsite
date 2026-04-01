@@ -9,6 +9,10 @@ import sbtghactions.GenerativeKeys._
 object ConfigureGitHubActions
 {
 	/// Instance Properties
+	private lazy val additionalEnv = Map (
+		"JAVA_OPTS" -> javaOpts.mkString (" ")
+		)
+
 	private lazy val detectSnapshotVersions = WorkflowStep.Run (
 		name = Some ("Reject attempts to publish snapshots"),
 		commands =
@@ -27,6 +31,14 @@ object ConfigureGitHubActions
 			Nil
 		)
 
+	private lazy val javaOpts =
+		"-Xms1024M" ::
+		"-Xmx4096M" ::
+		"-Xss2M" ::
+		"-XX:ReservedCodeCacheSize=128m" ::
+		"-Dfile.encoding=UTF-8" ::
+		Nil
+
 
 	/// see: https://github.com/sbt/sbt-github-actions
 	def apply () : Seq[Def.Setting[_]] =
@@ -43,7 +55,9 @@ object ConfigureGitHubActions
 
 			ThisBuild / githubWorkflowPublishPreamble :=
 				detectSnapshotVersions ::
-				Nil
+				Nil,
+
+			ThisBuild / githubWorkflowEnv ++= additionalEnv
 			)
 }
 
