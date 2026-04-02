@@ -68,6 +68,9 @@ jobs:
         scala: [2.13.18]
         java: [temurin@25]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
