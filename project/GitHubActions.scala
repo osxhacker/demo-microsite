@@ -6,9 +6,44 @@ import sbtghactions._
 import sbtghactions.GenerativeKeys._
 
 
+/**
+ * The '''ConfigureGitHubActions''' `object` is defined as an [[sbt.AutoPlugin]]
+ * to ensure [[sbtghactions.GenerativePlugin]] is available and initialized
+ * before augmenting its settings.  This is particularly relevant for having to
+ * add permissions to the "publish" [[sbtghactions.WorkflowJob]].
+ */
 object ConfigureGitHubActions
+	extends AutoPlugin
 {
 	/// Instance Properties
+	override lazy val requires = GenerativePlugin
+	override lazy val trigger = allRequirements
+
+	/// see: https://github.com/sbt/sbt-github-actions
+	override lazy val buildSettings : Seq[Setting[_]] =
+		Seq (
+			/// sbt-github-actions defaults to using JDK 8 for testing and
+			/// publishing.
+			ThisBuild / githubWorkflowJavaVersions := JavaSpec.temurin ("25") ::
+				Nil,
+
+			ThisBuild / githubWorkflowPublishTargetBranches :=
+				RefPredicate.Equals (Ref.Branch ("main")) ::
+				RefPredicate.Equals (Ref.Branch ("master")) ::
+				Nil,
+
+			ThisBuild / githubWorkflowBuild :=
+				compileThenTest ::
+				Nil,
+
+			ThisBuild / githubWorkflowEnv ++= additionalEnv,
+			ThisBuild / githubWorkflowGeneratedCI := addPermissions ().value,
+			ThisBuild / githubWorkflowPublishPreamble :=
+				detectSnapshotVersions ::
+				Nil,
+			)
+
+
 	private lazy val additionalEnv = Map (
 		"JAVA_OPTS" -> javaOpts.mkString (" ")
 		)
@@ -47,29 +82,22 @@ object ConfigureGitHubActions
 		"-Dfile.encoding=UTF-8" ::
 		Nil
 
-
-	/// see: https://github.com/sbt/sbt-github-actions
-	def apply () : Seq[Def.Setting[_]] =
-		Seq (
-			/// sbt-github-actions defaults to using JDK 8 for testing and
-			/// publishing.
-			ThisBuild / githubWorkflowJavaVersions := JavaSpec.temurin ("25") ::
-				Nil,
-
-			ThisBuild / githubWorkflowPublishTargetBranches :=
-				RefPredicate.Equals (Ref.Branch ("main")) ::
-				RefPredicate.Equals (Ref.Branch ("master")) ::
-				Nil,
-
-			ThisBuild / githubWorkflowBuild :=
-				compileThenTest ::
-				Nil,
-
-			ThisBuild / githubWorkflowPublishPreamble :=
-				detectSnapshotVersions ::
-				Nil,
-
-			ThisBuild / githubWorkflowEnv ++= additionalEnv
+	private lazy val publishPermissions = Permissions.Specify (
+		values = Map (
+			PermissionScope.Contents -> PermissionValue.Read,
+			PermissionScope.Packages -> PermissionValue.Write
 			)
+		)
+
+
+	private def addPermissions () = Def.setting {
+		githubWorkflowGeneratedCI.value.map {
+			case publish : WorkflowJob if publish.id == "publish" =>
+				publish.copy (permissions = Some (publishPermissions))
+
+			case unchanged =>
+				unchanged
+			}
+		}
 }
 

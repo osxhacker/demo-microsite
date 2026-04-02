@@ -103,7 +103,7 @@ ThisBuild / shellPrompt := {
 /// GitHub Actions
 //////////////////////////////
 
-ConfigureGitHubActions ()
+enablePlugins (ConfigureGitHubActions)
 
 
 //////////////////////////////
