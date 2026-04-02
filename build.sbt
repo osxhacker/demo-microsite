@@ -68,7 +68,7 @@ addCommandAlias (
 //////////////////////////////
 
 ThisBuild / organization := s"com.github.osxhacker.$systemName"
-ThisBuild / version := "0.7.3"
+ThisBuild / version := "0.7.4"
 
 /// see: https://www.scala-sbt.org/1.x/docs/Publishing.html#Version+scheme
 ThisBuild / versionScheme := Some ("semver-spec")
@@ -110,13 +110,13 @@ ConfigureGitHubActions ()
 /// Publishing
 //////////////////////////////
 
-publishTo := Some (
+ThisBuild / publishTo := Some (
 	"GitHub osxhacker Apache Maven Packages" at
 		"https://maven.pkg.github.com/osxhacker/demo-microsite"
 	).filterNot (_ => isSnapshot.value)
 
-publishMavenStyle := true
-credentials += Credentials(
+ThisBuild / publishMavenStyle := true
+ThisBuild / credentials += Credentials (
 	"GitHub Package Registry",
 	"maven.pkg.github.com",
 	"osxhacker",
