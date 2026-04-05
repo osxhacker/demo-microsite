@@ -22,22 +22,28 @@ object ConfigureGitHubActions
 	/// see: https://github.com/sbt/sbt-github-actions
 	override lazy val buildSettings : Seq[Setting[_]] =
 		Seq (
+			ThisBuild / githubWorkflowBuild :=
+				compileThenTest ::
+				Nil,
+
+			ThisBuild / githubWorkflowBuildPreamble :=
+				detectVersionDuplicates ::
+				Nil,
+
+			ThisBuild / githubWorkflowEnv ++= additionalEnv,
+
 			/// sbt-github-actions defaults to using JDK 8 for testing and
 			/// publishing.
 			ThisBuild / githubWorkflowJavaVersions := JavaSpec.temurin ("25") ::
 				Nil,
+
+			ThisBuild / githubWorkflowGeneratedCI := addPermissions ().value,
 
 			ThisBuild / githubWorkflowPublishTargetBranches :=
 				RefPredicate.Equals (Ref.Branch ("main")) ::
 				RefPredicate.Equals (Ref.Branch ("master")) ::
 				Nil,
 
-			ThisBuild / githubWorkflowBuild :=
-				compileThenTest ::
-				Nil,
-
-			ThisBuild / githubWorkflowEnv ++= additionalEnv,
-			ThisBuild / githubWorkflowGeneratedCI := addPermissions ().value,
 			ThisBuild / githubWorkflowPublishPreamble :=
 				detectSnapshotVersions ::
 				Nil,
@@ -46,6 +52,13 @@ object ConfigureGitHubActions
 
 	private lazy val additionalEnv = Map (
 		"JAVA_OPTS" -> javaOpts.mkString (" ")
+		)
+
+	private lazy val buildPermissions = Permissions.Specify (
+		values = Map (
+			PermissionScope.Contents -> PermissionValue.Read,
+			PermissionScope.Packages -> PermissionValue.Read
+			)
 		)
 
 	private lazy val compileThenTest = WorkflowStep.Sbt (
@@ -72,6 +85,13 @@ object ConfigureGitHubActions
 			Nil
 		)
 
+	private lazy val detectVersionDuplicates = WorkflowStep.Run (
+		name = Some ("Reject attempts to build duplicate versions"),
+		commands =
+			"/bin/sh -e scripts/detect-version-duplicates" ::
+			Nil
+		)
+
 	private lazy val javaOpts =
 		"-Xms2048M" ::
 		"-Xmx4096M" ::
@@ -94,6 +114,9 @@ object ConfigureGitHubActions
 		githubWorkflowGeneratedCI.value.map {
 			case publish : WorkflowJob if publish.id == "publish" =>
 				publish.copy (permissions = Some (publishPermissions))
+
+			case build : WorkflowJob if build.id == "build" =>
+				build.copy (permissions = Some (buildPermissions))
 
 			case unchanged =>
 				unchanged

@@ -26,6 +26,9 @@ jobs:
         scala: [2.13.18]
         java: [temurin@25]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
@@ -42,6 +45,9 @@ jobs:
 
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
+
+      - name: Reject attempts to build duplicate versions
+        run: /bin/sh -e scripts/detect-version-duplicates
 
       - name: Check that workflows are up to date
         run: sbt '++ ${{ matrix.scala }}' githubWorkflowCheck
