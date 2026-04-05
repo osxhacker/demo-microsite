@@ -1,0 +1,83 @@
+#!/bin/sh
+# @(#) Detect when the project version conflicts with published packages
+#
+# This script is designed to be ran both as a Git "pre-commit hook" and within
+# GitHub Actions.  The reason for supporting both is to support a "fail-fast"
+# model when developing while also ensuring CI builds do not allow known
+# conflicts to exist.
+#
+# For a description of the GitHub environment variables used, see:
+#
+# https://docs.github.com/en/actions/reference/workflows-and-actions/variables
+#
+
+curlError() {
+	echo "curl error detected, exiting." > /dev/stderr
+	exit 22
+}
+
+ghapi() {
+	curl -fsL \
+		-H "Accept: application/vnd.github+json" \
+		-H "Authorization: Bearer $GITHUB_TOKEN" \
+		"$@" || kill -s USR1 $$
+}
+
+packages() {
+	ghapi "https://api.github.com/users/osxhacker/packages?package_type=maven" |
+		jq '.[] | select(.repository.name == "demo-microsite") | .url'
+}
+
+unquote() {
+	sed -e 's/"//g'
+}
+
+versions() {
+	while read URL
+	do
+		ghapi "$URL/versions" | jq '.[] | .name'
+	done
+}
+
+
+########################################################################
+# MAIN
+########################################################################
+
+if [[ "${GITHUB_ACTIONS:-false}" = "false" ]]
+then
+	cd $(dirname $0) && cd $(git rev-parse --show-toplevel) || {
+		echo "unable to cd to the project top-level directory" > /dev/stderr
+		exit 1
+		}
+fi
+
+# Detect when curl fails and immediately stop with an observable
+# error code.
+trap 'curlError' USR1
+
+VERSION_LINE=$(grep -ni '^\s*ThisBuild\s*/\s*version\s*:=' build.sbt)
+VERSION=$(echo $VERSION_LINE | sed -e 's/^.*"\([0-9][0-9.]*\)".*/\1/')
+
+packages |
+	unquote |
+	versions |
+	unquote |
+	grep "^$VERSION$" |
+	while read CONFLICT
+	do
+		LINE_NO=$(echo $VERSION_LINE | awk -F: '{ print $1 }')
+		SOURCE=$(echo $VERSION_LINE | sed -e 's/^[^:]*://')
+
+		cat - <<EOT > /dev/stderr
+Version '$CONFLICT' has already been published.  Please increment the
+sbt version defined on line #$LINE_NO:
+
+	$SOURCE
+
+in build.sbt.
+EOT
+
+		exit 2
+	done
+
