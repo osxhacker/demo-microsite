@@ -44,7 +44,7 @@ versions() {
 # MAIN
 ########################################################################
 
-if [[ "${GITHUB_ACTIONS:-false}" = "false" ]]
+if [ "${GITHUB_ACTIONS:-false}" = "false" ]
 then
 	cd $(dirname $0) && cd $(git rev-parse --show-toplevel) || {
 		echo "unable to cd to the project top-level directory" > /dev/stderr
